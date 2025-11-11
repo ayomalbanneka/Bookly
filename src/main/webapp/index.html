@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookly - Modern Bookstore</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+<!-- Header -->
+<header class="sticky-top bg-white shadow-sm">
+    <!-- Top Bar -->
+    <div class="top-bar bg-dark text-white py-2 d-none d-md-block">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start">
+                    <small>Need help? Call us <a href="tel:+947113894655" class="text-white">+94 71 1389
+                        4655</a></small>
+                </div>
+                <div class="col-md-4 text-center border-start border-end border-secondary">
+                    <small>Summer sale discount off 60%! <a href="#" class="text-decoration-underline text-white">Shop
+                        Now</a></small>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <small>2-3 business days delivery & free returns</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 text-primary" href="index.html">BOOKLY</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="shop.html">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown">
+                            Pages
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="about.html">About</a></li>
+                            <li><a class="dropdown-item" href="shop.html">Shop</a></li>
+                            <li><a class="dropdown-item" href="product.html">Single Product</a></li>
+                            <li><a class="dropdown-item" href="cart.html">Cart</a></li>
+                            <li><a class="dropdown-item" href="checkout.html">Checkout</a></li>
+                            <li><a class="dropdown-item" href="blog.html">Blog</a></li>
+                            <li><a class="dropdown-item" href="post.html">Single Post</a></li>
+                            <li><a class="dropdown-item" href="contact.html">Contact</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-link text-dark p-2 me-2" data-bs-toggle="modal"
+                            data-bs-target="#searchModal">
+                        <i class="bi bi-search fs-5"></i>
+                    </button>
+                    <div class="dropdown me-2">
+                        <button class="btn btn-link text-dark p-2 dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                            <i class="bi bi-person fs-5"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end p-3" style="min-width: 300px;">
+                            <li>
+                                <h5 class="dropdown-header">Account</h5>
+                            </li>
+                            <li><a class="dropdown-item" href="sign-in.html">Sign In</a></li>
+                            <li><a class="dropdown-item" href="sign-up.html">Sign Up</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="wishlist.html">Wishlist</a></li>
+                            <li><a class="dropdown-item" href="orders.html">Orders</a></li>
+                        </ul>
+                    </div>
+                    <a href="wishlist.html" class="btn btn-link text-dark p-2 me-2 position-relative">
+                        <i class="bi bi-heart fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">2</span>
+                    </a>
+                    <a href="cart.html" class="btn btn-link text-dark p-2 position-relative">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">2</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero-section bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-2 order-lg-1 py-5">
+                <h1 class="display-4 fw-bold mb-4">Discover Your Next Favorite Book</h1>
+                <p class="lead mb-4">Explore our curated collection of bestsellers, new releases, and timeless classics.
+                    Find your next great read today!</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="shop.html" class="btn btn-primary btn-lg px-4">Shop Now</a>
+                    <a href="#bestsellers" class="btn btn-outline-primary btn-lg px-4">Bestsellers</a>
+                </div>
+            </div>
+            <div class="col-lg-6 order-1 order-lg-2 text-center">
+                <img src="./assets/images/post-img.jpg" alt="Book Collection" class="img-fluid rounded-3 shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center p-4 rounded-3 border h-100">
+                    <div class="feature-icon bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 70px; height: 70px;">
+                        <i class="bi bi-truck text-white fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Free Delivery</h5>
+                    <p class="text-muted">Free shipping on all orders over $50</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center p-4 rounded-3 border h-100">
+                    <div class="feature-icon bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 70px; height: 70px;">
+                        <i class="bi bi-award text-white fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Quality Guarantee</h5>
+                    <p class="text-muted">30-day money-back guarantee</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center p-4 rounded-3 border h-100">
+                    <div class="feature-icon bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 70px; height: 70px;">
+                        <i class="bi bi-tag text-white fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Daily Offers</h5>
+                    <p class="text-muted">Special discounts every day</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card text-center p-4 rounded-3 border h-100">
+                    <div class="feature-icon bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 70px; height: 70px;">
+                        <i class="bi bi-shield-check text-white fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Secure Payment</h5>
+                    <p class="text-muted">All transactions are secure</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bestsellers Section -->
+<section id="bestsellers" class="bestsellers-section py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title text-center mb-4">Best Selling Books</h2>
+                <p class="text-center text-muted mb-0">Discover our most popular titles loved by readers worldwide</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Product 1 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="product-card card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./assets/images/product-item1.png" class="card-img-top" alt="Book Title">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-3">10% OFF</span>
+                        <div class="card-actions position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-heart"></i></button>
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">House of Sky Breath</h5>
+                        <p class="card-text text-muted small">Lauren Asher</p>
+                        <div class="rating mb-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star text-warning"></i>
+                            <span class="text-muted small ms-1">(4.0)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">$24.99</span>
+                            <span class="text-muted text-decoration-line-through small">$27.99</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <button class="btn btn-primary w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="product-card card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./assets/images/product-item2.png" class="card-img-top" alt="Book Title">
+                        <div class="card-actions position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-heart"></i></button>
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Heartland Stars</h5>
+                        <p class="card-text text-muted small">Lauren Asher</p>
+                        <div class="rating mb-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <span class="text-muted small ms-1">(5.0)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">$19.99</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <button class="btn btn-primary w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="product-card card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./assets/images/product-item3.png" class="card-img-top" alt="Book Title">
+                        <div class="card-actions position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-heart"></i></button>
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Heavenly Bodies</h5>
+                        <p class="card-text text-muted small">Lauren Asher</p>
+                        <div class="rating mb-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-half text-warning"></i>
+                            <span class="text-muted small ms-1">(4.5)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">$22.99</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <button class="btn btn-primary w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="product-card card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./assets/images/product-item4.png" class="card-img-top" alt="Book Title">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3">SALE</span>
+                        <div class="card-actions position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-heart"></i></button>
+                            <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">His Saving Grace</h5>
+                        <p class="card-text text-muted small">Lauren Asher</p>
+                        <div class="rating mb-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star text-warning"></i>
+                            <span class="text-muted small ms-1">(4.0)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">$17.99</span>
+                            <span class="text-muted text-decoration-line-through small">$24.99</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <button class="btn btn-primary w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="shop.html" class="btn btn-outline-primary btn-lg">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section py-5 bg-white">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title text-center mb-4">Browse Categories</h2>
+                <p class="text-center text-muted mb-0">Explore books by genre and find your next favorite read</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="category-card position-relative rounded-3 overflow-hidden">
+                    <img src="./assets/images/category1.jpg" class="img-fluid" alt="Romance">
+                    <div class="category-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-4">
+                        <h3 class="text-white fw-bold">Romance</h3>
+                    </div>
+                    <a href="shop.html" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card position-relative rounded-3 overflow-hidden">
+                    <img src="./assets/images/category2.jpg" class="img-fluid" alt="Lifestyle">
+                    <div class="category-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-4">
+                        <h3 class="text-white fw-bold">Lifestyle</h3>
+                    </div>
+                    <a href="shop.html" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card position-relative rounded-3 overflow-hidden">
+                    <img src="./assets/images/category3.jpg" class="img-fluid" alt="Recipe">
+                    <div class="category-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-4">
+                        <h3 class="text-white fw-bold">Recipe</h3>
+                    </div>
+                    <a href="shop.html" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="section-title text-center mb-4">What Our Readers Say</h2>
+                <p class="text-center text-muted mb-0">Discover why readers love shopping with Bookly</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="rating mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="card-text mb-4">"I stumbled upon this bookstore while visiting the city, and it
+                            instantly became my favorite spot. The cozy atmosphere, friendly staff, and wide selection
+                            of books make every visit a delight!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <img src="https://via.placeholder.com/60x60" alt="Emma Chamberlin"
+                                     class="rounded-circle">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0 fw-bold">Emma Chamberlin</h6>
+                                <small class="text-muted">Regular Customer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="rating mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="card-text mb-4">"As an avid reader, I'm always on the lookout for new releases, and
+                            this bookstore never disappoints. They always have the latest titles, and their
+                            recommendations have introduced me to some incredible reads!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <img src="https://via.placeholder.com/60x60" alt="Thomas John" class="rounded-circle">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0 fw-bold">Thomas John</h6>
+                                <small class="text-muted">Book Enthusiast</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="rating mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-half text-warning"></i>
+                        </div>
+                        <p class="card-text mb-4">"I ordered a few books online from this store, and I was impressed by
+                            the quick delivery and careful packaging. It's clear that they prioritize customer
+                            satisfaction, and I'll definitely be shopping here again!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <img src="https://via.placeholder.com/60x60" alt="Kevin Bryan" class="rounded-circle">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0 fw-bold">Kevin Bryan</h6>
+                                <small class="text-muted">Online Shopper</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section -->
+<section class="blog-section py-5 bg-white">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <h2 class="section-title mb-0">Latest from Our Blog</h2>
+                <a href="blog.html" class="btn btn-outline-primary">View All Posts</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card card border-0 shadow-sm h-100">
+                    <img src="./assets/images/post-item1.jpg" class="card-img-top" alt="Blog Post">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Books</span>
+                        <h5 class="card-title">10 Must-Read Books of the Year</h5>
+                        <p class="card-text text-muted">Dive into the world of cutting-edge technology with our latest
+                            blog post...</p>
+                        <a href="post.html" class="btn btn-link text-primary p-0 text-decoration-none">Read More <i
+                                class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card card border-0 shadow-sm h-100">
+                    <img src="./assets/images/post-item2.jpg" class="card-img-top" alt="Blog Post">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Books</span>
+                        <h5 class="card-title">The Fascinating Realm of Science Fiction</h5>
+                        <p class="card-text text-muted">Explore the intersection of technology and sustainability in our
+                            latest blog post...</p>
+                        <a href="post.html" class="btn btn-link text-primary p-0 text-decoration-none">Read More <i
+                                class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card card border-0 shadow-sm h-100">
+                    <img src="./assets/images/post-item3.jpg" class="card-img-top" alt="Blog Post">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Books</span>
+                        <h5 class="card-title">Finding Love in the Pages of a Book</h5>
+                        <p class="card-text text-muted">Stay ahead of the curve with our insightful look into the
+                            rapidly evolving landscape...</p>
+                        <a href="post.html" class="btn btn-link text-primary p-0 text-decoration-none">Read More <i
+                                class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="blog-card card border-0 shadow-sm h-100">
+                    <img src="./assets/images/post-item4.jpg" class="card-img-top" alt="Blog Post">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Books</span>
+                        <h5 class="card-title">Reading for Mental Health</h5>
+                        <p class="card-text text-muted">In today's remote work environment, productivity is key.
+                            Discover the top apps and tools...</p>
+                        <a href="post.html" class="btn btn-link text-primary p-0 text-decoration-none">Read More <i
+                                class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <h2 class="mb-3">Stay Updated</h2>
+                <p class="mb-4">Subscribe to our newsletter for the latest book releases, exclusive deals, and reading
+                    recommendations.</p>
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control form-control-lg" placeholder="Your email address">
+                    <button type="submit" class="btn btn-light btn-lg px-4">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer bg-dark text-white py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h4 class="fw-bold mb-3">BOOKLY</h4>
+                <p class="mb-4">Your trusted source for quality books. We offer a wide selection of titles across all
+                    genres with fast shipping and excellent customer service.</p>
+                <div class="social-links d-flex gap-3">
+                    <a href="#" class="text-white"><i class="bi bi-facebook fs-5"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-twitter fs-5"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram fs-5"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="fw-bold mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="index.html" class="text-white text-decoration-none">Home</a></li>
+                    <li class="mb-2"><a href="about.html" class="text-white text-decoration-none">About</a></li>
+                    <li class="mb-2"><a href="shop.html" class="text-white text-decoration-none">Shop</a></li>
+                    <li class="mb-2"><a href="blog.html" class="text-white text-decoration-none">Blog</a></li>
+                    <li class="mb-2"><a href="contact.html" class="text-white text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-3">Help & Info</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">Track Your Order</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">Returns Policies</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">Shipping + Delivery</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">Contact Us</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">FAQs</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3">
+                <h5 class="fw-bold mb-3">Contact Us</h5>
+                <p class="mb-2">Do you have any queries or suggestions?</p>
+                <p class="mb-3"><a href="mailto:info@bookly.com" class="text-white text-decoration-underline">info@bookly.com</a>
+                </p>
+                <p class="mb-2">If you need support? Just give us a call.</p>
+                <p><a href="tel:+5511122233344" class="text-white text-decoration-underline">+55 111 222 333 44</a></p>
+            </div>
+        </div>
+
+        <hr class="my-5 border-secondary">
+
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex flex-wrap align-items-center gap-4">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">We ship with:</span>
+                        <div class="d-flex gap-2">
+                            <img src="https://via.placeholder.com/40x25" alt="DHL" class="img-fluid">
+                            <img src="https://via.placeholder.com/40x25" alt="Shipping" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Payment options:</span>
+                        <div class="d-flex gap-2">
+                            <img src="https://via.placeholder.com/40x25" alt="Visa" class="img-fluid">
+                            <img src="https://via.placeholder.com/40x25" alt="Mastercard" class="img-fluid">
+                            <img src="https://via.placeholder.com/40x25" alt="PayPal" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <p class="mb-0">&copy; 2023 Bookly. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Search Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Search Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-lg" placeholder="Search for books...">
+                        <button class="btn btn-primary btn-lg" type="submit">Search</button>
+                    </div>
+                </form>
+                <div class="mt-4">
+                    <h6 class="mb-3">Browse Categories</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Romance</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Thriller</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Sci-fi</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Cooking</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Health</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Lifestyle</a>
+                        <a href="#" class="badge bg-light text-dark text-decoration-none p-2">Fiction</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="./assets/js/script.js"></script>
+</body>
+</html>
