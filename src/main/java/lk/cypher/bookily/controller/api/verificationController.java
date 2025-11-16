@@ -1,18 +1,21 @@
 package lk.cypher.bookily.controller.api;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
+import com.google.gson.Gson;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lk.cypher.bookily.dto.UserDTO;
+import lk.cypher.bookily.services.UserServices;
 
 @Path("/verify-accounts")
 public class verificationController {
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verifyUserAccount(@QueryParam("verificationCode") String code) {
-        System.out.println(code);
-        return Response.ok().build();
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response verifyUserAccount(String jsonData) {
+        Gson gson = new Gson();
+        UserDTO userDTO = gson.fromJson(jsonData, UserDTO.class);
+        String responseJson = new UserServices().verifyAccount(userDTO);
+        return Response.ok().entity(responseJson).build();
     }
 }

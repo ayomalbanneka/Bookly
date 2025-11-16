@@ -37,9 +37,9 @@ public class UserServices {
             message = "Email cannot be empty or blank";
         } else if (userDTO.getPassword() == null) {
             message = "Password is required!";
-        } else if (userDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
+        } else if (!userDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
             message = "Please provide valid email address.";
-        } else if (userDTO.getPassword().matches(Validator.PASSWORD_VALIDATION)) {
+        } else if (!userDTO.getPassword().matches(Validator.PASSWORD_VALIDATION)) {
             message = "Please provide valid password. \n" +
                     "The password must containes at least one capita letter, one simple letter," +
                     "one digit, one special character and password must be greater than 8 characters";
@@ -101,9 +101,9 @@ public class UserServices {
             message = "Email is required!";
         } else if (userDTO.getPassword() == null || userDTO.getPassword().isBlank()) {
             message = "Password is required!";
-        } else if (userDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
+        } else if (!userDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
             message = "Please provide valid email address.";
-        } else if (userDTO.getPassword().matches(Validator.PASSWORD_VALIDATION)) {
+        } else if (!userDTO.getPassword().matches(Validator.PASSWORD_VALIDATION)) {
             message = "Please provide valid password. \n" +
                     "The password must containes at least one capita letter, one simple letter," +
                     "one digit, one special character and password must be greater than 8 characters";
@@ -137,5 +137,60 @@ public class UserServices {
         responseObject.addProperty("status", status);
         responseObject.addProperty("message", message);
         return responseObject.toString();
+    }
+
+    public String verifyAccount(UserDTO userDTO) {
+        JsonObject responseObject = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        // Validation Checks
+        if (userDTO.getVerificationCode() == null) {
+            message = "Verification code is required!";
+        } else if (userDTO.getEmail() == null) {
+            message = "Email is required";
+        } else if (userDTO.getEmail().isBlank()) {
+            message = "Email cannot be empty or blank";
+        } else if (!userDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
+            message = "Please provide valid email address.";
+        } else if (userDTO.getVerificationCode().isBlank()) {
+            message = "Verification code cannot be empty or blank";
+        } else if (!userDTO.getVerificationCode().matches(Validator.VERIFICATION_CODE_VALIDATION)) {
+            message = "Please provide valid verification code. Verification code must be 6 digits.";
+        } else {
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+            User user = hibernateSession.createQuery("FROM User u WHERE u.email=:email AND u.verificationCode=:code", User.class)
+                    .setParameter("email", userDTO.getEmail())
+                    .setParameter("code", userDTO.getVerificationCode())
+                    .getSingleResultOrNull(); // Check user by email and verification code
+            if (user == null) {
+                message = "Account not fount. Please register first.";
+            } else {
+                Status verifiedStatus = hibernateSession.createNamedQuery("Status.findByValue", Status.class)
+                        .setParameter("value", String.valueOf(Status.Type.VERIFIED))
+                        .getSingleResult();
+
+                if (user.getStatus().equals(verifiedStatus)) {
+                    message = "Account is already verified. Please login to continue.";
+                } else {
+                    user.setStatus(verifiedStatus);
+                    user.setVerificationCode(""); // Clear verification code after successful verification
+                    Transaction transaction = hibernateSession.beginTransaction();
+                    try {
+                        hibernateSession.merge(user);
+                        transaction.commit();
+                        status = true;
+                        message = "Account verified successfully. You can now login to your account.";
+                    } catch (Exception e) {
+                        transaction.rollback();
+                        message = "Failed to verify account. Please try again.";
+                    }
+                }
+            }
+            hibernateSession.close();
+        }
+        responseObject.addProperty("status", status);
+        responseObject.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObject);
     }
 }
