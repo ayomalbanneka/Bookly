@@ -59,7 +59,7 @@ async function createAccount() {
     }
 
     try {
-        const response = await fetch("api/users/login", {
+        const response = await fetch("api/users/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -87,7 +87,7 @@ async function createAccount() {
                 })
 
                 setTimeout(() => {
-                    window.location = "verify-account.html?uId=" + data.uId;
+                    window.location.href = `verify-account.html?email=${encodeURIComponent(email)}`;
                 }, 3000)
             } else {
                 new Notify({
@@ -144,7 +144,7 @@ async function createAccount() {
     }
 }
 
-async function loginAccount(){
+async function loginAccount() {
     Notiflix.Loading.dots("Loading...", {
         clickToClose: true,
         svgColor: "#000cf5"
@@ -244,7 +244,7 @@ async function loginAccount(){
     }
 }
 
-async function verifyAccount(){
+async function verifyAccount() {
     Notiflix.Loading.dots("Loading...", {
         clickToClose: true,
         svgColor: "#000cf5"

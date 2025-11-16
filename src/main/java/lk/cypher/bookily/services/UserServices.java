@@ -8,6 +8,8 @@ import jakarta.ws.rs.core.Context;
 import lk.cypher.bookily.dto.UserDTO;
 import lk.cypher.bookily.entity.Status;
 import lk.cypher.bookily.entity.User;
+import lk.cypher.bookily.mail.VerificationMail;
+import lk.cypher.bookily.provider.MailServiceProvider;
 import lk.cypher.bookily.util.AppUtil;
 import lk.cypher.bookily.util.HibernateUtil;
 import lk.cypher.bookily.validation.Validator;
@@ -20,7 +22,7 @@ public class UserServices {
     public String addNewUser(UserDTO userDTO) {
         JsonObject responseObject = new JsonObject();
         boolean status = false;
-        String message = "";
+        String message;
         if (userDTO.getFirstName() == null) {
             message = "First Name is Required";
         } else if (userDTO.getFirstName().isBlank()) {
@@ -42,10 +44,10 @@ public class UserServices {
                     "The password must containes at least one capita letter, one simple letter," +
                     "one digit, one special character and password must be greater than 8 characters";
         } else {
-            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession(); // Open Hibernate session
             User singleUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
                     .setParameter("email", userDTO.getEmail())
-                    .getSingleResultOrNull();
+                    .getSingleResultOrNull(); // Check if email already registered
 
             if (singleUser != null) { // Already email registered
                 message = "This email is already registered. Please use another email.";
@@ -56,11 +58,11 @@ public class UserServices {
                 u.setEmail(userDTO.getEmail());
                 u.setPassword(userDTO.getPassword());
 
-                String verificationCode = AppUtil.generateCode();
-                u.setVerificationCode(verificationCode);
+                String verificationCode = AppUtil.generateCode(); // Generate verification code
+                u.setVerificationCode(verificationCode); // Set verification code to user
 
                 Status pendingStatus = hibernateSession.createNamedQuery("Status.findByValue", Status.class)
-                        .setParameter("value", String.valueOf(Status.Type.PENDING)).getSingleResult();
+                        .setParameter("value", String.valueOf(Status.Type.PENDING)).getSingleResult(); // Get pending status
 
                 u.setStatus(pendingStatus);
 
@@ -75,7 +77,8 @@ public class UserServices {
                     message = "Account created successfully. Please check your email for verification code.";
 
                     // Verification Mail Sending Algorithm
-
+                    VerificationMail verificationMail = new VerificationMail(u.getEmail(), verificationCode);
+                    MailServiceProvider.getInstance().sendMail(verificationMail);
 
                 } catch (Exception e) {
                     transaction.rollback();
