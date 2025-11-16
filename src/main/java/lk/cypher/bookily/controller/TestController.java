@@ -1,6 +1,4 @@
 package lk.cypher.bookily.controller;
 
-
-class GmailEmailTest {
-
+public class TestController {
 }

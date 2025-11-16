@@ -244,16 +244,34 @@ async function loginAccount() {
     }
 }
 
+let params = new URLSearchParams(window.location.search)
+
+const inputVCode = document.getElementById("verificationCode");
+inputVCode.value = params.get("verificationCode");
+const userEmail = params.get("email");
+
 async function verifyAccount() {
     Notiflix.Loading.dots("Loading...", {
-        clickToClose: true,
+        clickToClose: false,
         svgColor: "#000cf5"
     });
 
-    const verificationCode = document.getElementById("verificationCode").value;
+    const verifyObj = {
+        verificationCode: inputVCode.value,
+        email: userEmail
+    }
+
+    console.log("Email sent to API:", userEmail);
+    console.log("Verification Code sent to API:", inputVCode.value);
 
     try {
-        const response = await fetch("api/verify-accounts?verificationCode=" + verificationCode);
+        const response = await fetch("api/verify-accounts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(verifyObj)
+        });
 
         if (response.ok) {
             const data = await response.json();
