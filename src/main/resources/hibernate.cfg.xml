@@ -12,17 +12,17 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>
 
-        <mapping class="lk.cypher.bookily.entity.Address"/>
-        <mapping class="lk.cypher.bookily.entity.Order"/>
-        <mapping class="lk.cypher.bookily.entity.User"/>
-        <mapping class="lk.cypher.bookily.entity.Cart"/>
-        <mapping class="lk.cypher.bookily.entity.City"/>
-        <mapping class="lk.cypher.bookily.entity.Address"/>
-        <mapping class="lk.cypher.bookily.entity.DeliveryType"/>
-        <mapping class="lk.cypher.bookily.entity.Discount"/>
-        <mapping class="lk.cypher.bookily.entity.OrderItem"/>
-        <mapping class="lk.cypher.bookily.entity.Product"/>
-        <mapping class="lk.cypher.bookily.entity.Status"/>
-        <mapping class="lk.cypher.bookily.entity.Stock"/>
+        <mapping class="lk.cypher.bookliy.entity.Address"/>
+        <mapping class="lk.cypher.bookliy.entity.Order"/>
+        <mapping class="lk.cypher.bookliy.entity.User"/>
+        <mapping class="lk.cypher.bookliy.entity.Cart"/>
+        <mapping class="lk.cypher.bookliy.entity.City"/>
+        <mapping class="lk.cypher.bookliy.entity.Address"/>
+        <mapping class="lk.cypher.bookliy.entity.DeliveryType"/>
+        <mapping class="lk.cypher.bookliy.entity.Discount"/>
+        <mapping class="lk.cypher.bookliy.entity.OrderItem"/>
+        <mapping class="lk.cypher.bookliy.entity.Product"/>
+        <mapping class="lk.cypher.bookliy.entity.Status"/>
+        <mapping class="lk.cypher.bookliy.entity.Stock"/>
     </session-factory>
 </hibernate-configuration>
