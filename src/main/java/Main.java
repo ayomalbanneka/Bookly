@@ -1,11 +1,9 @@
-import lk.cypher.bookily.config.AppConfig;
-import lk.cypher.bookily.listener.ContextPathListener;
-import lk.cypher.bookily.util.HibernateUtil;
+import lk.cypher.bookliy.config.AppConfig;
+import lk.cypher.bookliy.listener.ContextPathListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.hibernate.Session;
 
 import java.io.File;
 
@@ -14,7 +12,6 @@ public class Main {
     private static final String CONTEXT_PATH = "/bookliy";
 
     public static void main(String[] args) {
-//        Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             Tomcat tomcat = new Tomcat();
             tomcat.setPort(PORT);

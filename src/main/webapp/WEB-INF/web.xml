@@ -4,9 +4,23 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
+<!--        <servlet>-->
+<!--            <servlet-name>JerseyContainer</servlet-name>-->
+<!--            <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>-->
+<!--            <init-param>-->
+<!--                <param-name>jakarta.ws.rs.Application</param-name>-->
+<!--                <param-value>lk.cypher.bookliy.config.AppConfig</param-value>-->
+<!--            </init-param>-->
+<!--            <load-on-startup>1</load-on-startup>-->
+<!--        </servlet>-->
+<!--        <servlet-mapping>-->
+<!--            <servlet-name>JerseyContainer</servlet-name>-->
+<!--            <url-pattern>/*</url-pattern>-->
+<!--        </servlet-mapping>-->
+
     <filter>
         <filter-name>AuthAccessFilter</filter-name>
-        <filter-class>lk.cypher.bookily.middleware.AuthAccessFilter</filter-class>
+        <filter-class>lk.cypher.bookliy.middleware.AuthAccessFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AuthAccessFilter</filter-name>
@@ -23,7 +37,7 @@
 
     <filter>
         <filter-name>AccessControllFilter</filter-name>
-        <filter-class>lk.cypher.bookily.middleware.AccessControllFilter</filter-class>
+        <filter-class>lk.cypher.bookliy.middleware.AccessControllFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AccessControllFilter</filter-name>
