@@ -1,22 +1,10 @@
-// Password visibility toggle
 const toggleButtons = document.querySelectorAll('.toggle-password');
 
-toggleButtons.forEach(button => {
-    button.addEventListener('click', function () {
-        const passwordInput = this.parentElement.querySelector('input');
-        const icon = this.querySelector('i');
+let params = new URLSearchParams(window.location.search)
 
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    });
-});
+const inputVCode = document.getElementById("verificationCode");
+inputVCode.value = params.get("verificationCode");
+const userEmail = params.get("email");
 
 async function createAccount() {
     Notiflix.Loading.dots("Loading...", {
@@ -29,6 +17,27 @@ async function createAccount() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const termsAccepted = document.getElementById("terms").checked;
+
+    if (!termsAccepted) {
+        new Notify({
+            status: 'error',
+            title: 'Terms Not Accepted',
+            text: 'You must accept the terms and conditions to proceed.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
+        Notiflix.Loading.remove(1000);
+        return;
+    }
 
     if (password !== confirmPassword) {
         new Notify({
@@ -243,12 +252,6 @@ async function loginAccount() {
         Notiflix.Loading.remove(1000);
     }
 }
-
-let params = new URLSearchParams(window.location.search)
-
-const inputVCode = document.getElementById("verificationCode");
-inputVCode.value = params.get("verificationCode");
-const userEmail = params.get("email");
 
 async function verifyAccount() {
     Notiflix.Loading.dots("Loading...", {
