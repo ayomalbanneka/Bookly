@@ -41,7 +41,7 @@ public class MailSender {
             // Send the email
             Transport.send(message);
 
-            System.out.println("✅ Email sent successfully!");
+            System.out.println("Email sent successfully!");
         } catch (MessagingException e) {
             e.printStackTrace();
         }
