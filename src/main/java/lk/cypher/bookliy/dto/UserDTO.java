@@ -1,12 +1,24 @@
 package lk.cypher.bookliy.dto;
 
-public class UserDTO {
+import java.io.Serializable;
+
+public class UserDTO implements Serializable {
     private int id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String verificationCode;
+    private String lineOne;
+    private String lineTwo;
+    private String postalCode;
+    private boolean isPrimary;
+    private int cityId;
+    private String mobile;
+    private String cityName;
+    private String sinceAt;
+    private String newPassword;
+    private String confirmPassword;
 
     public UserDTO(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -25,6 +37,86 @@ public class UserDTO {
     }
 
     public UserDTO() {
+    }
+
+    public String getLineOne() {
+        return lineOne;
+    }
+
+    public void setLineOne(String lineOne) {
+        this.lineOne = lineOne;
+    }
+
+    public String getLineTwo() {
+        return lineTwo;
+    }
+
+    public void setLineTwo(String lineTwo) {
+        this.lineTwo = lineTwo;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public boolean isPrimary() {
+        return isPrimary;
+    }
+
+    public void setPrimary(boolean primary) {
+        isPrimary = primary;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getSinceAt() {
+        return sinceAt;
+    }
+
+    public void setSinceAt(String sinceAt) {
+        this.sinceAt = sinceAt;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
     public int getId() {
