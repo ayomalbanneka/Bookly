@@ -12,7 +12,7 @@ import java.util.Set;
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "first_name", nullable = false, length = 45)
     private String firstName;
@@ -48,11 +48,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private Set<Cart> carts = new HashSet<>();
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

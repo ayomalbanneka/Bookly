@@ -28,6 +28,17 @@ public class Address {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "is_primary", nullable = false)
+    private boolean isPrimary = true;
+
+    public boolean isPrimary() {
+        return isPrimary;
+    }
+
+    public void setPrimary(boolean primary) {
+        isPrimary = primary;
+    }
+
     public int getId() {
         return id;
     }
