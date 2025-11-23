@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.core.Context;
 import lk.cypher.bookliy.dto.UserDTO;
 import lk.cypher.bookliy.entity.Address;
+import lk.cypher.bookliy.entity.City;
 import lk.cypher.bookliy.entity.User;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
@@ -145,6 +146,121 @@ public class ProfileServices {
                 hibernateSession.close();
             }
         }
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String addNewAddress(String jsonData, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+        Session hibernateSession = null;
+        Transaction transaction = null;
+
+        try {
+            // Parse JSON data
+            JsonObject addressJson = AppUtil.gson.fromJson(jsonData, JsonObject.class);
+
+            String line1 = addressJson.has("line1") ? addressJson.get("line1").getAsString() : null;
+            String line2 = addressJson.has("line2") ? addressJson.get("line2").getAsString() : null;
+            int cityId = addressJson.has("cityId") ? addressJson.get("cityId").getAsInt() : 0;
+            String postalCode = addressJson.has("postalCode") ? addressJson.get("postalCode").getAsString() : null;
+            String mobile = addressJson.has("mobile") ? addressJson.get("mobile").getAsString() : null;
+            boolean isDefault = addressJson.has("isDefault") && addressJson.get("isDefault").getAsBoolean();
+
+            // Validation
+            if (line1 == null || line1.trim().isEmpty()) {
+                message = "Address Line 1 is required.";
+            } else if (line2 == null || line2.trim().isEmpty()) {
+                message = "Address Line 2 is required.";
+            } else if (cityId <= 0) {
+                message = "Please select a city.";
+            } else if (postalCode == null || postalCode.trim().isEmpty()) {
+                message = "Postal code is required.";
+            } else if (mobile == null || mobile.trim().isEmpty()) {
+                message = "Mobile number is required.";
+            } else if (!mobile.matches("^[0-9]{10}$")) {
+                message = "Please provide a valid 10-digit mobile number.";
+            } else {
+                hibernateSession = HibernateUtil.getSessionFactory().openSession();
+
+                // Get logged in user from session
+                HttpSession httpSession = request.getSession(false);
+                if (httpSession == null) {
+                    message = "Session expired. Please login again.";
+                    responseObj.addProperty("status", status);
+                    responseObj.addProperty("message", message);
+                    return AppUtil.gson.toJson(responseObj);
+                }
+
+                User sessionUser = (User) httpSession.getAttribute("user");
+                if (sessionUser == null) {
+                    message = "User not found in session. Please login again.";
+                    responseObj.addProperty("status", status);
+                    responseObj.addProperty("message", message);
+                    return AppUtil.gson.toJson(responseObj);
+                }
+
+                // Get user from database
+                User dbUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
+                        .setParameter("email", sessionUser.getEmail())
+                        .uniqueResult();
+
+                if (dbUser == null) {
+                    message = "User not found in database.";
+                    responseObj.addProperty("status", status);
+                    responseObj.addProperty("message", message);
+                    return AppUtil.gson.toJson(responseObj);
+                }
+
+                // Get city from database
+                City city = hibernateSession.find(City.class, cityId);
+                if (city == null) {
+                    message = "Invalid city selected.";
+                    responseObj.addProperty("status", status);
+                    responseObj.addProperty("message", message);
+                    return AppUtil.gson.toJson(responseObj);
+                }
+
+                transaction = hibernateSession.beginTransaction();
+
+                // If this is set as default, unset other default addresses
+                if (isDefault) {
+                    hibernateSession.createQuery(
+                                    "UPDATE Address SET isPrimary = false WHERE user.id = :userId")
+                            .setParameter("userId", dbUser.getId())
+                            .executeUpdate();
+                }
+
+                // Create new address
+                Address address = new Address();
+                address.setLine1(line1.trim());
+                address.setLine2(line2.trim());
+                address.setCity(city);
+                address.setPostalCode(postalCode.trim());
+                address.setMobile(mobile.trim());
+                address.setPrimary(isDefault);
+                address.setUser(dbUser);
+
+                hibernateSession.persist(address);
+                transaction.commit();
+
+                status = true;
+                message = "New address added successfully.";
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            message = "Failed to add new address: " + e.getMessage();
+        } finally {
+            if (hibernateSession != null) {
+                hibernateSession.close();
+            }
+        }
+
         responseObj.addProperty("status", status);
         responseObj.addProperty("message", message);
         return AppUtil.gson.toJson(responseObj);
