@@ -77,6 +77,7 @@ class headerContent extends HTMLElement {
                             <li>
                                 <h5 class="dropdown-header">Account</h5>
                             </li>
+                            <li><a class="dropdown-item" href="my-account.html">My Account</a></li>
                             <li><a class="dropdown-item" href="sign-in.html">Sign In</a></li>
                             <li><a class="dropdown-item" href="sign-up.html">Sign Up</a></li>
                             <li>
