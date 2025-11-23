@@ -4,9 +4,12 @@ window.addEventListener('load', async () => {
         svgColor: "#000cf5"
     });
     try {
-        console.log("Loading user data...");
         await loadUserData();
-        console.log("User data loaded.");
+
+        const addAddressForm = document.getElementById('addAddressForm');
+        if (addAddressForm) {
+            addAddressForm.addEventListener('submit', addNewAddress);
+        }
     } catch (e) {
         Notiflix.Notify.failure(e.message, {
             position: 'right top',
@@ -316,4 +319,226 @@ function renderAddresses(addresses, userName) {
 
         addressList.innerHTML += cardHTML;
     });
+}
+
+async function addNewAddress(event) {
+    event.preventDefault();
+
+    const line1 = document.getElementById('addressLine1').value.trim();
+    const line2 = document.getElementById('addressLine2').value.trim();
+    const districtId = document.getElementById('districtSelect').value;
+    const cityId = document.getElementById('citySelect').value;
+    const postalCode = document.getElementById('postalCode').value.trim();
+    const mobile = document.getElementById('mobileNumber').value.trim();
+    const isDefault = document.getElementById('setAsDefault').checked;
+
+    // Frontend validation
+    if (!line1) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Address Line 1 is required',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    if (!line2) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Address Line 2 is required',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    if (districtId === "0" || !districtId) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Please select a district',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    if (cityId === "0" || !cityId) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Please select a city',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    if (!postalCode) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Postal code is required',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    if (!mobile) {
+        new Notify({
+            status: 'warning',
+            title: 'Validation Error',
+            text: 'Mobile number is required',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+        return;
+    }
+
+    // Prepare data - send cityId as integer
+    const addressData = {
+        line1: line1,
+        line2: line2,
+        cityId: parseInt(cityId),
+        postalCode: postalCode,
+        mobile: mobile,
+        isDefault: isDefault
+    };
+
+    console.log("Sending address data:", addressData);
+
+    try {
+        Notiflix.Loading.dots("Adding new address...", {
+            clickToClose: false,
+            svgColor: "#000cf5"
+        });
+
+        const response = await fetch('api/profiles/new-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(addressData)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Response:", data);
+
+            if (data.status) {
+                new Notify({
+                    status: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top',
+                });
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addAddressModal'));
+                modal.hide();
+
+                // Reset form
+                document.getElementById('addAddressForm').reset();
+
+                // Reload page after short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+
+            } else {
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top',
+                });
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to add address. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                type: 'outline',
+                position: 'right top',
+            });
+        }
+    } catch (e) {
+        console.error("Error adding address:", e);
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+    } finally {
+        Notiflix.Loading.remove();
+    }
 }
