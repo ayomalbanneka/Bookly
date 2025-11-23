@@ -1,7 +1,7 @@
 window.addEventListener('load', async () => {
     Notiflix.Loading.dots("Loading...", {
         clickToClose: false,
-        svgColor: "#f5006a"
+        svgColor: "#000cf5"
     });
     try {
         console.log("Loading user data...");
@@ -34,44 +34,105 @@ document.getElementById('editProfileBtn').addEventListener('click', function () 
 
 // Save Profile Changes
 document.getElementById('saveProfileBtn').addEventListener('click', async function () {
-    const profileData = {
-        firstName: document.getElementById('editFirstName').value,
-        lastName: document.getElementById('editLastName').value,
-        email: document.getElementById('editEmail').value,
-        phone: document.getElementById('editPhone').value,
-        dob: document.getElementById('editDob').value
-    };
+    Notiflix.Loading.dots("Updating profile...", {
+        clickToClose: false,
+        svgColor: "#000cf5"
+    });
+
+    let firstName = document.getElementById("editFirstName").value;
+    let lastName = document.getElementById("editLastName").value;
+    let phone = document.getElementById("editPhone").value;
+
+    const payload = {
+        firstName: firstName,
+        lastName: lastName,
+        mobile: phone
+    }
 
     try {
-        Notiflix.Loading.dots("Saving...", {svgColor: "#f5006a"});
-
-        const response = await fetch('api/profiles/update', {
+        const response = await fetch('api/profiles/update-profile', {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(profileData)
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         });
 
         if (response.ok) {
             const data = await response.json();
+            console.log(data);
             if (data.status) {
-                // Update display values
-                document.getElementById('firstNameDisplay').textContent = profileData.firstName;
-                document.getElementById('lastNameDisplay').textContent = profileData.lastName;
-                document.getElementById('emailDisplay').textContent = profileData.email;
-                document.getElementById('phoneDisplay').textContent = profileData.phone;
-                document.getElementById('name').innerHTML = `Hello, ${profileData.firstName} ${profileData.lastName}`;
-                document.getElementById('uEmail').innerHTML = profileData.email;
+                new Notify({
+                    status: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been updated successfully.',
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                });
 
-                Notiflix.Notify.success('Profile updated successfully!', {position: 'right-top'});
-                editProfileModal.hide();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000)
             } else {
-                Notiflix.Notify.failure(data.message, {position: 'right-top'});
+                new Notify({
+                    status: 'error',
+                    title: 'Update Failed',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
             }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Update Failed',
+                text: 'Failed to update profile. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
         }
     } catch (e) {
-        Notiflix.Notify.failure('Failed to update profile', {position: 'right-top'});
+        new Notify({
+            status: 'error',
+            title: 'Update Failed',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
     } finally {
-        Notiflix.Loading.remove();
+        Notiflix.Loading.remove(1000);
     }
 });
 
@@ -159,9 +220,6 @@ async function loadUserData() {
             let replacedText = String(data.user.sinceAt).replace("-", " ");
             let since = replacedText.split(" ");
 
-            document.getElementById("firstName").innerText = data.user.firstName;
-            document.getElementById("lastName").innerText = data.user.lastName;
-            document.getElementById("email").innerText = data.user.email;
             document.getElementById("firstNameDisplay").innerText = data.user.firstName;
             document.getElementById("lastNameDisplay").innerText = data.user.lastName;
             document.getElementById("emailDisplay").innerText = data.user.email;

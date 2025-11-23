@@ -17,6 +17,7 @@
         <mapping class="lk.cypher.bookliy.entity.User"/>
         <mapping class="lk.cypher.bookliy.entity.Cart"/>
         <mapping class="lk.cypher.bookliy.entity.City"/>
+        <mapping class="lk.cypher.bookliy.entity.District"/>
         <mapping class="lk.cypher.bookliy.entity.Address"/>
         <mapping class="lk.cypher.bookliy.entity.DeliveryType"/>
         <mapping class="lk.cypher.bookliy.entity.Discount"/>

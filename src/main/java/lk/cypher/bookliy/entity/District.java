@@ -2,10 +2,11 @@ package lk.cypher.bookliy.entity;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-public class City implements Serializable {
+public class District {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -13,9 +14,8 @@ public class City implements Serializable {
     @Column(length = 50, nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_id", nullable = false)
-    private District district;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<City> cities = new HashSet<>();
 
     public int getId() {
         return id;

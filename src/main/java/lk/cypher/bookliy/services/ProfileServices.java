@@ -10,7 +10,10 @@ import lk.cypher.bookliy.entity.Address;
 import lk.cypher.bookliy.entity.User;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
+import lk.cypher.bookliy.validation.Validator;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,9 +57,9 @@ public class ProfileServices {
         }
 
         Address primaryAddress = null;
-        for (Address address : addressList) {
-            if (address.isPrimary()) {
-                primaryAddress = address;
+        for (Address address : addressList) { // Find primary address
+            if (address.isPrimary()) { // If primary
+                primaryAddress = address; // Set as primary
                 break;
             }
         }
@@ -81,6 +84,67 @@ public class ProfileServices {
         hibernateSession.close();
         status = true;
         message = "User profile loaded successfully.";
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String updateProfile(UserDTO userDTO, @Context HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        //update-profile logic
+        if (userDTO.getFirstName() == null) {
+            message = "First name is required.";
+        } else if (userDTO.getFirstName().isBlank()) {
+            message = "First name cannot be empty.";
+        } else if (userDTO.getLastName() == null) {
+            message = "Last name is required.";
+        } else if (userDTO.getLastName().isBlank()) {
+            message = "Last name cannot be empty.";
+        } else if (userDTO.getMobile() == null) {
+            message = "Mobile is required.";
+        } else if (userDTO.getMobile().isBlank()) {
+            message = "Mobile is cannot be empty.";
+        } else if (userDTO.getMobile().equals(Validator.MOBILE_VALIDATION)) {
+            message = "Please provide a valid mobile number.";
+        } else {
+            HttpSession httpSession = request.getSession(false);
+            if (httpSession == null) {
+                message = "Session expired. Please log in again.";
+            } else {
+                User sessionUser = (User) httpSession.getAttribute("user");
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                User dbUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
+                        .setParameter("email", sessionUser.getEmail())
+                        .uniqueResult();
+
+                Address addressDb = hibernateSession.createQuery("from Address a where a.user = :user and a.isPrimary = true", Address.class)
+                        .setParameter("user", dbUser)
+                        .uniqueResult();
+
+                dbUser.setFirstName(userDTO.getFirstName());
+                dbUser.setLastName(userDTO.getLastName());
+                addressDb.setMobile(userDTO.getMobile());
+
+                Transaction transaction = hibernateSession.beginTransaction();
+
+                try {
+                    hibernateSession.merge(dbUser);
+                    hibernateSession.merge(addressDb);
+                    transaction.commit();
+                    // Update session user
+                    httpSession.setAttribute("user", dbUser);
+                    status = true;
+                    message = "Profile updated successfully.";
+                } catch (HibernateException e) {
+                    transaction.rollback();
+                    message = "Failed to update profile. Please try again.";
+                }
+                hibernateSession.close();
+            }
+        }
         responseObj.addProperty("status", status);
         responseObj.addProperty("message", message);
         return AppUtil.gson.toJson(responseObj);
