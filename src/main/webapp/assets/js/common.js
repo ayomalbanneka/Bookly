@@ -113,7 +113,6 @@ async function loadDistricts() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Districts data:", data);
 
             const districtSelect = document.getElementById('districtSelect');
 
@@ -122,7 +121,6 @@ async function loadDistricts() {
             }
         }
     } catch (e) {
-        console.error("Error loading districts:", e);
         new Notify({
             status: 'error',
             title: 'Error',
@@ -150,3 +148,64 @@ function renderDropDowns(selector, list, suffix) {
         selector.appendChild(option); // Append the option to the select element
     })
 }
+
+// Search functionality
+const searchModal = document.getElementById('searchModal');
+if (searchModal) {
+    const searchForm = searchModal.querySelector('form');
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchInput = this.querySelector('input[type="text"]');
+        const searchTerm = searchInput.value.trim();
+
+        if (searchTerm) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(searchModal);
+            modal.hide();
+
+            // Show search results notification
+            showNotification(`Searching for: "${searchTerm}"`, 'info');
+
+            // In a real application, you would redirect to search results page
+            // window.location.href = `shop.html?search=${encodeURIComponent(searchTerm)}`;
+        }
+    });
+}
+
+// Mobile menu enhancement
+const navbarToggler = document.querySelector('.navbar-toggler');
+if (navbarToggler) {
+    navbarToggler.addEventListener('click', function() {
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        navbarCollapse.classList.toggle('show');
+    });
+}
+
+// Category cards hover effect
+const categoryCards = document.querySelectorAll('.category-card');
+categoryCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    });
+});
