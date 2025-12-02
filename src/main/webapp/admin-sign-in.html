@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Bookly Bookstore</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/admin-style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="admin-auth-page">
+<!-- Security Badge -->
+<div class="security-badge">
+    <i class="bi bi-shield-check"></i>
+    <span>Secure Connection</span>
+</div>
+
+<!-- Main Container -->
+<div class="admin-auth-container">
+    <div class="auth-wrapper">
+        <!-- Left Panel - Login Form -->
+        <div class="auth-form-panel">
+            <div class="auth-form-container">
+                <!-- Header -->
+                <div class="auth-header text-center mb-5">
+                    <div class="logo-container mb-4">
+                        <div class="logo-icon">
+                            <i class="bi bi-book-half"></i>
+                        </div>
+                        <h1 class="brand-name-login">Bookly</h1>
+                    </div>
+                    <h2 class="auth-title">Admin Portal</h2>
+                    <p class="auth-subtitle">Access Your BookStore Management Dashboard</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="adminLoginForm" class="auth-form" novalidate>
+                    <!-- Username Field -->
+                    <div class="form-group mb-4">
+                        <label for="adminUsername" class="form-label">
+                            <i class="bi bi-person-circle me-2"></i>Username
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="text"
+                                   class="form-control"
+                                   id="adminUsername"
+                                   placeholder="Enter your username"
+                                   required
+                                   autocomplete="username">
+                        </div>
+<!--                            <p class="text-danger small">Error</p>-->
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group mb-4">
+                        <label for="adminPassword" class="form-label">
+                            <i class="bi bi-key me-2"></i>Password
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="password"
+                                   class="form-control"
+                                   id="adminPassword"
+                                   placeholder="Enter your password"
+                                   required
+                                   autocomplete="current-password">
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Two-Factor Section -->
+                    <div class="form-group mb-4" id="twoFactorSection" style="display: none;">
+                        <label for="twoFactorCode" class="form-label">
+                            <i class="bi bi-shield-check me-2"></i>Two-Factor Code
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="text"
+                                   class="form-control"
+                                   id="twoFactorCode"
+                                   placeholder="Enter 6-digit code"
+                                   maxlength="6"
+                                   inputmode="numeric">
+                            <div class="input-icon">
+                                <i class="bi bi-mobile"></i>
+                            </div>
+                        </div>
+                        <div class="form-helper">
+                            <button type="button" class="btn-link" id="send2FACode">
+                                <i class="bi bi-send me-1"></i>Send new code
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="form-options mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberDevice">
+                            <label class="form-check-label" for="rememberDevice">
+                                Remember this device
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-submit mb-4">
+                        <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+                                <span class="btn-content">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    Sign In to Dashboard
+                                </span>
+                            <span class="btn-loading">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Authenticating...
+                                </span>
+                        </button>
+                    </div>
+
+                    <!-- Help Links -->
+                    <div class="auth-links text-center">
+                        <a href="#" class="auth-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                            <i class="bi bi-question-circle me-1"></i>Forgot Password?
+                        </a>
+                        <span class="link-divider">•</span>
+                        <a href="index.html" class="auth-link">
+                            <i class="bi bi-arrow-left me-1"></i>Back to Main Site
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    <div class="security-badge-small">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <div class="security-text">
+                        <small>Protected by end-to-end encryption</small>
+                        <div class="security-status">
+                            <span class="status-indicator"></span>
+                            <span>All systems operational</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Visual -->
+        <div class="auth-visual-panel">
+            <div class="visual-content">
+                <!-- Background Elements -->
+                <div class="background-shapes">
+                    <div class="shape shape-1"></div>
+                    <div class="shape shape-2"></div>
+                    <div class="shape shape-3"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="visual-main">
+                    <div class="visual-icon">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <h2 class="visual-title">Bookly Admin Suite</h2>
+                    <p class="visual-description">
+                        Complete control over your bookstore operations. Monitor sales, manage inventory, and analyze performance in real-time.
+                    </p>
+
+                    <!-- Features -->
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h6>Sales Analytics</h6>
+                                <small>Real-time revenue tracking</small>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h6>Inventory Management</h6>
+                                <small>Smart stock control</small>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h6>Customer Insights</h6>
+                                <small>Detailed user analytics</small>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-bar-chart"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h6>Reports</h6>
+                                <small>Customizable dashboards</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-key me-2"></i>Reset Admin Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="mb-3">
+                        <label for="adminEmail" class="form-label">Admin Email Address</label>
+                        <input type="email" class="form-control" id="adminEmail" placeholder="admin@bookly.com" required>
+                        <div class="form-text">
+                            We'll send password reset instructions to your registered email.
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-content">Send Reset Link</span>
+                            <span class="btn-loading">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>Sending...
+                                </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="assets/js/admin-panel.js"></script>
+</body>
+</html>
