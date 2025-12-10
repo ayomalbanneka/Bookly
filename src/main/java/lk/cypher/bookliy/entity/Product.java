@@ -1,12 +1,15 @@
 package lk.cypher.bookliy.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.engine.internal.Cascade;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Product {
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -14,7 +17,7 @@ public class Product {
     @Column(length = 200, nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(nullable = false)
@@ -26,6 +29,31 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
+
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "image_url", nullable = false, length = 500)
+    private List<String> images = new ArrayList<>();
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+    }
 
     public Category getCategory() {
         return category;
