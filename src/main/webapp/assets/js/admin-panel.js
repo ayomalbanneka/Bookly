@@ -450,6 +450,167 @@ async function loadCategories() {
     }
 }
 
+const editor1 = new RichTextEditor('#description');
+
+async function saveProduct() {
+    let title = document.getElementById('productTitle').value;
+    let description = editor1.getHTMLCode();
+    let author = document.getElementById('author').value;
+    let price = document.getElementById('price').value;
+    let categoryId = document.getElementById('categorySelect').value;
+    let stock = document.getElementById('stock').value;
+
+    const productData = {
+        title: title,
+        description: description,
+        author: author,
+        price: parseFloat(price),
+        categoryId: categoryId,
+        stock: parseInt(stock)
+    }
+
+    try {
+        const response = await fetch('api/admin/products/save-product', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        })
+        const data = await response.json();
+        if (response.ok) {
+            if (data.status) {
+                await uploadProductImage(data.productId);
+            } else {
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top'
+                })
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: data.message,
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                type: 'outline',
+                position: 'right top'
+            });
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: "Server error while saving product.",
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        console.error("Error saving product:", e);
+    }
+}
+
+async function uploadProductImage(productId) {
+    let imgFileInput = document.getElementById('image-input');
+
+    // Validate file selection
+    if (!imgFileInput.files || imgFileInput.files.length === 0) {
+        new Notify({
+            status: 'warning',
+            title: 'Warning',
+            text: 'Please select an image to upload.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', imgFileInput.files[0]);
+
+    try {
+        const response = await fetch(`api/admin/products/${productId}/upload-image`, {
+            method: "PUT",
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                console.log("Image uploaded:", data);
+                new Notify({
+                    status: 'success',
+                    title: 'Success',
+                    text: 'Product and image saved successfully!',
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top'
+                });
+            } else {
+                console.error("Failed to upload image:", data.message);
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to upload image.',
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top'
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Error uploading image:", e);
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: 'Failed to upload image.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+    }
+}
+
 function renderDropDowns(selector, list, suffix) {
     selector.innerHTML = `<option value="0">Select</option>`; // Clear existing options first!
     list.forEach((item) => {

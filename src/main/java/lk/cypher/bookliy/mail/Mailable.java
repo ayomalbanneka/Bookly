@@ -75,7 +75,7 @@ public abstract class Mailable implements Runnable {
             long duration = System.currentTimeMillis() - startTime;
             String recipient = mimeMessage.getRecipients(MimeMessage.RecipientType.TO)[0].toString();
 
-            logger.info(String.format("\u001B[32m✓ Email sent successfully to %s in %dms\u001B[0m",
+            logger.info(String.format("\u001B[32m Email sent successfully to %s in %dms\u001B[0m",
                     recipient, duration));
 
         } catch (MessagingException e) {

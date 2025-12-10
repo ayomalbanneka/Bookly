@@ -18,7 +18,7 @@ public class VerificationMail extends Mailable {
     }
 
     public String getSubject() {
-        return "Verify your Bookily Account";
+        return "Verify your Bookliy Account";
     }
 
     @Override
@@ -63,7 +63,7 @@ public class VerificationMail extends Mailable {
                 "<div class='container'>" +
                 "<div class='header'>" +
                 "<div class='book-icon'>📚</div>" +
-                "<h1>Welcome to Bookily!</h1>" +
+                "<h1>Welcome to Bookliy!</h1>" +
                 "<p>Your gateway to endless reading adventures</p>" +
                 "</div>" +
                 "<div class='content'>" +

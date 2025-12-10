@@ -17,13 +17,11 @@ public class AuthAccessFilter implements Filter {
 
         if (httpSession != null && httpSession.getAttribute("user") != null) { // User is authenticated
             response.sendRedirect("index.html"); // Redirect to home page
-//            System.out.println(httpSession.getAttribute("user"));
         } else {
             response.setHeader("Cache-Control", " no-cache, no-store, revalidate"); // HTTP 1.1.
             response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
             response.setDateHeader("Expires", 0); // Proxies.
             filterChain.doFilter(servletRequest, servletResponse);  // Proceed to requested resource
-
         }
     }
 }

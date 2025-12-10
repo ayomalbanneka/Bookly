@@ -288,7 +288,7 @@
     transition: opacity 0.3s ease;
 }
 
-.btn .btn-loading {
+.btn.btn-loading, .btn .btn-loading {
     opacity: 0;
     position: absolute;
     top: 50%;
@@ -302,6 +302,11 @@
 
 .btn.loading .btn-loading {
     opacity: 1;
+}
+
+.btn-loading {
+    display: none;
+    align-items: center;
 }
 
 /* Form Helper */

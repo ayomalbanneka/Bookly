@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
+@NamedQuery(name = "Discount.findDefault", query = "SELECT d FROM Discount d WHERE d.coupenCode='DEFAULT'")
 public class Discount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
