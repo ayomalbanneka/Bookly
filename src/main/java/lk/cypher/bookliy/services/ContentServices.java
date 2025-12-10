@@ -1,8 +1,12 @@
 package lk.cypher.bookliy.services;
 
 import com.google.gson.JsonObject;
+import lk.cypher.bookliy.dto.ProductDTO;
+import lk.cypher.bookliy.dto.StockDTO;
 import lk.cypher.bookliy.entity.City;
 import lk.cypher.bookliy.entity.District;
+import lk.cypher.bookliy.entity.Product;
+import lk.cypher.bookliy.entity.Stock;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
 import org.hibernate.Session;
@@ -15,7 +19,9 @@ public class ContentServices {
         JsonObject responseObject = new JsonObject();
 
         Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
-        List<District> districtList = hibernateSession.createQuery("FROM District d", District.class).getResultList();
+        List<District> districtList = hibernateSession
+                .createQuery("FROM District d LEFT JOIN FETCH d.cities", District.class)
+                .getResultList();
         responseObject.add("districts", AppUtil.gson.toJsonTree(ContentServices.districts(districtList)));
         hibernateSession.close();
 
@@ -54,6 +60,35 @@ public class ContentServices {
         return AppUtil.gson.toJson(responseObject);
     }
 
+    public String loadNewArrivals() {
+        JsonObject responseObject = new JsonObject();
+        Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+        List<Product> productList = hibernateSession.createQuery("FROM Product p ORDER BY p.createdAt DESC", Product.class)
+                .setMaxResults(10)
+                .getResultList();
+
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        for (Product product : productList) {
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setProductId(product.getId());
+            productDTO.setTitle(product.getTitle());
+            productDTO.setAuthor(product.getAuthor());
+            productDTO.setImages(product.getImages());
+
+            List<StockDTO> stockDTOList = new ArrayList<>();
+            for (Stock stock : product.getStocks()) {
+                StockDTO stockDTO = new StockDTO();
+                stockDTO.setPrice(stock.getPrice());
+                stockDTOList.add(stockDTO);
+            }
+            productDTO.setStockDTOList(stockDTOList);
+            productDTOList.add(productDTO);
+        }
+        hibernateSession.close();
+        responseObject.add("newArrivals", AppUtil.gson.toJsonTree(productDTOList));
+        return AppUtil.gson.toJson(responseObject);
+    }
+
     private static List<JsonObject> cities(List<City> cityList) {
         List<JsonObject> cities = new ArrayList<>();
         for (City city : cityList) {
@@ -66,13 +101,13 @@ public class ContentServices {
         return cities;
     }
 
-    private static List<District> districts(List<District> districtList) {
-        List<District> districts = new ArrayList<>();
+    private static List<JsonObject> districts(List<District> districtList) {
+        List<JsonObject> districts = new ArrayList<>();
         for (District district : districtList) {
-            JsonObject object = new JsonObject();
-            object.addProperty("id", district.getId());
-            object.addProperty("name", district.getName());
-            districts.add(district);
+            JsonObject districtObject = new JsonObject();
+            districtObject.addProperty("id", district.getId());
+            districtObject.addProperty("name", district.getName());
+            districts.add(districtObject);
         }
         return districts;
     }
