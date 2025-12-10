@@ -29,6 +29,7 @@ public class AuthFilter implements ContainerRequestFilter {
             containerRequestContext
                     .abortWith(Response.status(Response.Status.TEMPORARY_REDIRECT)
                             .location(URI.create(request.getContextPath() + "/sign-in.html")).build());
+            System.out.println("Unauthenticated access attempt redirected to sign-in.html");
         }
     }
 }
