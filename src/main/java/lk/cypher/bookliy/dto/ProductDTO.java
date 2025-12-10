@@ -7,7 +7,7 @@ public class ProductDTO {
     private String title;
     private String author;
     private double price;
-    private int quantity;
+    private int stock;
     private int categoryId;
     private String categoryName;
     private String description;
@@ -46,12 +46,12 @@ public class ProductDTO {
         this.price = price;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getStock() {
+        return stock;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public int getCategoryId() {
