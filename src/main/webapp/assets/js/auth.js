@@ -6,6 +6,32 @@ const inputVCode = document.getElementById("verificationCode");
 inputVCode.value = params.get("verificationCode");
 const userEmail = params.get("email");
 
+function togglePassword() {
+    var textField = document.getElementById("passwordField");
+    var button = document.getElementById("passwordBtn");
+
+    if (textField.type === "password") {
+        textField.type = "text";
+        button.innerHTML = `<i class="bi bi-eye-slash-fill"></i>`;
+    } else {
+        textField.type = "password";
+        button.innerHTML = `<i class="bi bi-eye-fill"></i>`;
+    }
+}
+
+function toggleConfirmPassword() {
+    var textField = document.getElementById("confirmPasswordField");
+    var button = document.getElementById("confirmPasswordBtn");
+
+    if (textField.type === "password") {
+        textField.type = "text";
+        button.innerHTML = `<i class="bi bi-eye-slash-fill"></i>`;
+    } else {
+        textField.type = "password";
+        button.innerHTML = `<i class="bi bi-eye-fill"></i>`;
+    }
+}
+
 async function createAccount() {
     Notiflix.Loading.dots("Loading...", {
         clickToClose: true,
