@@ -41,7 +41,7 @@ public class AdminServices {
                     message = "Invalid email or password. Please try again.";
                 } else {
                     Status verifyStatus = hibernateSession.createNamedQuery("Status.findByValue", Status.class)
-                            .setParameter("value", String.valueOf(Status.Type.VERIFIED))
+                            .setParameter("value", String.valueOf(Status.Type.APPROVED))
                             .getSingleResultOrNull();
                     if (!singleAdmin.getStatus().equals(verifyStatus)) {
                         message = "Account is still under the review process. Please try again later.";
