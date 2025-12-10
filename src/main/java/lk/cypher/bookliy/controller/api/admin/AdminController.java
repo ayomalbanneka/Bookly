@@ -10,8 +10,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lk.cypher.bookliy.dto.AdminDTO;
-import lk.cypher.bookliy.services.AdminServices;
-import lk.cypher.bookliy.util.AppUtil;
+import lk.cypher.bookliy.services.admin.AdminServices;
 
 @Path("/admin/auth")
 public class AdminController {
