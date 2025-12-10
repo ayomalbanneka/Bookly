@@ -15,17 +15,17 @@ import lk.cypher.bookliy.util.AppUtil;
 @Path("/profiles")
 public class ProfileController {
 
-    @GET
     @IsUser
     @Path("/user-profile")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserProfile(@Context HttpServletRequest request) {
         String response = new ProfileServices().userProfile(request); // Placeholder for actual service call
         return Response.ok().entity(response).build();
     }
 
-    @PUT
     @IsUser
+    @PUT
     @Path("/update-profile")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserProfile(String jsonData, @Context HttpServletRequest request) {
@@ -34,8 +34,8 @@ public class ProfileController {
         return Response.ok().entity(responseJson).build();
     }
 
-    @POST
     @IsUser
+    @POST
     @Path("/new-address")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

@@ -8,16 +8,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lk.cypher.bookliy.dto.ProductDTO;
 import lk.cypher.bookliy.entity.Product;
-import lk.cypher.bookliy.services.FileUploadService;
-import lk.cypher.bookliy.services.ProductServices;
+import lk.cypher.bookliy.services.admin.FileUploadService;
+import lk.cypher.bookliy.services.admin.ProductServices;
 import lk.cypher.bookliy.util.AppUtil;
-import lk.cypher.bookliy.util.HibernateUtil;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.io.InputStream;
 import java.util.ArrayList;

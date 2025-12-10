@@ -1,9 +1,6 @@
 package lk.cypher.bookliy.controller.api;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lk.cypher.bookliy.services.ContentServices;
@@ -25,4 +22,13 @@ public class ContentController {
         String responseJson = new ContentServices().loadAllDistricts();
         return Response.ok().entity(responseJson).build();
     }
+
+    @Path("/latest-arrivals")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadLatestArrivals() {
+        String responseJson = new ContentServices().loadNewArrivals();
+        return Response.ok().entity(responseJson).build();
+    }
+
 }

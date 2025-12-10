@@ -1,4 +1,4 @@
-package lk.cypher.bookliy.services;
+package lk.cypher.bookliy.services.admin;
 
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;

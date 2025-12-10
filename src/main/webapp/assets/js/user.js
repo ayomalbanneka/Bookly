@@ -5,15 +5,24 @@ window.addEventListener('load', async () => {
     });
     try {
         await loadUserData();
-
         const addAddressForm = document.getElementById('addAddressForm');
         if (addAddressForm) {
             addAddressForm.addEventListener('submit', addNewAddress);
         }
     } catch (e) {
-        Notiflix.Notify.failure(e.message, {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
             position: 'right top',
-        });
+        })
     } finally {
         Notiflix.Loading.remove(1000);
     }

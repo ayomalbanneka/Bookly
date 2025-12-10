@@ -1,4 +1,4 @@
-package lk.cypher.bookliy.services;
+package lk.cypher.bookliy.services.admin;
 
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.WebApplicationException;
