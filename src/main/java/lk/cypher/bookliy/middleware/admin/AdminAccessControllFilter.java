@@ -1,4 +1,4 @@
-package lk.cypher.bookliy.middleware;
+package lk.cypher.bookliy.middleware.admin;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
