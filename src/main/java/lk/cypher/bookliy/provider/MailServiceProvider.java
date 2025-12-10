@@ -85,7 +85,7 @@ public class MailServiceProvider {
 
         executor.prestartCoreThread();
 
-        logger.info("\u001B[32m✓ Email Service Initialized Successfully\u001B[0m");
+        logger.info("\u001B[32m Email Service Initialized Successfully\u001B[0m");
         logger.info("Mail Host: " + ENV.get("mail.host"));
         logger.info("Mail Port: " + ENV.get("mail.port"));
         logger.info("Thread Pool: Core=2, Max=5");
@@ -122,7 +122,7 @@ public class MailServiceProvider {
     }
 
     /**
-     * Send email using Runnable (legacy support)
+     * Send email using Runnable
      */
     public void sendMail(Runnable mailable) {
         if (executor == null || executor.isShutdown()) {
