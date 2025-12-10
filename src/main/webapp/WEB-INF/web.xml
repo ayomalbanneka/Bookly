@@ -24,7 +24,7 @@
     </filter>
     <filter>
         <filter-name>AdminAuthAccessFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.AdminAuthAccessFilter</filter-class>
+        <filter-class>lk.cypher.bookliy.middleware.admin.AdminAuthAccessFilter</filter-class>
     </filter>
 
     <!--  User  -->
@@ -59,7 +59,7 @@
 
     <filter>
         <filter-name>AdminAccessControllFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.AdminAccessControllFilter</filter-class>
+        <filter-class>lk.cypher.bookliy.middleware.admin.AdminAccessControllFilter</filter-class>
     </filter>
 
     <filter-mapping>
