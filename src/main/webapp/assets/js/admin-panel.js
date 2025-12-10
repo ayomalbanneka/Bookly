@@ -576,6 +576,13 @@ async function uploadProductImage(productId) {
                     type: 'outline',
                     position: 'right top'
                 });
+                document.getElementById('productTitle').value = "";
+                editor1.setHTMLCode(""); // Clear rich-text editor
+                document.getElementById('author').value = "";
+                document.getElementById('price').value = "";
+                document.getElementById('categorySelect').value = "";
+                document.getElementById('stock').value = "";
+                imgFileInput.value = "";
             } else {
                 console.error("Failed to upload image:", data.message);
                 new Notify({
