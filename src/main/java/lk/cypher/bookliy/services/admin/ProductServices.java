@@ -12,6 +12,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class ProductServices {
 
     public Product getProductById(int productId) {
@@ -60,6 +63,22 @@ public class ProductServices {
             message = "Product author cannot be empty";
         } else if (productDTO.getPrice() <= 0) {
             message = "Product price must be greater than zero";
+        } else if (productDTO.getIsbn() == null) {
+            message = "ISBN is required";
+        } else if (productDTO.getIsbn().isBlank()) {
+            message = "Product ISBN cannot be empty";
+        } else if (productDTO.getLanguage() == null) {
+            message = "Language is required";
+        } else if (productDTO.getLanguage().isBlank()) {
+            message = "Product language cannot be empty";
+        } else if (productDTO.getPublishedDate() == null) {
+            message = "Published Date is required";
+        } else if (productDTO.getPublishedDate().isBlank()) {
+            message = "Published Date cannot be empty";
+        } else if (productDTO.getPublisher() == null) {
+            message = "Publisher is required";
+        } else if (productDTO.getPublisher().isBlank()) {
+            message = "Product publisher cannot be empty";
         } else if (productDTO.getStock() < 0) {
             message = "Product quantity cannot be negative";
         } else if (productDTO.getCategoryId() <= 0) {
@@ -93,11 +112,23 @@ public class ProductServices {
                             message = "Category not found. Please contact support.";
                         } else {
                             Product product = new Product();
+
+                            LocalDateTime parsedDate = LocalDateTime.parse(
+                                    productDTO.getPublishedDate() + "T00:00:00"
+                            );
+
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+                            String formattedDate = parsedDate.format(formatter);
+
                             product.setTitle(productDTO.getTitle());
                             product.setAuthor(productDTO.getAuthor());
                             product.setDescription(productDTO.getDescription());
                             product.setCategory(category);
                             product.setDescription(productDTO.getDescription());
+                            product.setIsbn(productDTO.getIsbn());
+                            product.setLanguage(productDTO.getLanguage());
+                            product.setPublishedDate(formattedDate);
+                            product.setPublisher(productDTO.getPublisher());
                             product.setAdmin(admin);
 
                             Stock stock = new Stock();
