@@ -71,10 +71,29 @@ class FooterContent extends HTMLElement {
                         <div class="d-flex align-items-center">
                             <span class="me-2 d-none d-sm-inline">Payment methods:</span>
                             <div class="d-flex gap-2">
-                                <img src="assets/images/visa.png" alt="Visa" class="img-fluid" style="width:40px;height:auto;">
-                                <img src="assets/images/mastercard.png" alt="Mastercard" class="img-fluid" style="width:40px;height:auto;">
-                                <img src="assets/images/paypal.png" alt="PayPal" class="img-fluid" style="width:40px;height:auto;">
-                                <img src="assets/images/amex.png" alt="American Express" class="img-fluid" style="width:40px;height:auto;">
+                                <!-- Visa - Blue/Yellow/Gold -->
+                                <img src="https://img.icons8.com/color/48/000000/visa.png" 
+                                     alt="Visa" 
+                                     class="payment-icon"
+                                     title="Visa">
+                                
+                                <!-- Mastercard - Red/Yellow -->
+                                <img src="https://img.icons8.com/color/48/000000/mastercard.png" 
+                                     alt="Mastercard" 
+                                     class="payment-icon"
+                                     title="Mastercard">
+                                
+                                <!-- PayPal - Blue -->
+                                <img src="https://img.icons8.com/color/48/000000/paypal.png" 
+                                     alt="PayPal" 
+                                     class="payment-icon"
+                                     title="PayPal">
+                                
+                                <!-- Discover - Orange (Bonus icon if needed) -->
+                                <img src="https://img.icons8.com/color/48/000000/discover.png" 
+                                     alt="Discover" 
+                                     class="payment-icon"
+                                     title="Discover">
                             </div>
                         </div>
                     </div>

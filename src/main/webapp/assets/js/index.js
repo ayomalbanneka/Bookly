@@ -100,5 +100,5 @@ async function renderLatestArrivals(newArrivals) {
                </div>
 `;
         })
-    })
+    });
 }
