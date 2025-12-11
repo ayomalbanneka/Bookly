@@ -6,6 +6,10 @@ public class ProductDTO {
     private int productId;
     private String title;
     private String author;
+    private String publisher;
+    private String publishedDate;
+    private String isbn;
+    private String language;
     private double price;
     private int stock;
     private int categoryId;
@@ -13,6 +17,38 @@ public class ProductDTO {
     private String description;
     private List<StockDTO> stockDTOList;
     private List<String> images;
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public String getPublishedDate() {
+        return publishedDate;
+    }
+
+    public void setPublishedDate(String publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public int getProductId() {
         return productId;
