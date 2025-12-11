@@ -458,6 +458,10 @@ async function saveProduct() {
     let author = document.getElementById('author').value;
     let price = document.getElementById('price').value;
     let categoryId = document.getElementById('categorySelect').value;
+    let isbn = document.getElementById('isbn').value;
+    let language = document.getElementById('language').value;
+    let publishDate = document.getElementById('publishDate').value;
+    let publisher = document.getElementById('publisher').value;
     let stock = document.getElementById('stock').value;
 
     const productData = {
@@ -466,6 +470,10 @@ async function saveProduct() {
         author: author,
         price: parseFloat(price),
         categoryId: categoryId,
+        isbn: isbn,
+        publisher: publisher,
+        publishedDate: publishDate,
+        language: language,
         stock: parseInt(stock)
     }
 
