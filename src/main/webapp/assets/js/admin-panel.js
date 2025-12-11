@@ -462,6 +462,8 @@ async function saveProduct() {
     let language = document.getElementById('language').value;
     let publishDate = document.getElementById('publishDate').value;
     let publisher = document.getElementById('publisher').value;
+    let pages = document.getElementById('pages').value;
+    let genre = document.getElementById('genre').value;
     let stock = document.getElementById('stock').value;
 
     const productData = {
@@ -474,6 +476,8 @@ async function saveProduct() {
         publisher: publisher,
         publishedDate: publishDate,
         language: language,
+        pages: parseInt(pages),
+        genre: genre,
         stock: parseInt(stock)
     }
 
@@ -558,6 +562,28 @@ async function uploadProductImage(productId) {
         return;
     }
 
+    const file = imgFileInput.files[0];
+
+    // Validate image file
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+        new Notify({
+            status: 'warning',
+            title: 'Invalid File',
+            text: validation.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        imgFileInput.value = ''; // Clear the input
+        return;
+    }
+
     const formData = new FormData();
     formData.append('image', imgFileInput.files[0]);
 
@@ -590,6 +616,12 @@ async function uploadProductImage(productId) {
                 document.getElementById('price').value = "";
                 document.getElementById('categorySelect').value = "";
                 document.getElementById('stock').value = "";
+                document.getElementById('isbn').value = "";
+                document.getElementById('language').value = "";
+                document.getElementById('publishDate').value = "";
+                document.getElementById('publisher').value = "";
+                document.getElementById('pages').value = "";
+                document.getElementById('genre').value = "";
                 imgFileInput.value = "";
             } else {
                 console.error("Failed to upload image:", data.message);
@@ -624,6 +656,42 @@ async function uploadProductImage(productId) {
             position: 'right top'
         });
     }
+}
+
+function validateImageFile(file) {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const allowedExtensions = ['jpg', 'jpeg', 'png'];
+    const fileExtension = file.name.toLowerCase().split('.').pop();
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    // Check extension
+    if (!allowedExtensions.includes(fileExtension)) {
+        return {
+            valid: false,
+            message: 'Only JPG, JPEG, and PNG files are allowed!'
+        };
+    }
+
+    // Check MIME type
+    if (!allowedTypes.includes(file.type)) {
+        return {
+            valid: false,
+            message: 'Invalid file type detected!'
+        };
+    }
+
+    // Check file size
+    if (file.size > maxSize) {
+        return {
+            valid: false,
+            message: 'File size must be less than 5MB!'
+        };
+    }
+
+    return {
+        valid: true,
+        message: 'Valid image file'
+    };
 }
 
 function renderDropDowns(selector, list, suffix) {
