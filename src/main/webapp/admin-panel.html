@@ -428,14 +428,14 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                <h5 class="modal-title" id="addProductModalLabel">Add New Book</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form class="product-form" id="productForm">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Product Title</label>
+                            <label class="form-label">Book Title</label>
                             <input type="text" class="form-control" placeholder="Enter book title" id="productTitle"
                                    required>
                         </div>
@@ -447,6 +447,27 @@
                         <div class="col-md-4">
                             <label class="form-label">Price</label>
                             <input type="number" class="form-control" placeholder="0.00" step="0.01" id="price"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ISBN</label>
+                            <input type="text" class="form-control" placeholder="123456789" step="0.01" id="isbn"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Language</label>
+                            <input type="text" class="form-control" placeholder="Language" id="language"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Published Date</label>
+                            <input type="date" class="form-control" placeholder="Select Date" step="0.01" id="publishDate"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Publisher</label>
+                            <input type="text" class="form-control" placeholder="Publisher Name" step="0.01"
+                                   id="publisher"
                                    required>
                         </div>
                         <div class="col-md-4">
@@ -476,7 +497,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="submitProduct" onclick="saveProduct();">Add Product</button>
+                <button type="button" class="btn btn-primary" id="submitProduct" onclick="saveProduct();">Add Product
+                </button>
             </div>
         </div>
     </div>
