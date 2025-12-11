@@ -3,6 +3,7 @@ package lk.cypher.bookliy.entity;
 import jakarta.persistence.*;
 import org.hibernate.engine.internal.Cascade;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,18 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private String author;
 
+    @Column(nullable = false)
+    private String publisher;
+
+    @Column(name = "published_date", nullable = false)
+    private String publishedDate;
+
+    @Column(nullable = false)
+    private String isbn;
+
+    @Column(nullable = false)
+    private String language;
+
     @OneToMany(mappedBy = "product")
     private Set<Stock> stocks = new HashSet<>();
 
@@ -38,6 +51,38 @@ public class Product extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "image_url", nullable = false, length = 500)
     private List<String> images = new ArrayList<>();
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public String getPublishedDate() {
+        return publishedDate;
+    }
+
+    public void setPublishedDate(String publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public List<String> getImages() {
         return images;
