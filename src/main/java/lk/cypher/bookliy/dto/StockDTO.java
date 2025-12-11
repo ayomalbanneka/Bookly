@@ -5,11 +5,47 @@ public class StockDTO {
     private int productId;
     private String title;
     private String author;
+    private String publisher;
+    private String publishedDate;
+    private String isbn;
+    private String language;
     private int stock;
     private double price;
     private int categoryId;
     private String categoryName;
     private String description;
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public String getPublishedDate() {
+        return publishedDate;
+    }
+
+    public void setPublishedDate(String publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public int getStockId() {
         return stockId;
