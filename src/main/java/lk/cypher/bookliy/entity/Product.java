@@ -36,6 +36,12 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private String language;
 
+    @Column(nullable = false)
+    private int pages;
+
+    @Column(nullable = false)
+    private String genre;
+
     @OneToMany(mappedBy = "product")
     private Set<Stock> stocks = new HashSet<>();
 
@@ -51,6 +57,22 @@ public class Product extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "image_url", nullable = false, length = 500)
     private List<String> images = new ArrayList<>();
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 
     public String getPublisher() {
         return publisher;

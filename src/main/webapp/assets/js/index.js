@@ -62,40 +62,43 @@ async function renderLatestArrivals(newArrivals) {
     newArrivals.forEach((product) => {
         product.stockDTOList.forEach((stock) => {
             newArrivalProductContainer.innerHTML += `
-<div class="col-sm-6 col-md-4 col-lg-3">
-<div class="product-card card border-0 shadow-sm h-100" >
-<div class="position-relative">
-                <img src="${product.images[0]}" class="card-img-top" alt="Book Title">
-                    <span class="badge bg-success position-absolute top-0 start-0 m-2">NEW</span>
-                    <div class="card-actions position-absolute top-0 end-0 m-2">
-                        <button class="btn btn-light btn-sm rounded-circle mb-1"><i class="bi bi-heart"></i>
-                        </button>
-                        <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>
-                    </div>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title h6">${product.title}</h5>
-                <p class="card-text text-muted small">${product.author}</p>
-                <div class="rating mb-2">
-                    <i class="bi bi-star-fill text-warning"></i>
-                    <i class="bi bi-star-fill text-warning"></i>
-                    <i class="bi bi-star-fill text-warning"></i>
-                    <i class="bi bi-star-fill text-warning"></i>
-                    <i class="bi bi-star-half text-warning"></i>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold text-primary">LKR
-                        ${new Intl.NumberFormat("en-US", {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="product-card card border-0 shadow-sm h-100" >
+                <a class="text-decoration-none" href="single-product.html?productId=${product.productId}">
+                    <div class="position-relative">
+                                <img src="${product.images[0]}" class="card-img-top" alt="Book Title">
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-2">NEW</span>
+                                    <div class="card-actions position-absolute top-0 end-0 m-2">
+                                        <button class="btn btn-light btn-sm rounded-circle mb-1"><i class="bi bi-heart"></i>
+                                        </button>
+<!--                                        <button class="btn btn-light btn-sm rounded-circle"><i class="bi bi-eye"></i></button>-->
+                                    </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title h6">${product.title}</h5>
+                                <p class="card-text text-muted small">${product.author}</p>
+                                <div class="rating mb-2">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-half text-warning"></i>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-primary">LKR
+                                        ${new Intl.NumberFormat("en-US", {
                 minimumFractionDigits: 2,
             }).format(stock.price)}
-                    </span>
-                </div>
-            </div>
-            <div class="card-footer bg-transparent border-0 pt-0">
-                <button class="btn btn-primary w-100 btn-sm">Add to Cart</button>
-            </div>
-        </div>
-       </div>`;
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <button class="btn btn-primary w-100 btn-sm">Add to Cart</button>
+                            </div>
+                </a>
+                    </div>
+               </div>
+`;
         })
-    })
+    });
 }

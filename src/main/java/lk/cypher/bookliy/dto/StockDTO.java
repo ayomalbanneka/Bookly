@@ -9,11 +9,29 @@ public class StockDTO {
     private String publishedDate;
     private String isbn;
     private String language;
+    private String genre;
+    private int pages;
     private int stock;
     private double price;
     private int categoryId;
     private String categoryName;
     private String description;
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
 
     public String getPublisher() {
         return publisher;

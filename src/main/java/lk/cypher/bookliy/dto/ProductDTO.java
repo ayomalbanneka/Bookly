@@ -10,6 +10,8 @@ public class ProductDTO {
     private String publishedDate;
     private String isbn;
     private String language;
+    private String genre;
+    private int pages;
     private double price;
     private int stock;
     private int categoryId;
@@ -17,6 +19,22 @@ public class ProductDTO {
     private String description;
     private List<StockDTO> stockDTOList;
     private List<String> images;
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 
     public String getPublisher() {
         return publisher;

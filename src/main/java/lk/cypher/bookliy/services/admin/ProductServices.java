@@ -129,6 +129,8 @@ public class ProductServices {
                             product.setLanguage(productDTO.getLanguage());
                             product.setPublishedDate(formattedDate);
                             product.setPublisher(productDTO.getPublisher());
+                            product.setGenre(productDTO.getGenre());
+                            product.setPages(productDTO.getPages());
                             product.setAdmin(admin);
 
                             Stock stock = new Stock();
