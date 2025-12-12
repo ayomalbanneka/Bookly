@@ -64,7 +64,7 @@ public class ContentServices {
         JsonObject responseObject = new JsonObject();
         Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
         List<Product> productList = hibernateSession.createQuery("FROM Product p ORDER BY p.createdAt DESC", Product.class)
-                .setMaxResults(10)
+                .setMaxResults(8)
                 .getResultList();
 
         List<ProductDTO> productDTOList = new ArrayList<>();
