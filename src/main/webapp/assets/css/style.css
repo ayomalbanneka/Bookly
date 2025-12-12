@@ -618,8 +618,12 @@ body {
 }
 
 .related-products .card-img-top {
-    height: 200px;
-    object-fit: cover;
+    height: 280px;
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 15px;
+    background-color: #f8f9fa;
 }
 
 /* Responsive Adjustments */
@@ -678,16 +682,6 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* Success/Failure Messages */
-.alert-message {
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    z-index: 1050;
-    display: none;
-    animation: slideIn 0.3s ease;
 }
 
 @keyframes slideIn {
