@@ -25,9 +25,7 @@ public class AdminServices {
         } else if (!adminDTO.getEmail().matches(Validator.EMAIL_VALIDATION)) {
             message = "Please provide valid email address.";
         } else if (!adminDTO.getPassword().matches(Validator.PASSWORD_VALIDATION)) {
-            message = "Please provide valid password. \n" +
-                    "The password must containes at least one capita letter, one simple letter," +
-                    "one digit, one special character and password must be greater than 8 characters";
+            message = "Please provide valid password.";
         } else {
             Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
             Admin singleAdmin = hibernateSession.createNamedQuery("admin.getByEmail", Admin.class)

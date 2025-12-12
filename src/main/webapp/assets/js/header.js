@@ -53,17 +53,17 @@ class HeaderContent extends HTMLElement {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Pages
+                                Categories
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="about.html">About</a></li>
-                                <li><a class="dropdown-item" href="shop.html">Shop</a></li>
-                                <li><a class="dropdown-item" href="product.html">Single Product</a></li>
-                                <li><a class="dropdown-item" href="cart.html">Cart</a></li>
-                                <li><a class="dropdown-item" href="checkout.html">Checkout</a></li>
-                                <li><a class="dropdown-item" href="blog.html">Blog</a></li>
-                                <li><a class="dropdown-item" href="post.html">Single Post</a></li>
-                                <li><a class="dropdown-item" href="contact.html">Contact</a></li>
+                                <li><a class="dropdown-item" href="romance.html">Romance</a></li>
+                                <li><a class="dropdown-item" href="fiction.html">Fiction</a></li>
+                                <li><a class="dropdown-item" href="mystrey.html">Mystrey</a></li>
+                                <li><a class="dropdown-item" href="sci-fi.html">Sci-Fi</a></li>
+                                <li><a class="dropdown-item" href="biography.html">Biography</a></li>
+                                <li><a class="dropdown-item" href="business.html">Business</a></li>
+                                <li><a class="dropdown-item" href="self-help.html">Self-Help</a></li>
+                                <li><a class="dropdown-item" href="children.html">Children</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">

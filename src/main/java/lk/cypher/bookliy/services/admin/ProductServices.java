@@ -114,7 +114,7 @@ public class ProductServices {
                             Product product = new Product();
 
                             LocalDateTime parsedDate = LocalDateTime.parse(
-                                    productDTO.getPublishedDate() + "T00:00:00"
+                                    productDTO.getPublishedDate() + "T00:00:00" // Assuming time as midnight
                             );
 
                             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
