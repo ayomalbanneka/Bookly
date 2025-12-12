@@ -17,4 +17,12 @@ public class CommonController {
         String responseJson = new CommonServices().getSingleProduct(id);
         return Response.ok().entity(responseJson).build();
     }
+
+    @Path("/related-products")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadRelatedProducts(@QueryParam("productId") int id) {
+        String responseJson = new CommonServices().getRelatedProducts(id);
+        return Response.ok().entity(responseJson).build();
+    }
 }
