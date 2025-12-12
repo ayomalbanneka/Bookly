@@ -64,7 +64,7 @@ async function renderLatestArrivals(newArrivals) {
             newArrivalProductContainer.innerHTML += `
         <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="product-card card border-0 shadow-sm h-100" >
-                <a class="text-decoration-none" href="single-product.html?productId=${product.productId}">
+                <a class="text-decoration-none text-dark" href="single-product.html?productId=${product.productId}">
                     <div class="position-relative">
                                 <img src="${product.images[0]}" class="card-img-top" alt="Book Title">
                                     <span class="badge bg-success position-absolute top-0 start-0 m-2">NEW</span>
@@ -75,7 +75,7 @@ async function renderLatestArrivals(newArrivals) {
                                     </div>
                             </div>
                             <div class="card-body">
-                                <h5 class="card-title h6">${product.title}</h5>
+                                <h5 class="card-title text-truncate h6">${product.title}</h5>
                                 <p class="card-text text-muted small">${product.author}</p>
                                 <div class="rating mb-2">
                                     <i class="bi bi-star-fill text-warning"></i>
