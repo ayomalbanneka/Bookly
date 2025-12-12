@@ -8,6 +8,7 @@ window.addEventListener('load', async () => {
     });
     try {
         await loadSingleProductDetails();
+        await loadRelatedProducts();
         initializeQuantityControls();
     } catch (e) {
         console.log("Error loading initial data:", e);
@@ -24,8 +25,6 @@ async function loadSingleProductDetails() {
         if (response.ok) {
             const data = await response.json();
             const product = data.singleProduct;
-            console.log(data)
-            console.log(product)
 
             if (product.images && product.images.length > 0) {
                 document.getElementById("image").src = product.images[0];
@@ -39,6 +38,7 @@ async function loadSingleProductDetails() {
 
             document.getElementById("isbn").innerHTML = product.isbn;
             document.getElementById("category").innerHTML = product.categoryName;
+            document.getElementById("category").href = product.categoryName.toLowerCase() + ".html";
             document.getElementById("pages").innerHTML = product.pages;
             document.getElementById("genre").innerHTML = product.genre;
             document.getElementById("publisher").innerHTML = product.publisher;
@@ -78,6 +78,50 @@ async function loadSingleProductDetails() {
         }
     } catch (e) {
         console.log("Error fetching product details:", e);
+    }
+}
+
+async function loadRelatedProducts() {
+    try {
+        const response = await fetch(`api/common/related-products?productId=${productId}`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+
+            const relatedProductsMain = document.getElementById("related-products-section");
+            const productTemplate = document.getElementById('related-product-template');
+            relatedProductsMain.innerHTML = "";
+
+            data.relatedProducts.forEach((product) => {
+                product.stockDTOList.forEach((stock) => {
+                    const productClone = productTemplate.content.cloneNode(true);
+
+                    // Product link
+                    productClone.querySelector(".r-product-link").href = "single-product.html?productId=" + product.productId;
+
+                    // Set the image
+                    productClone.querySelector(".r-image").src = product.images[0];
+                    productClone.querySelector(".r-image").alt = product.title;
+
+                    // Set the title
+                    productClone.querySelector(".r-title").textContent = product.title;
+
+                    // Set the author (if you have it in your data)
+                    productClone.querySelector(".r-author").textContent = product.author;
+
+                    // Set the price
+                    productClone.querySelector(".r-price").textContent = "LKR " + new Intl.NumberFormat("en-US", {
+                        minimumFractionDigits: 2,
+                    }).format(stock.price);
+
+                    relatedProductsMain.appendChild(productClone);
+                });
+            });
+        } else {
+            console.error("Failed to load related products");
+        }
+    } catch (e) {
+        console.error("Error fetching related products:", e);
     }
 }
 
