@@ -140,15 +140,18 @@ class AdminPanel {
             new Chart(salesCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fiction', 'Non-Fiction', 'Romance', 'Mystery', 'Sci-Fi'],
+                    labels: ['Fiction', 'Non-Fiction', 'Romance', 'Mystery', 'Sci-Fi', 'Biography','Business', 'Children'],
                     datasets: [{
-                        data: [35, 25, 20, 15, 5],
+                        data: [35, 25, 20, 15, 5, 10, 8, 12],
                         backgroundColor: [
                             '#6366f1',
                             '#10b981',
                             '#f59e0b',
                             '#ef4444',
-                            '#8b5cf6'
+                            '#8b5cf6',
+                            '#3b82f6',
+                            '#50b814',
+                            '#420611'
                         ],
                         borderWidth: 0,
                         hoverOffset: 8
@@ -453,6 +456,26 @@ async function loadCategories() {
 const editor1 = new RichTextEditor('#description');
 
 async function saveProduct() {
+
+    // Validate image before doing anything else
+    let imgFileInput = document.getElementById('image-input');
+    if (!imgFileInput.files || imgFileInput.files.length === 0) {
+        new Notify({
+            status: 'warning',
+            title: 'Warning',
+            text: 'Please select an image before saving the product.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        return; // STOP the function immediately
+    }
+
     let title = document.getElementById('productTitle').value;
     let description = editor1.getHTMLCode();
     let author = document.getElementById('author').value;
