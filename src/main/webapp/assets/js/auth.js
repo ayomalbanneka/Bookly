@@ -186,7 +186,7 @@ async function loginAccount() {
     });
 
     const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const password = document.getElementById("passwordField").value;
 
     const loginObject = {
         email: email,
