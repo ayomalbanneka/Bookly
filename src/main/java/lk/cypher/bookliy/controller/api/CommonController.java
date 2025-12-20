@@ -25,4 +25,68 @@ public class CommonController {
         String responseJson = new CommonServices().getRelatedProducts(id);
         return Response.ok().entity(responseJson).build();
     }
+
+    @Path("/romance")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadRomance() {
+        String responseJson = new CommonServices().getRomanceBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/mystery")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadFiction() {
+        String responseJson = new CommonServices().getMysteryBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/science-fiction")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadScienceFiction() {
+        String responseJson = new CommonServices().getScienceFictionBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/biography")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadBiography() {
+        String responseJson = new CommonServices().getBiographyBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/self-help")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadSelfHelp() {
+        String responseJson = new CommonServices().getSelfHelpBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/fiction")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadFictionBooks() {
+        String responseJson = new CommonServices().getFictionBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/business")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadBusinessBooks() {
+        String responseJson = new CommonServices().getBusinessBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/children")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadChildrenBooks() {
+        String responseJson = new CommonServices().getChildrenBooks();
+        return Response.ok().entity(responseJson).build();
+    }
 }

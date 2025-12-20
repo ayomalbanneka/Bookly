@@ -58,7 +58,7 @@ class HeaderContent extends HTMLElement {
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="romance.html">Romance</a></li>
                                 <li><a class="dropdown-item" href="fiction.html">Fiction</a></li>
-                                <li><a class="dropdown-item" href="mystrey.html">Mystrey</a></li>
+                                <li><a class="dropdown-item" href="mystery.html">Mystrey</a></li>
                                 <li><a class="dropdown-item" href="sci-fi.html">Sci-Fi</a></li>
                                 <li><a class="dropdown-item" href="biography.html">Biography</a></li>
                                 <li><a class="dropdown-item" href="business.html">Business</a></li>
