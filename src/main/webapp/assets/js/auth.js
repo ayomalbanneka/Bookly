@@ -377,3 +377,75 @@ async function verifyAccount() {
         Notiflix.Loading.remove(1000);
     }
 }
+
+async function signOut() {
+    Notiflix.Loading.dots("Please Wait...", {
+        clickToClose: true,
+        svgColor: "#000cf5",
+        timeout: 3000
+    });
+
+    try {
+        const response = await fetch('api/users/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            new Notify({
+                status: 'success',
+                title: 'Logout Successful',
+                text: 'You have been logged out successfully.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+
+            setTimeout(() => {
+                window.location.href = 'sign-in.html';
+            }, 3000)
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Sign Out Failed',
+                text: 'Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+        }
+
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'API Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
+    } finally {
+        Notiflix.Loading.remove(3000);
+    }
+}
