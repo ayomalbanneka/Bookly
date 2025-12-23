@@ -4,10 +4,12 @@ window.addEventListener('load', async () => {
         svgColor: "#000cf5"
     });
     try {
-        await loadDistricts();
-        // Add event listener for district selection change
-        const districtSelect = document.getElementById('districtSelect');
-        districtSelect.addEventListener('change', loadCities);
+        // Only run on my-account.html
+        if (window.location.pathname.includes('my-account.html')) {
+            await loadDistricts();
+            const districtSelect = document.getElementById('districtSelect');
+            districtSelect.addEventListener('change', loadCities);
+        }
 
     } catch (e) {
         console.log("Error loading initial data:", e);
@@ -15,7 +17,6 @@ window.addEventListener('load', async () => {
         Notiflix.Loading.remove(3000);
     }
 })
-
 
 // Search functionality
 const searchModal = document.getElementById('searchModal');
@@ -209,4 +210,167 @@ function renderDropDowns(selector, list, suffix) {
         option.innerHTML = item[suffix]; // Set the display text
         selector.appendChild(option); // Append the option to the select element
     })
+}
+
+async function addToCart(stockId, qty) {
+    try {
+        Notiflix.Loading.dots('Adding to cart...', {
+            clickToClose: false,
+            svgColor: '#000cf5'
+        });
+
+        const response = await fetch(`api/common/add-to-cart?sId=${stockId}&qty=${qty}`);
+
+        if (response.ok) {
+            let data = await response.json();
+            if (data.status) {
+                new Notify({
+                    status: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            } else {
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to add to cart. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
+    } finally {
+        Notiflix.Loading.remove();
+    }
+}
+
+async function loadCartItems() {
+    try {
+        Notiflix.Loading.dots('Loading cart items...', {
+            clickToClose: false,
+            svgColor: '#000cf5'
+        });
+
+        const response = await fetch('api/common/get-cart-items');
+        if (response.ok) {
+            let data = await response.json();
+            if (data.status) {
+                new Notify({
+                    status: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            } else {
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to load cart items. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
+    } finally {
+        Notiflix.Loading.remove();
+    }
 }
