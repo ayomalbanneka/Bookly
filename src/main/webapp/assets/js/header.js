@@ -92,6 +92,7 @@ class HeaderContent extends HTMLElement {
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="wishlist.html">Wishlist</a></li>
                                 <li><a class="dropdown-item" href="orders.html">Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
                             </ul>
                         </div>
 

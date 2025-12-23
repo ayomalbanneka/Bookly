@@ -47,6 +47,13 @@ async function loadSingleProductDetails() {
             document.getElementById("book-name").innerHTML = product.title;
             document.getElementById("description").innerHTML = product.description;
 
+            const addToCartBtn = document.getElementById('add-to-cart');
+            addToCartBtn.addEventListener('click', async (evt) => {
+                const qtyInput = document.getElementById('quantity-input');
+                await addToCart(product.stockDTOList[0].stockId, qtyInput.value);
+                evt.preventDefault();
+            });
+
             // Set quantity input VALUE, not innerHTML
             const qtyInput = document.getElementById("quantity-input");
             if (qtyInput) {
