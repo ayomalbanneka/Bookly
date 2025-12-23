@@ -1,19 +1,295 @@
 package lk.cypher.bookliy.services;
 
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lk.cypher.bookliy.dto.ProductDTO;
 import lk.cypher.bookliy.dto.StockDTO;
-import lk.cypher.bookliy.entity.Category;
-import lk.cypher.bookliy.entity.Product;
-import lk.cypher.bookliy.entity.Stock;
+import lk.cypher.bookliy.entity.*;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
+import lk.cypher.bookliy.validation.Validator;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommonServices {
+
+    // Get all user carts service
+    public String getAllUserCarts(HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        HttpSession httpSession = request.getSession();
+        User sessionUser = (User) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            //Use session cart
+            List<Cart> sessionCart = getSessionAttribute(httpSession);
+            if(sessionCart == null){
+                message = "No items in cart.";
+            } else if (sessionCart.isEmpty()) {
+                message = "No items in cart.";
+            }else{
+                // Generate Cart DTOs
+            }
+        } else {
+            // Use user cart from DB
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+            List<Cart> cartList = hibernateSession.createQuery("FROM Cart c WHERE c.user.id=:id", Cart.class)
+                    .setParameter("id", sessionUser.getId())
+                    .getResultList();
+            if(cartList.isEmpty()){
+                message = "No items in cart.";
+            }else{
+                // Generate Cart DTOs
+            }
+            hibernateSession.close();
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public void mergeUserCarts(HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        User sessionUser = (User) request.getSession().getAttribute("user");
+        if (sessionUser != null) {
+            List<Cart> sessionCart = getSessionAttribute(httpSession);
+            if (sessionCart != null && !sessionCart.isEmpty()) {
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                User dbUser = hibernateSession.find(User.class, sessionUser.getId());
+                Transaction transaction = hibernateSession.beginTransaction();
+                for (Cart cart : sessionCart) {
+                    Stock stock = hibernateSession.find(Stock.class, cart.getStock().getId());
+                    Cart existingCart = hibernateSession.createQuery("FROM Cart c WHERE c.user=:user AND c.stock=:stock", Cart.class)
+                            .setParameter("user", dbUser)
+                            .setParameter("stock", stock)
+                            .getSingleResultOrNull();
+
+                    if (existingCart == null) {
+                        existingCart = new Cart();
+                        existingCart.setUser(dbUser);
+                        existingCart.setStock(stock);
+                        existingCart.setQty(cart.getQty());
+                        hibernateSession.persist(existingCart);
+                    } else {
+                        int newQuantity = existingCart.getQty() + cart.getQty();
+                        if (newQuantity <= stock.getQty()) {
+                            existingCart.setQty(newQuantity);
+                            hibernateSession.merge(existingCart);
+                        }
+                    }
+                }
+                transaction.commit();
+                hibernateSession.close();
+            }
+            httpSession.setAttribute("sessionCart", null); // Clear session cart after merging
+        }
+    }
+
+    // Add to cart service
+    public String addToCart(String sId, String qty, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        Session hibernateSession = null;
+
+        try {
+            if (sId == null || sId.isEmpty()) {
+                message = "Product ID is not provided.";
+            } else if (!sId.matches(Validator.IS_INTEGER)) {
+                message = "Invalid Product ID.";
+            } else if (qty == null || qty.isEmpty()) {
+                message = "Product quantity is not provided.";
+            } else if (!qty.matches(Validator.IS_INTEGER)) {
+                message = "Invalid quantity value.";
+            } else {
+                int stockId = Integer.parseInt(sId);
+                int requestQuantity = Integer.parseInt(qty);
+
+                hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                Stock stock = hibernateSession.find(Stock.class, stockId);
+
+                if (stock == null) {
+                    message = "Product not found.";
+                } else {
+                    // Stock found, proceed to add to cart
+                    HttpSession httpSession = request.getSession();
+                    User user = (User) request.getSession().getAttribute("user");
+                    List<Cart> sessionCart = getSessionAttribute(httpSession);
+
+                    if (user == null) {
+                        // User not logged in
+                        if (sessionCart == null) {
+                            // No session cart found, create a new one (First time)
+                            return guestUserFirstTime(stock, requestQuantity, httpSession);
+                        } else {
+                            // Session cart found, proceed to add item (Second time)
+                            return guestUserSecondTime(stock, requestQuantity, httpSession);
+                        }
+                    } else {
+                        // User already logged in
+                        return loggedUserCart(stock, requestQuantity, httpSession, hibernateSession);
+                    }
+                }
+            }
+        } finally {
+            // Fixed: Ensure session is always closed
+            if (hibernateSession != null) {
+                hibernateSession.close();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    // Guest user adding to cart
+    private String guestUserFirstTime(Stock stock, int requestQuantity, HttpSession httpSession) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        if (requestQuantity > stock.getQty()) {
+            message = "Product quantity exceeds available stock.";
+        } else {
+            List<Cart> cartList = new ArrayList<>();
+            Cart cart = new Cart();
+            cart.setId(1);
+            cart.setStock(stock);
+            cart.setQty(requestQuantity);
+            cart.setUser(null);
+            cartList.add(cart);
+            httpSession.setAttribute("sessionCart", cartList);
+            status = true;
+            message = "Product added to cart successfully.";
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    // Guest user adding to cart again
+    private String guestUserSecondTime(Stock stock, int requestQuantity, HttpSession httpSession) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        List<Cart> sessionCart = getSessionAttribute(httpSession);
+        boolean found = false;
+        Cart cart = null;
+
+        for (Cart c : sessionCart) {
+            if (c.getStock().getId() == stock.getId()) {
+                found = true;
+                cart = c;
+                break;
+            }
+        }
+
+        if (found) {
+            // Product already exists in cart, update quantity
+            int newQuantity = cart.getQty() + requestQuantity;
+            if (newQuantity > stock.getQty()) {
+                message = "Product quantity exceeds available stock.";
+            } else {
+                cart.setQty(newQuantity);
+                status = true;
+                message = "Product quantity updated in cart successfully.";
+            }
+        } else {
+            // Fixed: Added stock quantity validation for new items
+            if (requestQuantity > stock.getQty()) {
+                message = "Product quantity exceeds available stock.";
+            } else {
+                cart = new Cart();
+                cart.setId(sessionCart.size() + 1);
+                cart.setStock(stock);
+                cart.setQty(requestQuantity);
+                cart.setUser(null);
+                sessionCart.add(cart);
+                status = true;
+                message = "Product added to cart successfully.";
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    // Logged-in user adding to cart
+    private String loggedUserCart(Stock stock, int requestQuantity, HttpSession httpSession, Session hibernateSession) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        User sessionUser = (User) httpSession.getAttribute("user");
+
+        if (sessionUser != null) {
+            User dbUser = hibernateSession.find(User.class, sessionUser.getId());
+            Cart existingCart = hibernateSession.createQuery("FROM Cart c WHERE c.user=:user AND c.stock=:stock", Cart.class)
+                    .setParameter("user", dbUser)
+                    .setParameter("stock", stock)
+                    .getSingleResultOrNull();
+
+            Transaction transaction = hibernateSession.beginTransaction();
+
+            try {
+                if (existingCart == null) {
+                    // Fixed: Added stock quantity validation for new cart items
+                    if (requestQuantity > stock.getQty()) {
+                        message = "Product quantity exceeds available stock.";
+                    } else {
+                        existingCart = new Cart();
+                        existingCart.setUser(dbUser);
+                        existingCart.setStock(stock);
+                        existingCart.setQty(requestQuantity);
+                        hibernateSession.persist(existingCart);
+                        status = true;
+                        message = "Product added to cart successfully.";
+                    }
+                } else {
+                    // Update existing cart item
+                    int newQuantity = existingCart.getQty() + requestQuantity;
+                    if (newQuantity > stock.getQty()) {
+                        message = "Product quantity exceeds available stock.";
+                    } else {
+                        existingCart.setQty(newQuantity);
+                        hibernateSession.merge(existingCart);
+                        status = true;
+                        message = "User cart updated successfully.";
+                    }
+                }
+
+                transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                status = false;
+                message = "Error updating cart: " + e.getMessage();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    // Helper method to prevent warnings
+    @SuppressWarnings("unchecked")
+    private <T> T getSessionAttribute(HttpSession httpSession) {
+        return (T) httpSession.getAttribute("sessionCart");
+    }
+
+    // Fetch single product details
     public String getSingleProduct(int productId) {
         JsonObject responseObj = new JsonObject();
         Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
@@ -48,6 +324,7 @@ public class CommonServices {
         return AppUtil.gson.toJson(responseObj);
     }
 
+    //Fetch related products
     public String getRelatedProducts(int productId) {
         JsonObject responseObj = new JsonObject();
 
@@ -89,6 +366,7 @@ public class CommonServices {
         return AppUtil.gson.toJson(responseObj);
     }
 
+    //Fetch category-wise books
     public String getRomanceBooks() {
         JsonObject responseObj = new JsonObject();
 
