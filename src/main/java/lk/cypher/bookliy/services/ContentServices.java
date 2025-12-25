@@ -79,6 +79,7 @@ public class ContentServices {
             for (Stock stock : product.getStocks()) {
                 StockDTO stockDTO = new StockDTO();
                 stockDTO.setPrice(stock.getPrice());
+                stockDTO.setStockId(stock.getId());
                 stockDTOList.add(stockDTO);
             }
             productDTO.setStockDTOList(stockDTOList);

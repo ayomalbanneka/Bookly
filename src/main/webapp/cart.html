@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Bookly</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <link rel="icon" type="image/svg+xml"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%230d6efd' d='M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783'/></svg>">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Simple Notify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.css"/>
+</head>
+
+<style>
+    /* Cart Title */
+    .cart-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+
+    /* Cart Items Container */
+    .cart-items-container {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Cart Item */
+    .cart-item {
+        position: relative;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .cart-item:hover {
+        background-color: #fafbfc;
+    }
+
+    .cart-item-content {
+        position: relative;
+    }
+
+    /* Book Thumbnail */
+    .book-thumbnail {
+        position: relative;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        aspect-ratio: 2/3;
+    }
+
+    .book-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .cart-item:hover .book-thumbnail img {
+        transform: scale(1.05);
+    }
+
+    .badge-category {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Book Details */
+    .book-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        line-height: 1.3;
+    }
+
+    .book-author {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-meta {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        background: var(--light-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    /* Quantity Control */
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: white;
+    }
+
+    .qty-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .qty-btn:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .qty-btn:active {
+        transform: scale(0.95);
+    }
+
+    .qty-input {
+        width: 50px;
+        border: none;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-primary);
+        background: transparent;
+    }
+
+    .qty-input:focus {
+        outline: none;
+    }
+
+    /* Hide spinner buttons */
+    .qty-input::-webkit-inner-spin-button,
+    .qty-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .qty-input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    /* Price Container */
+    .price-container {
+        text-align: right;
+    }
+
+    .current-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        display: block;
+    }
+
+    .original-price {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-decoration: line-through;
+        display: block;
+        margin-top: 0.25rem;
+    }
+
+    .discount-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        background: #fef3c7;
+        color: #92400e;
+        border-radius: 4px;
+        font-weight: 700;
+        margin-top: 0.25rem;
+    }
+
+    .mobile-price {
+        margin-top: 0.5rem;
+    }
+
+    .mobile-price .current-price {
+        font-size: 1.1rem;
+        margin-right: 0.5rem;
+    }
+
+    .mobile-price .original-price {
+        display: inline;
+        font-size: 0.85rem;
+    }
+
+    .mobile-price .discount-badge {
+        margin-left: 0.5rem;
+    }
+
+    /* Cart Item Actions */
+    .cart-item-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .wishlist-btn:hover {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .wishlist-btn.active {
+        background: var(--danger-color);
+        border-color: var(--danger-color);
+        color: white;
+    }
+
+    .remove-btn:hover {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+        background: #fef2f2;
+    }
+
+    /* Delivery Info */
+    .delivery-info {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed var(--border-color);
+    }
+
+    .delivery-info small {
+        font-size: 0.8rem;
+    }
+
+    /* Coupon Section */
+    .coupon-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.5rem;
+    }
+
+    .coupon-header {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .coupon-input-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .coupon-input-group .form-control {
+        flex: 1;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .coupon-input-group .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .coupon-input-group .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+    }
+
+    .available-coupons {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .coupon-chip {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .coupon-chip:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Shipping Options Section */
+    .shipping-options-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+    }
+
+    .shipping-card {
+        position: relative;
+        padding: 1.25rem;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        height: 100%;
+    }
+
+    .shipping-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .shipping-card label {
+        cursor: pointer;
+        margin: 0;
+        display: block;
+    }
+
+    .shipping-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-2px);
+    }
+
+    .shipping-card.active {
+        border-color: var(--primary-color);
+        background: rgba(67, 97, 238, 0.03);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .shipping-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .shipping-time {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .shipping-price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--primary-color);
+    }
+
+    .shipping-card.active .shipping-price {
+        color: var(--primary-color);
+    }
+
+    /* Order Summary */
+    .order-summary {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    .sticky-summary {
+        position: sticky;
+        top: 100px;
+    }
+
+    .summary-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .summary-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .summary-body {
+        padding: 1.5rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        font-size: 0.95rem;
+    }
+
+    .summary-row:not(:last-child) {
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .summary-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 1rem 0;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0 0;
+    }
+
+    .summary-total > span {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .total-amount {
+        text-align: right;
+    }
+
+    .amount {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: var(--primary-color);
+        line-height: 1;
+    }
+
+    /* Summary Footer */
+    .summary-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-checkout {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.75rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Trust Badges */
+    .trust-badges {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        padding: 1.5rem;
+        background: var(--light-bg);
+    }
+
+    .trust-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        text-align: center;
+    }
+
+    .trust-item i {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .trust-item small {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    /* Delivery Estimate */
+    .delivery-estimate {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: #eff6ff;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .delivery-estimate i {
+        font-size: 1.5rem;
+    }
+
+    .delivery-estimate strong {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+
+    /* Recommended Section */
+    .recommended-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .recommended-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .recommended-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        transition: background 0.2s ease;
+    }
+
+    .recommended-item:hover {
+        background: var(--light-bg);
+    }
+
+    .recommended-item img {
+        width: 70px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .recommended-details {
+        flex: 1;
+    }
+
+    .recommended-details h6 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--text-primary);
+    }
+
+    .recommended-details p {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .recommended-details .price {
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    /* Empty Cart State */
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .empty-cart-icon {
+        font-size: 5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-cart h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .empty-cart p {
+        margin-bottom: 2rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991px) {
+        .sticky-summary {
+            position: static;
+        }
+
+        .cart-progress {
+            margin-top: 1rem;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+        }
+
+        .cart-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .progress-steps {
+            padding: 0;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 0.9rem;
+        }
+
+        .step-label {
+            display: none;
+        }
+
+        .step-line {
+            margin: 0 0.5rem;
+            top: -18px;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+        }
+
+        .cart-item {
+            padding: 1rem;
+        }
+
+        .cart-item-actions {
+            position: static;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        .book-title {
+            font-size: 1rem;
+        }
+
+        .shipping-options-section .row {
+            gap: 0.75rem;
+        }
+
+        .trust-badges {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .trust-item {
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        .recommended-item img {
+            width: 60px;
+            height: 85px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .coupon-input-group {
+            flex-direction: column;
+        }
+
+        .coupon-input-group .btn {
+            width: 100%;
+        }
+
+        .amount {
+            font-size: 1.0rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .cart-item {
+        animation: fadeInUp 0.4s ease-out;
+    }
+
+    .cart-item:nth-child(1) { animation-delay: 0.1s; }
+    .cart-item:nth-child(2) { animation-delay: 0.2s; }
+    .cart-item:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Print Styles */
+    @media print {
+        .cart-item-actions,
+        .summary-footer,
+        .coupon-section,
+        .shipping-options-section,
+        .recommended-section {
+            display: none;
+        }
+    }
+</style>
+
+<body>
+
+<!-- Header Component -->
+<header class="sticky-top bg-white shadow-sm">
+    <header-content></header-content>
+</header>
+
+<!-- Main Content -->
+<main class="cart-main py-4 py-md-5">
+    <div class="container">
+
+        <!-- Page Title -->
+        <div class="text-center mb-4 mb-md-5">
+            <h1 class="cart-title mb-2">Your Cart</h1>
+            <p class="text-muted">Review your selected books before checkout</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Cart Items Column -->
+            <div class="col-lg-8">
+
+                <!-- Cart Items Container -->
+                <div class="cart-items-container" id="cartItemsContainer">
+
+                    <!-- Cart Item -->
+                    <div class="cart-item" data-item-id="1" id="cartItems">
+                        <div class="cart-item-content">
+                            <div class="row g-3 align-items-center">
+
+                                <!-- Book Image -->
+                                <div class="col-4 col-sm-3 col-md-2">
+                                    <div class="book-thumbnail">
+                                        <img src=""
+                                             alt=""
+                                             class="img-fluid rounded">
+                                    </div>
+                                </div>
+
+                                <!-- Book Details -->
+                                <div class="col-8 col-sm-9 col-md-5">
+                                    <h5 class="book-title mb-1"></h5>
+                                    <p class="book-author text-muted mb-2"></p>
+                                    <div class="book-meta d-flex flex-wrap gap-2 mb-2">
+                                        <span class="meta-badge"></span>
+                                        <span class="meta-badge"></span>
+                                    </div>
+                                    <div class="mobile-price d-md-none">
+                                        <span class="current-price"></span>
+                                        <!--                                        <span class="original-price">$19.99</span>-->
+                                        <!--                                        <span class="discount-badge">25% OFF</span>-->
+                                    </div>
+                                </div>
+
+                                <!-- Quantity & Price -->
+                                <div class="col-12 col-md-5">
+                                    <div class="row align-items-center g-2">
+
+                                        <!-- Quantity Selector -->
+                                        <div class="col-6 col-md-4">
+                                            <div class="quantity-control">
+                                                <button class="qty-btn qty-minus" data-item="1">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <input type="number" class="qty-input" value="" min="1" max="10"
+                                                       data-item="1">
+                                                <button class="qty-btn qty-plus" data-item="1">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div class="col-6 col-md-6 text-end">
+                                            <div class="price-container d-none d-md-block">
+                                                <div class="current-price"></div>
+                                                <!--                                                <div class="original-price">$19.99</div>-->
+                                                <!--                                                <div class="discount-badge">25% OFF</div>-->
+                                            </div>
+                                            <div class="item-total d-md-none">
+                                                <strong></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="cart-item-actions">
+                                <button class="action-btn remove-btn" data-item="1" title="Remove">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Info -->
+                        <div class="delivery-info">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="bi bi-truck me-1"></i>
+                                        Delivery in 3-5 business days
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <small class="text-success">
+                                        <i class="bi bi-patch-check me-1"></i>
+                                        Free shipping eligible
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Coupon Section -->
+                <!--                <div class="coupon-section">-->
+                <!--                    <div class="coupon-header">-->
+                <!--                        <i class="bi bi-gift me-2"></i>-->
+                <!--                        <span>Have a coupon code?</span>-->
+                <!--                    </div>-->
+                <!--                    <div class="coupon-input-group">-->
+                <!--                        <input type="text" class="form-control" placeholder="Enter coupon code" id="couponInput">-->
+                <!--                        <button class="btn btn-primary" id="applyCoupon">Apply</button>-->
+                <!--                    </div>-->
+                <!--                    <div class="available-coupons">-->
+                <!--                        <small class="text-muted">Available: </small>-->
+                <!--                        <span class="coupon-chip">SUMMER20</span>-->
+                <!--                        <span class="coupon-chip">BOOK10</span>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="order-summary sticky-summary" id="orderSummary">
+
+                    <!-- Summary Header -->
+                    <div class="summary-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+
+                    <!-- Summary Details -->
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span>Subtotal (2 items)</span>
+                            <span>$27.98</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span class="text-success">FREE</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <div class="total-amount">
+                                <div class="amount">LKR 30.50</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <div class="summary-footer">
+                        <button class="btn btn-checkout w-100 mb-3">
+                            <i class="bi bi-lock-fill me-2"></i>
+                            Proceed to Checkout
+                        </button>
+                        <a href="shop.html" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Continue Shopping
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Empty Cart State (Hidden by default) -->
+            <div class="empty-cart d-none" id="emptyCart">
+                <div class="empty-cart-icon">
+                    <i class="bi bi-cart-x"></i>
+                </div>
+                <h3>Your cart is empty</h3>
+                <p class="text-muted">Looks like you haven't added any books yet</p>
+                <a href="shop.html" class="btn btn-primary btn-lg">
+                    <i class="bi bi-book me-2"></i>Browse Books
+                </a>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Footer Component -->
+<footer class="footer bg-dark text-white py-5">
+    <footer-content></footer-content>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.min.js"></script>
+<!-- Custom JS -->
+<script src="assets/js/header.js"></script>
+<script src="assets/js/footer.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/notiflix-aio-3.2.8.min.js"></script>
+
+</body>
+</html>
