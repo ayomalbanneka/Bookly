@@ -92,10 +92,11 @@ async function renderLatestArrivals(newArrivals) {
                                     </span>
                                 </div>
                             </div>
-                            <div class="card-footer bg-transparent border-0 pt-0">
-                                <button class="btn btn-primary w-100 btn-sm">Add to Cart</button>
-                            </div>
                 </a>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <button class="btn btn-primary w-100 btn-sm" 
+                                onclick="addToCart(${stock.stockId},1)">Add to Cart</button>
+                            </div>
                     </div>
                </div>
 `;
