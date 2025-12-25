@@ -3,6 +3,7 @@ package lk.cypher.bookliy.services;
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lk.cypher.bookliy.dto.CartDTO;
 import lk.cypher.bookliy.dto.ProductDTO;
 import lk.cypher.bookliy.dto.StockDTO;
 import lk.cypher.bookliy.entity.*;
@@ -34,6 +35,10 @@ public class CommonServices {
                 message = "No items in cart.";
             }else{
                 // Generate Cart DTOs
+                List<CartDTO> cartDTOList = generateCartDTOs(sessionCart);
+                responseObj.add("cartItems", AppUtil.gson.toJsonTree(cartDTOList));
+                status = true;
+                message = "Cart items retrieved successfully.";
             }
         } else {
             // Use user cart from DB
@@ -45,6 +50,10 @@ public class CommonServices {
                 message = "No items in cart.";
             }else{
                 // Generate Cart DTOs
+                List<CartDTO> cartDTOList = generateCartDTOs(cartList);
+                responseObj.add("cartItems", AppUtil.gson.toJsonTree(cartDTOList));
+                status = true;
+                message = "Cart items retrieved successfully.";
             }
             hibernateSession.close();
         }
@@ -52,6 +61,27 @@ public class CommonServices {
         responseObj.addProperty("status", status);
         responseObj.addProperty("message", message);
         return AppUtil.gson.toJson(responseObj);
+    }
+
+    private List<CartDTO> generateCartDTOs(List<Cart> cartList) {
+        List<CartDTO> cartDTOList = new ArrayList<>();
+        Session hinernateSession = HibernateUtil.getSessionFactory().openSession();
+        for (Cart cart : cartList) {
+            Stock stock = hinernateSession.find(Stock.class, cart.getStock().getId());
+
+            CartDTO cartDTO = new CartDTO();
+            cartDTO.setCartId(cart.getId());
+            cartDTO.setStockId(stock.getId());
+            cartDTO.setProductTitle(stock.getProduct().getTitle());
+            cartDTO.setImages(stock.getProduct().getImages());
+            cartDTO.setQty(cart.getQty());
+            cartDTO.setPrice(stock.getPrice());
+            cartDTO.setAuthorName(stock.getProduct().getAuthor());
+            cartDTO.setBookCategory(stock.getProduct().getCategory().getName());
+            cartDTO.setPages(stock.getProduct().getPages());
+            cartDTOList.add(cartDTO);
+        }
+        return cartDTOList;
     }
 
     public void mergeUserCarts(HttpServletRequest request) {
