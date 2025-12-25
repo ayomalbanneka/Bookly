@@ -15,6 +15,11 @@
     --primary: #0d6efd;
     --secondary: #6c757d;
 
+    /* Category Specific Colors */
+    --romance: #e83e8c;
+    --romance-light: #f8d7da;
+    --romance-dark: #d63384;
+
     /* Fiction Page */
 
     --fiction: #4361ee;
@@ -47,6 +52,23 @@
     --children: #ff006e; /* Pink - Joy/Playfulness */
     --children-light: #ffafcc;
     --children-dark: #e63946;
+
+    /*Cart Page*/
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --light-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 }
 
 * {
