@@ -15,12 +15,70 @@ window.addEventListener('load', async () => {
             await loadCartItems();
         }
 
+        if (window.location.pathname.includes('shop.html')) {
+            initFilterToggle();
+            await loadAdvancedSearchData();
+        }
+
+
     } catch (e) {
         console.log("Error loading initial data:", e);
     } finally {
         Notiflix.Loading.remove(3000);
     }
 })
+
+function initFilterToggle() {
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
+    const filtersSidebar = document.getElementById('filtersSidebar');
+    const filtersOverlay = document.createElement('div');
+
+    if (!toggleFiltersBtn || !filtersSidebar) {
+        console.error('Filter elements not found');
+        return;
+    }
+
+    // Create overlay for mobile
+    filtersOverlay.className = 'filters-overlay';
+    document.body.appendChild(filtersOverlay);
+
+    // Toggle filters on button click
+    toggleFiltersBtn.addEventListener('click', function () {
+        filtersSidebar.classList.toggle('show');
+        filtersOverlay.classList.toggle('show');
+
+        // Update button text
+        if (filtersSidebar.classList.contains('show')) {
+            toggleFiltersBtn.innerHTML = '<i class="bi bi-x-circle me-1"></i> Hide Filters';
+            toggleFiltersBtn.classList.remove('btn-outline-primary');
+            toggleFiltersBtn.classList.add('btn-primary');
+        } else {
+            toggleFiltersBtn.innerHTML = '<i class="bi bi-funnel me-1"></i> Show Filters';
+            toggleFiltersBtn.classList.remove('btn-primary');
+            toggleFiltersBtn.classList.add('btn-outline-primary');
+        }
+    });
+
+    // Close filters when clicking overlay
+    filtersOverlay.addEventListener('click', function () {
+        filtersSidebar.classList.remove('show');
+        filtersOverlay.classList.remove('show');
+        toggleFiltersBtn.innerHTML = '<i class="bi bi-funnel me-1"></i> Show Filters';
+        toggleFiltersBtn.classList.remove('btn-primary');
+        toggleFiltersBtn.classList.add('btn-outline-primary');
+    });
+
+    // Close filters on escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && filtersSidebar.classList.contains('show')) {
+            filtersSidebar.classList.remove('show');
+            filtersOverlay.classList.remove('show');
+            toggleFiltersBtn.innerHTML = '<i class="bi bi-funnel me-1"></i> Show Filters';
+            toggleFiltersBtn.classList.remove('btn-primary');
+            toggleFiltersBtn.classList.add('btn-outline-primary');
+        }
+    });
+}
 
 // Search functionality
 const searchModal = document.getElementById('searchModal');
@@ -509,5 +567,264 @@ async function loadCartItems() {
         })
     } finally {
         Notiflix.Loading.remove();
+    }
+}
+
+async function loadAdvancedSearchData() {
+    try {
+        const response = await fetch('api/common/all-products');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                updateProductView(data);
+                updateCategoriesView(data.categoryList, data.allProductCount);
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to load advanced search data',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
+    }
+}
+
+let allProductsData = null; // Store all products globally for filtering
+
+function updateProductView(data) {
+    allProductsData = data;
+
+    const bookCount = document.getElementById('bookCount');
+    bookCount.innerText = data.allProductCount;
+
+    const productContainer = document.getElementById('productsContainer');
+    let htmlContent = '';
+
+    data.allProducts.forEach((product) => {
+        product.stockDTOList.forEach((stock) => {
+            let priceFormatted = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(stock.price);
+
+            // Determine stock status - IMPORTANT: Check if stock.stock exists
+            const stockQty = stock.stock || 0;
+            const isInStock = stockQty > 0;
+            const stockStatus = isInStock ? 'in-stock' : 'out-of-stock';
+
+            htmlContent += `
+            <div class="col-md-4 col-sm-6 product-item" 
+                 data-category="${product.categoryName.toLowerCase()}"
+                 data-availability="${stockStatus}">
+                    <a href="single-product.html?productId=${product.productId}" class="text-decoration-none text-dark">
+                        <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="${product.images[0]}"
+                             alt="${product.title}"
+                             class="img-fluid">
+                        <span class="product-badge bg-${product.categoryName.toLowerCase()}">${product.categoryName}</span>
+                        <div class="product-actions">
+                            <button class="wishlist-toggle" title="Add to Wishlist">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <button class="quick-view" title="Quick View">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h5 class="product-title text-truncate">${product.title}</h5>
+                        <p class="product-author">${product.author}</p>
+                        <div class="product-price">
+                            <span class="current-price">LKR ${priceFormatted}</span>
+                        </div>
+                        <div class="product-stock-info mb-2">
+                            <small class="${isInStock ? 'text-success' : 'text-danger'}">
+                                ${isInStock ? `${stockQty} in stock` : 'Out of stock'}
+                            </small>
+                        </div>
+                        <div class="product-actions-bottom">
+                            <button class="add-to-cart" 
+                                    onclick="addToCart(${stock.stockId},1)"
+                                    ${!isInStock ? 'disabled' : ''}>
+                                <i class="bi bi-cart-plus me-2"></i>
+                                ${isInStock ? 'Add to Cart' : 'Out of Stock'}
+                            </button>
+                        </div>
+                    </div>
+                </div>     
+                    </a>
+               
+            </div>
+            `;
+        });
+    });
+
+    productContainer.innerHTML = htmlContent;
+}
+
+function updateCategoriesView(categoryList, allProductCount) {
+    const categoriesContainer = document.querySelector('.categories-list');
+
+    let htmlContent = `
+        <div class="form-check mb-2">
+            <input class="form-check-input category-filter" type="checkbox" value="all"
+                   id="catAll" checked onchange="filterByCategory(event)">
+            <label class="form-check-label" for="catAll">
+                All Categories
+            </label>
+            <span class="badge bg-light text-dark float-end">${allProductCount}</span>
+        </div>
+    `;
+
+    categoryList.forEach(category => {
+        const categoryId = `cat${category.name.replace(/\s+/g, '')}`;
+        const categoryValue = category.name.toLowerCase();
+
+        htmlContent += `
+            <div class="form-check mb-2">
+                <input class="form-check-input category-filter" type="checkbox" 
+                       value="${categoryValue}" id="${categoryId}" onchange="filterByCategory(event)">
+                <label class="form-check-label text-truncate" for="${categoryId}">
+                    ${category.name}
+                </label>
+                <span class="badge bg-${categoryValue} text-white float-end">${category.count}</span>
+            </div>
+        `;
+    });
+
+    categoriesContainer.innerHTML = htmlContent;
+}
+
+// Filter functions
+function filterByCategory(event) {
+    const allCheckbox = document.getElementById('catAll');
+    const categoryCheckboxes = document.querySelectorAll('.category-filter:not(#catAll)');
+    const clickedCheckbox = event ? event.target : null;
+
+    // If "All" was clicked
+    if (clickedCheckbox && clickedCheckbox.id === 'catAll') {
+        if (allCheckbox.checked) {
+            // Uncheck all other categories
+            categoryCheckboxes.forEach(cb => cb.checked = false);
+        }
+    } else if (clickedCheckbox) {
+        // If any category was clicked, uncheck "All"
+        if (clickedCheckbox.checked) {
+            allCheckbox.checked = false;
+        } else {
+            // If no categories are selected, check "All"
+            const anyChecked = Array.from(categoryCheckboxes).some(cb => cb.checked);
+            if (!anyChecked) {
+                allCheckbox.checked = true;
+            }
+        }
+    }
+
+    // Get selected categories
+    const checkedBoxes = document.querySelectorAll('.category-filter:checked');
+    const selectedCategories = Array.from(checkedBoxes).map(cb => cb.value);
+
+    // Filter products
+    const allProducts = document.querySelectorAll('.product-item');
+    let visibleCount = 0;
+
+    allProducts.forEach(product => {
+        const productCategory = product.getAttribute('data-category');
+
+        if (selectedCategories.includes('all') || selectedCategories.includes(productCategory)) {
+            product.style.display = '';
+            visibleCount++;
+        } else {
+            product.style.display = 'none';
+        }
+    });
+
+    // Apply all filters
+    applyAllFilters();
+}
+
+// Availability filter
+function filterByAvailability(event) {
+    const inStockCheckbox = document.getElementById('inStock');
+    const outOfStockCheckbox = document.getElementById('outOfStock');
+
+    // Prevent both from being unchecked
+    const clickedCheckbox = event.target;
+
+    // If trying to uncheck the last checked box, prevent it
+    if (!clickedCheckbox.checked && !inStockCheckbox.checked && !outOfStockCheckbox.checked) {
+        clickedCheckbox.checked = true;
+        return;
+    }
+
+    // Apply all filters
+    applyAllFilters();
+}
+
+// Apply all filters together
+function applyAllFilters() {
+    // Get selected categories
+    const categoryCheckboxes = document.querySelectorAll('.category-filter:checked');
+    const selectedCategories = Array.from(categoryCheckboxes).map(cb => cb.value);
+
+    // Get selected availability
+    const availabilityCheckboxes = document.querySelectorAll('.availability-filter:checked');
+    const selectedAvailability = Array.from(availabilityCheckboxes).map(cb => cb.value);
+
+    // Filter products
+    const allProducts = document.querySelectorAll('.product-item');
+    let visibleCount = 0;
+
+    allProducts.forEach(product => {
+        const productCategory = product.getAttribute('data-category');
+        const productAvailability = product.getAttribute('data-availability');
+
+        // Check if product matches filters
+        const categoryMatch = selectedCategories.includes('all') ||
+            selectedCategories.includes(productCategory);
+        const availabilityMatch = selectedAvailability.length === 0 ||
+            selectedAvailability.includes(productAvailability);
+
+        if (categoryMatch && availabilityMatch) {
+            product.style.display = '';
+            visibleCount++;
+        } else {
+            product.style.display = 'none';
+        }
+    });
+
+    // Update book count with format: "Showing X of Y books"
+    const bookCount = document.getElementById('bookCount');
+    if (bookCount) {
+        // Add a small fade effect
+        bookCount.style.opacity = '0.5';
+        setTimeout(() => {
+            bookCount.innerText = visibleCount;
+            bookCount.style.opacity = '1';
+        }, 150);
     }
 }

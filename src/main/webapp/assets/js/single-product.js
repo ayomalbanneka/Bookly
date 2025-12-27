@@ -30,6 +30,7 @@ async function loadSingleProductDetails() {
                 document.getElementById("image").src = product.images[0];
             }
 
+            document.getElementById('bookNameOnTittle').innerHTML = product.title + " | Bookly";
             document.getElementById("productTitle").innerHTML = product.title;
             document.getElementById("author").innerHTML = product.author;
             document.getElementById("price").innerHTML = "LKR " + new Intl.NumberFormat("en-US", {
