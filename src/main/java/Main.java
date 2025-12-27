@@ -1,5 +1,5 @@
-import lk.cypher.bookly.config.AppConfig;
-import lk.cypher.bookly.listener.ContextPathListener;
+import lk.cypher.bookliy.config.AppConfig;
+import lk.cypher.bookliy.listener.ContextPathListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -9,7 +9,7 @@ import java.io.File;
 
 public class Main {
     private static final int PORT = 8080;
-    private static final String CONTEXT_PATH = "/bookliy";
+    private static final String CONTEXT_PATH = "/bookly";
 
     public static void main(String[] args) {
         try {
