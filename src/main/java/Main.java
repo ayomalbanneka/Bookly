@@ -9,7 +9,7 @@ import java.io.File;
 
 public class Main {
     private static final int PORT = 8080;
-    private static final String CONTEXT_PATH = "/bookliy";
+    private static final String CONTEXT_PATH = "/bookly";
 
     public static void main(String[] args) {
         try {
