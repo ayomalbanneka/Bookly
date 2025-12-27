@@ -1,4 +1,4 @@
-import lk.cypher.bookliy.util.HibernateUtil;
+import lk.cypher.bookly.util.HibernateUtil;
 import org.hibernate.Session;
 
 public class Test {

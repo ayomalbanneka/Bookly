@@ -9,7 +9,7 @@
 <!--            <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>-->
 <!--            <init-param>-->
 <!--                <param-name>jakarta.ws.rs.Application</param-name>-->
-<!--                <param-value>lk.cypher.bookliy.config.AppConfig</param-value>-->
+<!--                <param-value>lk.cypher.bookly.config.AppConfig</param-value>-->
 <!--            </init-param>-->
 <!--            <load-on-startup>1</load-on-startup>-->
 <!--        </servlet>-->
@@ -20,11 +20,11 @@
 
     <filter>
         <filter-name>AuthAccessFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.AuthAccessFilter</filter-class>
+        <filter-class>lk.cypher.bookly.middleware.AuthAccessFilter</filter-class>
     </filter>
     <filter>
         <filter-name>AdminAuthAccessFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.admin.AdminAuthAccessFilter</filter-class>
+        <filter-class>lk.cypher.bookly.middleware.admin.AdminAuthAccessFilter</filter-class>
     </filter>
 
     <!--  User  -->
@@ -50,7 +50,7 @@
 
     <filter>
         <filter-name>AccessControllFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.AccessControllFilter</filter-class>
+        <filter-class>lk.cypher.bookly.middleware.AccessControllFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AccessControllFilter</filter-name>
@@ -59,7 +59,7 @@
 
     <filter>
         <filter-name>AdminAccessControllFilter</filter-name>
-        <filter-class>lk.cypher.bookliy.middleware.admin.AdminAccessControllFilter</filter-class>
+        <filter-class>lk.cypher.bookly.middleware.admin.AdminAccessControllFilter</filter-class>
     </filter>
 
     <filter-mapping>
