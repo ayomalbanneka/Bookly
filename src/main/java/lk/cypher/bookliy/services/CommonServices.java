@@ -103,6 +103,134 @@ public class CommonServices {
         return AppUtil.gson.toJson(responseObj);
     }
 
+    // Sort products
+    public String getSortedProducts(String sortBy) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+
+        String orderClause;
+        switch (sortBy) {
+            case "Price Low to High":
+            case "price-low":
+                orderClause = "s.price ASC";
+                break;
+            case "price_desc":
+            case "price-high":
+                orderClause = "s.price DESC";
+                break;
+            case "Newest First":
+            case "newest":
+                orderClause = "s.id DESC";
+                break;
+            case "title":
+                orderClause = "p.title ASC";
+                break;
+            case "rating":
+                orderClause = "p.rating DESC"; // Adjust based on your Product model
+                break;
+            case "popularity":
+            default:
+                orderClause = "s.id ASC";
+                break;
+        }
+
+        // Update query to join with Product if sorting by product fields
+        Query<Stock> stockQuery = hibernateSession.createQuery(
+                "FROM Stock s JOIN s.product p ORDER BY " + orderClause, Stock.class);
+        stockQuery.setFirstResult(AppUtil.FIRST_RESULT_VALUE);
+        stockQuery.setMaxResults(AppUtil.MAX_RESULT_VALUE);
+
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        for (Stock stock : stockQuery.getResultList()) {
+            Product product = stock.getProduct();
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setProductId(product.getId());
+            productDTO.setTitle(product.getTitle());
+            productDTO.setAuthor(product.getAuthor());
+            productDTO.setCategoryName(product.getCategory().getName());
+            productDTO.setImages(product.getImages());
+
+            List<StockDTO> stockDTOList = new ArrayList<>();
+            StockDTO stockDTO = new StockDTO();
+            stockDTO.setStockId(stock.getId());
+            stockDTO.setPrice(stock.getPrice());
+            stockDTO.setStock(stock.getQty());
+            stockDTOList.add(stockDTO);
+
+            productDTO.setStockDTOList(stockDTOList);
+            productDTOList.add(productDTO);
+        }
+
+        hibernateSession.close();
+
+        responseObj.add("sortedProducts", AppUtil.gson.toJsonTree(productDTOList));
+        status = true;
+        message = "Products sorted successfully.";
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    // Remove cart item service
+    public String removeCartItem(String cartId, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        if (cartId == null || cartId.isEmpty()) {
+            message = "Invalid Id format";
+        } else if (!cartId.matches(Validator.IS_INTEGER)) {
+            message = "Invalid Id format";
+        } else {
+            int cId = Integer.parseInt(cartId);
+            HttpSession httpSession = request.getSession();
+            User sessionUser = (User) httpSession.getAttribute("user");
+            if (sessionUser == null) {
+                // Remove from session cart
+                List<Cart> sessionCart = getSessionAttribute(httpSession);
+                if (sessionCart != null || !sessionCart.isEmpty()) {
+                    sessionCart.removeIf(cart -> cart.getId() == Integer.parseInt(cartId));
+                    httpSession.setAttribute("sessionCart", sessionCart);
+                    status = true;
+                    message = "Cart item removed successfully.";
+                }
+            } else {
+                // Remove from user cart in DB
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                Cart existingCart = hibernateSession.createQuery("FROM Cart c WHERE c.id=:cartId AND c.user.id=:userId", Cart.class)
+                        .setParameter("cartId", cId)
+                        .setParameter("userId", sessionUser.getId())
+                        .getSingleResultOrNull();
+
+                if (existingCart == null) {
+                    message = "Cart item not found.";
+                } else {
+                    Transaction transaction = hibernateSession.beginTransaction();
+                    try {
+                        hibernateSession.remove(existingCart);
+                        transaction.commit();
+                        status = true;
+                        message = "Cart item removed successfully.";
+                    } catch (Exception e) {
+                        transaction.rollback();
+                        message = "Error removing cart item: " + e.getMessage();
+                    } finally {
+                        hibernateSession.close();
+                    }
+                }
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
     // Get all user carts service
     public String getAllUserCarts(HttpServletRequest request) {
         JsonObject responseObj = new JsonObject();
