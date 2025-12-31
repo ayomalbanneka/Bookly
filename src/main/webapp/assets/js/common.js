@@ -28,6 +28,23 @@ window.addEventListener('load', async () => {
     }
 })
 
+// Add event listener for sort options
+document.addEventListener('DOMContentLoaded', function() {
+    const sortOptions = document.querySelectorAll('.sort-option');
+
+    sortOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortValue = this.getAttribute('data-sort');
+            // Update the displayed sort option
+            document.getElementById('currentSort').textContent = this.textContent.trim();
+
+            // Call the sort function
+            sortProducts(sortValue);
+        });
+    });
+});
+
 function initFilterToggle() {
     const toggleFiltersBtn = document.getElementById('toggleFilters');
     const filtersSidebar = document.getElementById('filtersSidebar');
@@ -141,6 +158,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+// Load cities based on selected district
 async function loadCities() {
     const districtSelect = document.getElementById('districtSelect');
     const selectedDistrictId = districtSelect.value;
@@ -229,6 +247,7 @@ async function loadCities() {
     }
 }
 
+// Load districts for the dropdown
 async function loadDistricts() {
     try {
         const response = await fetch(`api/data/districts`, {
@@ -264,6 +283,7 @@ async function loadDistricts() {
     }
 }
 
+// Utility function to render dropdown options
 function renderDropDowns(selector, list, suffix) {
     selector.innerHTML = `<option value="0">Select</option>`; // Clear existing options first!
     list.forEach((item) => {
@@ -274,6 +294,7 @@ function renderDropDowns(selector, list, suffix) {
     })
 }
 
+// Add to cart functionality
 async function addToCart(stockId, qty) {
     try {
         Notiflix.Loading.dots('Adding to cart...', {
@@ -356,6 +377,7 @@ async function addToCart(stockId, qty) {
     }
 }
 
+// Load cart items
 async function loadCartItems() {
     try {
         Notiflix.Loading.dots('Loading cart items...', {
@@ -366,7 +388,6 @@ async function loadCartItems() {
         const response = await fetch('api/common/get-cart-items');
         if (response.ok) {
             let data = await response.json();
-            console.log(data)
 
             const cartItemsContainer = document.getElementById('cartItemsContainer');
             const orderSummary = document.getElementById('orderSummary');
@@ -453,9 +474,9 @@ async function loadCartItems() {
                                                 <!--                                                <div class="original-price">$19.99</div>-->
                                                 <!--                                                <div class="discount-badge">25% OFF</div>-->
                                             </div>
-                                            <div class="item-total d-md-none">
-                                                <strong>$14.99</strong>
-                                            </div>
+<!--                                            <div class="item-total d-md-none">-->
+<!--                                                <strong>$14.99</strong>-->
+<!--                                            </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -463,7 +484,7 @@ async function loadCartItems() {
 
                             <!-- Action Buttons -->
                             <div class="cart-item-actions">
-                                <button class="action-btn remove-btn" data-item="1" title="Remove">
+                                <button class="action-btn remove-btn" data-item="1" title="Remove" onclick="removeItemFromCart(${item.cartId})">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -516,21 +537,25 @@ async function loadCartItems() {
                 }
 
             } else {
-                new Notify({
-                    status: 'error',
-                    title: 'Error',
-                    text: data.message,
-                    effect: 'fade',
-                    speed: 300,
-                    showIcon: true,
-                    showCloseButton: true,
-                    autoclose: true,
-                    autotimeout: 3000,
-                    notificationsGap: null,
-                    notificationsPadding: null,
-                    type: 'outline',
-                    position: 'right top',
-                })
+                if(data.message === "No items in cart."){
+                    // return null;
+                }else{
+                    new Notify({
+                        status: 'error',
+                        title: 'Error',
+                        text: data.message,
+                        effect: 'fade',
+                        speed: 300,
+                        showIcon: true,
+                        showCloseButton: true,
+                        autoclose: true,
+                        autotimeout: 3000,
+                        notificationsGap: null,
+                        notificationsPadding: null,
+                        type: 'outline',
+                        position: 'right top',
+                    })
+                }
             }
         } else {
             new Notify({
@@ -570,6 +595,7 @@ async function loadCartItems() {
     }
 }
 
+// Load advanced search data
 async function loadAdvancedSearchData() {
     try {
         const response = await fetch('api/common/all-products');
@@ -615,8 +641,10 @@ async function loadAdvancedSearchData() {
     }
 }
 
+// Update product view
 let allProductsData = null; // Store all products globally for filtering
 
+// Render products
 function updateProductView(data) {
     allProductsData = data;
 
@@ -686,6 +714,7 @@ function updateProductView(data) {
     productContainer.innerHTML = htmlContent;
 }
 
+// Render categories
 function updateCategoriesView(categoryList, allProductCount) {
     const categoriesContainer = document.querySelector('.categories-list');
 
@@ -717,6 +746,156 @@ function updateCategoriesView(categoryList, allProductCount) {
     });
 
     categoriesContainer.innerHTML = htmlContent;
+}
+
+// Sort products
+async function sortProducts(sortBy) {
+    try {
+        Notiflix.Loading.dots('Sorting products...', {
+            clickToClose: false,
+            svgColor: '#000cf5'
+        });
+
+        // Map frontend values to backend values
+        const sortMapping = {
+            'popularity': 'popularity',
+            'newest': 'Newest First',
+            'price-low': 'Price Low to High',
+            'price-high': 'price_desc',
+            'rating': 'rating',
+            'title': 'title'
+        };
+
+        const backendSortValue = sortMapping[sortBy] || sortBy;
+
+        const response = await fetch(`api/common/sort-by?sortBy=${encodeURIComponent(backendSortValue)}`);
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                // Update the product view with sorted products
+                updateSortedProductView(data.sortedProducts);
+
+                // Re-apply current filters
+                applyAllFilters();
+
+                Notiflix.Loading.remove();
+            } else {
+                Notiflix.Loading.remove();
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to sort products',
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top',
+                });
+            }
+        } else {
+            Notiflix.Loading.remove();
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to sort products',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                type: 'outline',
+                position: 'right top',
+            });
+        }
+    } catch (e) {
+        Notiflix.Loading.remove();
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top',
+        });
+    }
+}
+
+// Update product view with sorted products
+function updateSortedProductView(sortedProducts) {
+    // Update the global data
+    if (allProductsData) {
+        allProductsData.allProducts = sortedProducts;
+    }
+
+    const productContainer = document.getElementById('productsContainer');
+    let htmlContent = '';
+
+    sortedProducts.forEach((product) => {
+        product.stockDTOList.forEach((stock) => {
+            let priceFormatted = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(stock.price);
+
+            const stockQty = stock.stock || 0;
+            const isInStock = stockQty > 0;
+            const stockStatus = isInStock ? 'in-stock' : 'out-of-stock';
+
+            htmlContent += `
+            <div class="col-md-4 col-sm-6 product-item" 
+                 data-category="${product.categoryName.toLowerCase()}"
+                 data-availability="${stockStatus}">
+                <a href="single-product.html?productId=${product.productId}" class="text-decoration-none text-dark">
+                    <div class="product-card">
+                        <div class="product-image-container">
+                            <img src="${product.images[0]}"
+                                 alt="${product.title}"
+                                 class="img-fluid">
+                            <span class="product-badge bg-${product.categoryName.toLowerCase()}">${product.categoryName}</span>
+                            <div class="product-actions">
+                                <button class="wishlist-toggle" title="Add to Wishlist">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                                <button class="quick-view" title="Quick View">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h5 class="product-title text-truncate">${product.title}</h5>
+                            <p class="product-author">${product.author}</p>
+                            <div class="product-price">
+                                <span class="current-price">LKR ${priceFormatted}</span>
+                            </div>
+                            <div class="product-stock-info mb-2">
+                                <small class="${isInStock ? 'text-success' : 'text-danger'}">
+                                    ${isInStock ? `${stockQty} in stock` : 'Out of stock'}
+                                </small>
+                            </div>
+                            <div class="product-actions-bottom">
+                                <button class="add-to-cart" 
+                                        onclick="addToCart(${stock.stockId},1)"
+                                        ${!isInStock ? 'disabled' : ''}>
+                                    <i class="bi bi-cart-plus me-2"></i>
+                                    ${isInStock ? 'Add to Cart' : 'Out of Stock'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>     
+                </a>
+            </div>
+            `;
+        });
+    });
+
+    productContainer.innerHTML = htmlContent;
 }
 
 // Filter functions
@@ -826,5 +1005,82 @@ function applyAllFilters() {
             bookCount.innerText = visibleCount;
             bookCount.style.opacity = '1';
         }, 150);
+    }
+}
+
+async function removeItemFromCart(cartId){
+    try{
+        const response = await fetch(`api/common/remove-cart-item/${cartId}`,{
+            method: 'DELETE'
+        });
+
+        if(response.ok){
+            const data = await response.json();
+            if(data.status){
+                new Notify({
+                    status: 'success',
+                    title: 'Successfully Removed',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            }else{
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
+            }
+        }else{
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to remove item from cart. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
+        }
+    }catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            notificationsGap: null,
+            notificationsPadding: null,
+            type: 'outline',
+            position: 'right top',
+        })
     }
 }
