@@ -1,5 +1,17 @@
 window.addEventListener('load', async () => {
-    Notiflix.Loading.dots("Data is Loading...", {
+    const loadingMessage = [
+        "Dusting off our shelves for you...",
+        "Flipping through our latest chapters...",
+        "Unwrapping your next great read...",
+        "Searching our library's hidden gems...",
+        "Binding the perfect selection for you...",
+        "Turning pages to find your favorites..."
+    ]
+
+    const randomLoadingMessage = loadingMessage[Math.floor(Math.random() * loadingMessage.length)];
+
+    Notiflix.Loading.dots(randomLoadingMessage, {
+        messageMaxLength: 200,
         clickToClose: false,
         svgColor: "#000cf5"
     });
