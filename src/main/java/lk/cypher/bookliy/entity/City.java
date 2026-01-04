@@ -17,6 +17,14 @@ public class City implements Serializable {
     @JoinColumn(name = "district_id", nullable = false)
     private District district;
 
+    public District getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(District district) {
+        this.district = district;
+    }
+
     public int getId() {
         return id;
     }
