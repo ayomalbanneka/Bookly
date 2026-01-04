@@ -1,20 +1,10 @@
-package lk.cypher.bookliy.entity;
+package lk.cypher.bookliy.dto;
 
-import jakarta.persistence.*;
+import lk.cypher.bookliy.entity.District;
 
-import java.io.Serializable;
-
-@Entity
-public class City implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CityDTO {
     private int id;
-
-    @Column(length = 50, nullable = false)
     private String name;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_id", nullable = false)
     private District district;
 
     public District getDistrict() {

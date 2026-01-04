@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Bookly</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%230d6efd' d='M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783'/></svg>">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Simple Notify -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.css"/>
+
+  <style>
+    /* Checkout Page Styles */
+    .checkout-page {
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    /* Progress Steps */
+    .checkout-progress {
+      position: relative;
+      padding: 1rem 0;
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      background-color: #e9ecef;
+      z-index: 1;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+    }
+
+    .step.active .step-icon {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    .step.active .step-label {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .step-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: white;
+      border: 3px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #6c757d;
+      transition: all 0.3s ease;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+      text-align: center;
+      transition: color 0.3s ease;
+    }
+
+    /* Checkout Sections */
+    .checkout-section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      border: 1px solid #e9ecef;
+    }
+
+    .section-header {
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f8f9fa;
+    }
+
+    /* Form Controls */
+    .checkout-section .form-control,
+    .checkout-section .form-select {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e9ecef;
+      transition: all 0.3s ease;
+    }
+
+    .checkout-section .form-control:focus,
+    .checkout-section .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .checkout-section .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Shipping Options */
+    .shipping-options {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .shipping-option {
+      padding: 1.25rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .shipping-option:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+
+    .shipping-option.active {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .shipping-option .form-check-input {
+      margin-top: 0.3rem;
+    }
+
+    .shipping-option .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    /* Payment Methods */
+    .payment-methods {
+      border-radius: 8px;
+    }
+
+    .payment-option {
+      padding: 1.25rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .payment-option:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+
+    .payment-option.active {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .payment-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .payment-option .bi-paypal {
+      background: linear-gradient(135deg, #003087, #009cde);
+    }
+
+    .payment-option .bi-cash {
+      background: linear-gradient(135deg, #28a745, #20c997);
+    }
+
+    .card-details {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .card-logos img {
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .card-logos img:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Order Summary */
+    .order-summary {
+      position: sticky;
+      top: 100px;
+    }
+
+    .order-summary .card {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .order-items {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .order-items::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .order-items::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 2px;
+    }
+
+    .order-items::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .order-item {
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e9ecef;
+      margin-bottom: 1rem;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .item-image {
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-totals .order-line {
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #e9ecef;
+    }
+
+    .order-totals .order-line:last-child {
+      border-bottom: none;
+    }
+
+    .order-total {
+      padding-top: 1rem;
+      border-top: 2px solid #e9ecef;
+    }
+
+    /* Promo Code */
+    .promo-code .input-group {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .promo-code .btn {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .promo-code .btn:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    /* Security & Guarantee */
+    .security-item {
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .security-item:hover {
+      transform: translateX(5px);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .security-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Terms & Conditions */
+    .terms-conditions {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .terms-conditions .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    /* Complete Order Button */
+    #completeOrder {
+      background: linear-gradient(135deg, #198754, #157347);
+      border: none;
+      padding: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    #completeOrder:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(25, 135, 84, 0.3);
+    }
+
+    #completeOrder:active {
+      transform: translateY(-1px);
+    }
+
+    /* Need Help Section */
+    .need-help {
+      transition: all 0.3s ease;
+    }
+
+    .need-help:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .need-help .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Navigation Buttons */
+    .checkout-navigation .btn-outline-primary {
+      border-width: 2px;
+      padding: 0.75rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .checkout-navigation .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .checkout-navigation .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      padding: 0.75rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .checkout-navigation .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Payment Security */
+    .payment-security .security-logos i {
+      font-size: 1.5rem;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .payment-security .security-logos i:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* Form Validation */
+    .form-control:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.05);
+    }
+
+    .form-control:valid:not(:focus):not(:placeholder-shown) {
+      border-color: #198754;
+      background-color: rgba(25, 135, 84, 0.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+      .progress-steps {
+        flex-wrap: wrap;
+      }
+
+      .step {
+        flex: 0 0 33.333%;
+        margin-bottom: 1.5rem;
+      }
+
+      .progress-steps::before {
+        display: none;
+      }
+
+      .order-summary {
+        position: static;
+        margin-top: 2rem;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .checkout-section {
+        padding: 1.5rem;
+      }
+
+      .step {
+        flex: 0 0 50%;
+      }
+
+      .shipping-option .d-flex {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .shipping-option .text-end {
+        text-align: center !important;
+        margin-top: 0.5rem;
+      }
+
+      .payment-option .d-flex {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .payment-icon {
+        margin: 0 auto 0.5rem;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .checkout-section {
+        padding: 1rem;
+      }
+
+      .step {
+        flex: 0 0 100%;
+      }
+
+      .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+
+      .checkout-navigation .btn {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .order-summary .card-body {
+        padding: 1rem;
+      }
+    }
+
+    /* Loading State */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .success-animation {
+      animation: successPulse 0.6s ease-out;
+    }
+
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+
+</head>
+<body class="checkout-page">
+<!-- Header Component -->
+<header class="sticky-top bg-white shadow-sm">
+  <header-content></header-content>
+</header>
+
+<!-- Main Content -->
+<main class="py-5">
+  <div class="container">
+
+    <div class="row">
+      <!-- Left Column - Forms -->
+      <div class="col-lg-8">
+        <!-- Contact Information -->
+
+
+        <!-- Shipping Address -->
+        <div class="checkout-section mb-4">
+          <div class="section-header mb-4">
+            <h3 class="fw-bold">
+              <i class="bi bi-house-door me-2"></i>Shipping Address
+            </h3>
+            <p class="text-muted mb-0">Where should we deliver your order?</p>
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" id="showPrimaryAddress">
+              <label class="form-check-label" for="showPrimaryAddress">
+                Use primary address on my account
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="firstName" class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="firstName" placeholder="Enter first name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="lastName" class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="lastName" placeholder="Enter last name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="mobile" class="form-label fw-bold">Phone Number <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="mobile" placeholder="+94 77 123 4567" required>
+            </div>
+            <div class="col-12 mb-3">
+              <label for="line-one" class="form-label fw-bold">Address Line 1 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="line-one" placeholder="123 Main Street" required>
+            </div><div class="col-12 mb-3">
+              <label for="line-two" class="form-label fw-bold">Address Line 2 <span class="text-danger"></span></label>
+              <input type="text" class="form-control" id="line-two" placeholder="123 Main Street">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="districtSelect" class="form-label fw-bold">Districts <span class="text-danger">*</span></label>
+              <select class="form-select" id="districtSelect" required>
+                <option value="0" selected disabled>Select</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="citySelect" class="form-label fw-bold">City <span class="text-danger">*</span></label>
+              <select class="form-select" id="citySelect" required>
+                <option value="0" selected disabled>Select</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="postalCode" class="form-label fw-bold">Postal Code <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="postalCode" placeholder="10000" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="checkout-navigation mt-5">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <a href="cart.html" class="btn btn-outline-primary w-100">
+                <i class="bi bi-arrow-left me-2"></i>Back to Cart
+              </a>
+            </div>
+            <div class="col-md-6 mb-3">
+              <button class="btn btn-primary w-100" id="continueToShipping">
+                Continue to Shipping
+                <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="col-lg-4">
+        <div class="order-summary">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-4">
+              <h4 class="fw-bold mb-0">
+                <i class="bi bi-receipt me-2"></i>Order Summary
+              </h4>
+            </div>
+
+            <div class="card-body">
+              <!-- Order Items -->
+              <div class="order-items mb-4">
+                <h6 class="fw-bold mb-3" id="items">Order Items (3)</h6>
+              </div>
+
+              <!-- Order Totals -->
+              <div class="order-totals">
+                <div class="order-line d-flex justify-content-between mb-2">
+                  <span class="text-muted">Subtotal</span>
+                  <span class="fw-bold" id="subtotal"></span>
+                </div>
+                <div class="order-line d-flex justify-content-between mb-2">
+                  <span class="text-muted">Shipping</span>
+                  <span class="fw-bold" id="shipping"></span>
+                </div>
+
+                <hr>
+
+                <div class="order-total d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold mb-0">Total</h5>
+                    <small class="text-muted">Including all charges</small>
+                  </div>
+                  <div class="text-end">
+                    <h3 class="fw-bold text-primary mb-0" id="total"></h3>
+                    <small class="text-muted">LKR</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Security & Guarantee -->
+              <div class="security-guarantee">
+                <div class="security-item d-flex align-items-start mb-3">
+                  <div class="security-icon me-3">
+                    <i class="bi bi-shield-check text-success"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Secure Checkout</h6>
+                    <p class="text-muted small mb-0">Your payment information is encrypted and secure</p>
+                  </div>
+                </div>
+
+                <div class="security-item d-flex align-items-start">
+                  <div class="security-icon me-3">
+                    <i class="bi bi-arrow-counterclockwise text-primary"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">30-Day Return Policy</h6>
+                    <p class="text-muted small mb-0">Easy returns if you're not satisfied</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terms & Conditions -->
+              <div class="terms-conditions mt-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                  <label class="form-check-label small" for="acceptTerms">
+                    I agree to the <a href="#" class="text-primary">Terms & Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Complete Order Button -->
+              <button class="btn btn-success btn-lg w-100 mt-4" id="completeOrder">
+                <i class="bi bi-lock-fill me-2"></i>Complete Order
+              </button>
+
+              <!-- Payment Security Logos -->
+              <div class="payment-security text-center mt-4">
+                <small class="text-muted d-block mb-2">Payment secured by</small>
+                <div class="security-logos d-flex justify-content-center gap-3">
+                  <i class="bi bi-shield-check text-success"></i>
+                  <i class="bi bi-pci-card text-info"></i>
+                  <i class="bi bi-ssl text-warning"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Need Help Section -->
+          <div class="need-help card border-0 shadow-sm mt-4">
+            <div class="card-body text-center">
+              <i class="bi bi-headset text-primary display-6 mb-3"></i>
+              <h6 class="fw-bold mb-2">Need Help?</h6>
+              <p class="text-muted small mb-3">Our customer support team is here to help</p>
+              <a href="tel:+947113894655" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-telephone me-1"></i>+94 71 1389 4655
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer Component -->
+<footer class="footer bg-dark text-white py-5">
+  <footer-content></footer-content>
+</footer>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.min.js"></script>
+<!-- Header/Footer Components -->
+<script src="assets/js/header.js"></script>
+<script src="assets/js/footer.js"></script>
+<!-- Checkout JavaScript -->
+<script src="assets/js/payment/checkout.js"></script>
+<script src="assets/js/notiflix-aio-3.2.8.min.js"></script>
+</body>
+</html>

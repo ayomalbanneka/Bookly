@@ -29,11 +29,11 @@ window.addEventListener('load', async () => {
 })
 
 // Add event listener for sort options
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const sortOptions = document.querySelectorAll('.sort-option');
 
     sortOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
+        option.addEventListener('click', function (e) {
             e.preventDefault();
             const sortValue = this.getAttribute('data-sort');
             // Update the displayed sort option
@@ -391,15 +391,14 @@ async function loadCartItems() {
 
             const cartItemsContainer = document.getElementById('cartItemsContainer');
             const orderSummary = document.getElementById('orderSummary');
-
             const emptyCartDesign = document.getElementById('emptyCart');
 
             if (data.cartItems == null) {
-                emptyCartDesign.classList.remove('d-none'); // Show empty cart
+                emptyCartDesign.classList.remove('d-none');
                 cartItemsContainer.style.display = 'none';
                 orderSummary.style.display = 'none';
             } else {
-                emptyCartDesign.classList.add('d-none'); // Hide empty cart
+                emptyCartDesign.classList.add('d-none');
                 cartItemsContainer.style.display = 'block';
                 orderSummary.style.display = 'block';
             }
@@ -408,14 +407,20 @@ async function loadCartItems() {
                 console.log(data);
 
                 if (cartItemsContainer) {
-                    cartItemsContainer.innerHTML = ''; // Clear existing items
+                    cartItemsContainer.innerHTML = '';
 
-                    let total = 0;
+                    let subtotal = 0;
                     let totalQty = 0;
+                    let totalShipping = 0;
+                    const deliveryTypeList = data.deliveryTypeList;
+
+                    // Calculate shipping cost per product (each product gets one shipping charge)
+                    const shippingPerProduct = deliveryTypeList.length > 0 ? deliveryTypeList[0].price : 0;
+                    totalShipping = data.cartItems.length * shippingPerProduct;
 
                     data.cartItems.forEach((item) => {
                         let itemsTotal = parseFloat(item.price) * parseInt(item.qty);
-                        total += itemsTotal;
+                        subtotal += itemsTotal;
                         totalQty += parseInt(item.qty);
 
                         cartItemsContainer.innerHTML += `
@@ -443,8 +448,6 @@ async function loadCartItems() {
                                     <div class="mobile-price d-md-none">
                                         <span class="current-price">LKR 
                                         ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)}</span>
-                                        <!--                                        <span class="original-price">$19.99</span>-->
-                                        <!--                                        <span class="discount-badge">25% OFF</span>-->
                                     </div>
                                 </div>
 
@@ -471,12 +474,7 @@ async function loadCartItems() {
                                             <div class="price-container d-none d-md-block">
                                                 <div class="current-price">LKR 
                                                 ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)}</div>
-                                                <!--                                                <div class="original-price">$19.99</div>-->
-                                                <!--                                                <div class="discount-badge">25% OFF</div>-->
                                             </div>
-<!--                                            <div class="item-total d-md-none">-->
-<!--                                                <strong>$14.99</strong>-->
-<!--                                            </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -500,9 +498,9 @@ async function loadCartItems() {
                                     </small>
                                 </div>
                                 <div class="col-md-6 text-md-end">
-                                    <small class="text-success">
-                                        <i class="bi bi-patch-check me-1"></i>
-                                        Free shipping eligible
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-seam me-1"></i>
+                                        Shipping: LKR ${shippingPerProduct.toLocaleString('en-US', {minimumFractionDigits: 2})}
                                     </small>
                                 </div>
                             </div>
@@ -511,25 +509,30 @@ async function loadCartItems() {
                         `;
                     });
 
+                    // Calculate grand total
+                    const grandTotal = subtotal + totalShipping;
+
                     // Update Order Summary
                     if (orderSummary) {
                         const subtotalText = `Subtotal (${totalQty} ${totalQty === 1 ? 'item' : 'items'})`;
-                        const formattedTotal = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(total);
+                        const formattedSubtotal = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(subtotal);
+                        const formattedShipping = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(totalShipping);
+                        const formattedGrandTotal = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(grandTotal);
 
                         orderSummary.querySelector('.summary-body').innerHTML = `
                             <div class="summary-row">
                                 <span>${subtotalText}</span>
-                                <span>LKR ${formattedTotal}</span>
+                                <span>LKR ${formattedSubtotal}</span>
                             </div>
                             <div class="summary-row">
-                                <span>Shipping</span>
-                                <span class="text-success">FREE</span>
+                                <span>Shipping (${data.cartItems.length} ${data.cartItems.length === 1 ? 'product' : 'products'} × LKR ${shippingPerProduct.toLocaleString('en-US', {minimumFractionDigits: 2})})</span>
+                                <span class="text-success">LKR ${formattedShipping}</span>
                             </div>
                             <div class="summary-divider"></div>
                             <div class="summary-total">
                                 <span>Total</span>
                                 <div class="total-amount">
-                                    <div class="amount">LKR ${formattedTotal}</div>
+                                    <div class="amount">LKR ${formattedGrandTotal}</div>
                                 </div>
                             </div>
                         `;
@@ -1008,15 +1011,15 @@ function applyAllFilters() {
     }
 }
 
-async function removeItemFromCart(cartId){
-    try{
-        const response = await fetch(`api/common/remove-cart-item/${cartId}`,{
+async function removeItemFromCart(cartId) {
+    try {
+        const response = await fetch(`api/common/remove-cart-item/${cartId}`, {
             method: 'DELETE'
         });
 
-        if(response.ok){
+        if (response.ok) {
             const data = await response.json();
-            if(data.status){
+            if (data.status) {
                 new Notify({
                     status: 'success',
                     title: 'Successfully Removed',
@@ -1032,7 +1035,7 @@ async function removeItemFromCart(cartId){
                     type: 'outline',
                     position: 'right top',
                 })
-            }else{
+            } else {
                 new Notify({
                     status: 'error',
                     title: 'Error',
@@ -1049,7 +1052,7 @@ async function removeItemFromCart(cartId){
                     position: 'right top',
                 })
             }
-        }else{
+        } else {
             new Notify({
                 status: 'error',
                 title: 'Error',
@@ -1066,7 +1069,7 @@ async function removeItemFromCart(cartId){
                 position: 'right top',
             })
         }
-    }catch (e) {
+    } catch (e) {
         new Notify({
             status: 'error',
             title: 'Error',
