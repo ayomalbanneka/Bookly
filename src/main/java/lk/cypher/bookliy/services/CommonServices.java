@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lk.cypher.bookliy.dto.CartDTO;
+import lk.cypher.bookliy.dto.DeliveryTypeDTO;
 import lk.cypher.bookliy.dto.ProductDTO;
 import lk.cypher.bookliy.dto.StockDTO;
 import lk.cypher.bookliy.entity.*;
@@ -247,6 +248,18 @@ public class CommonServices {
             } else if (sessionCart.isEmpty()) {
                 message = "No items in cart.";
             } else {
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                List<DeliveryTypeDTO> deleiverTypeDTOList = new ArrayList<>();
+                List<DeliveryType> deliveryTypeList = hibernateSession.createQuery("FROM DeliveryType d", DeliveryType.class).getResultList();
+                for (DeliveryType deliveryType : deliveryTypeList) {
+                    DeliveryTypeDTO deliveryTypeDTO = new DeliveryTypeDTO();
+                    deliveryTypeDTO.setId(deliveryType.getId());
+                    deliveryTypeDTO.setName(deliveryType.getName());
+                    deliveryTypeDTO.setPrice(deliveryType.getPrice());
+                    deleiverTypeDTOList.add(deliveryTypeDTO);
+                }
+                responseObj.add("deliveryTypeList", AppUtil.gson.toJsonTree(deleiverTypeDTOList));
+
                 // Generate Cart DTOs
                 List<CartDTO> cartDTOList = generateCartDTOs(sessionCart);
                 responseObj.add("cartItems", AppUtil.gson.toJsonTree(cartDTOList));
@@ -263,6 +276,18 @@ public class CommonServices {
                 message = "No items in cart.";
             } else {
                 // Generate Cart DTOs
+
+                List<DeliveryTypeDTO> deleiverTypeDTOList = new ArrayList<>();
+                List<DeliveryType> deliveryTypeList = hibernateSession.createQuery("FROM DeliveryType d", DeliveryType.class).getResultList();
+                for (DeliveryType deliveryType : deliveryTypeList) {
+                    DeliveryTypeDTO deliveryTypeDTO = new DeliveryTypeDTO();
+                    deliveryTypeDTO.setId(deliveryType.getId());
+                    deliveryTypeDTO.setName(deliveryType.getName());
+                    deliveryTypeDTO.setPrice(deliveryType.getPrice());
+                    deleiverTypeDTOList.add(deliveryTypeDTO);
+                }
+                responseObj.add("deliveryTypeList", AppUtil.gson.toJsonTree(deleiverTypeDTOList));
+
                 List<CartDTO> cartDTOList = generateCartDTOs(cartList);
                 responseObj.add("cartItems", AppUtil.gson.toJsonTree(cartDTOList));
                 status = true;
@@ -276,7 +301,7 @@ public class CommonServices {
         return AppUtil.gson.toJson(responseObj);
     }
 
-    private List<CartDTO> generateCartDTOs(List<Cart> cartList) {
+    public List<CartDTO> generateCartDTOs(List<Cart> cartList) {
         List<CartDTO> cartDTOList = new ArrayList<>();
         Session hinernateSession = HibernateUtil.getSessionFactory().openSession();
         for (Cart cart : cartList) {
