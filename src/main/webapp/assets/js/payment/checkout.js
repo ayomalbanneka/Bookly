@@ -8,7 +8,15 @@ window.addEventListener('load', async () => {
         await loadCheckoutData(); // Load user checkout data on page load
         document.getElementById('districtSelect').addEventListener('change', loadCheckoutCities); // Load cities when district changes
 
-    }catch (e) {
+        // Add event listener to hide error when checkbox is checked
+        document.getElementById('acceptTerms').addEventListener('change', function () {
+            let termsNotify = document.getElementById('acceptTermsNotify');
+            if (this.checked) {
+                termsNotify.style.display = 'none';
+            }
+        });
+
+    } catch (e) {
         new Notify({
             status: 'error',
             title: 'Error',
@@ -22,7 +30,7 @@ window.addEventListener('load', async () => {
             autoclose: false,
             gap: 20
         })
-    }finally {
+    } finally {
         Notiflix.Loading.remove();
     }
 })
@@ -172,7 +180,7 @@ async function loadCheckoutData() {
                 fillUserCurrentAddress(data.userPrimaryAddress);
                 makeOrderSummary(data);
             } else {
-               new Notify({
+                new Notify({
                     status: 'error',
                     title: 'Error',
                     text: data.message,
@@ -186,7 +194,7 @@ async function loadCheckoutData() {
                     notificationsPadding: null,
                     type: 'outline',
                     position: 'right top',
-               })
+                })
             }
         } else {
             new Notify({
@@ -224,7 +232,7 @@ async function loadCheckoutData() {
     }
 }
 
-function  fillUserCurrentAddress(address){
+function fillUserCurrentAddress(address) {
     console.log(address)
     const currentAddressTick = document.getElementById('showPrimaryAddress');
     currentAddressTick.addEventListener('change', async () => {
@@ -352,3 +360,138 @@ function makeOrderSummary(data) {
     let grandTotal = subtotal + totalShipping;
     totalElement.textContent = `LKR ${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 }
+
+async function checkout() {
+
+    let firstName = document.getElementById('firstName');
+    let lastName = document.getElementById('lastName');
+    let emailAddress = document.getElementById('email');
+    let city = document.getElementById('citySelect');
+    let district = document.getElementById('districtSelect');
+    let line1 = document.getElementById('line-one');
+    let line2 = document.getElementById('line-two');
+    let postalCode = document.getElementById('postalCode');
+    let phoneNumber = document.getElementById('mobile');
+    let termsCheckbox = document.getElementById('acceptTerms');
+    let termsNotify = document.getElementById('acceptTermsNotify');
+
+    // Check if terms are accepted
+    if (!termsCheckbox.checked) {
+        termsNotify.style.display = 'block';
+        termsCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        new Notify({
+            status: 'error',
+            title: 'Terms Required',
+            text: 'Please accept the Terms & Conditions to continue',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            position: 'right top',
+        });
+
+        return;
+    }
+
+    // Hide error message if showing
+    termsNotify.style.display = 'none';
+
+    const userData = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        email: emailAddress.value,
+        cityId: city.value,
+        districtId: district.value,
+        lineOne: line1.value,
+        lineTwo: line2.value,
+        postalCode: postalCode.value,
+        mobile: phoneNumber.value
+    }
+
+    const userDataJson = JSON.stringify(userData);
+
+    try {
+        Notiflix.Loading.dots('Processing your order...', {
+            svgColor: '#0026ff',
+            clickToClose: false
+        });
+
+        const response = await fetch('api/payments/checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: userDataJson
+        });
+
+        if(response.ok){
+            const data = await response.json();
+            if(data.status){
+                console.log(data);
+                payhere.startPayment(data.paymentDetails);
+            } else {
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message || 'Checkout failed',
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    position: 'right top',
+                });
+            }
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Error',
+                text: 'Failed to process checkout. Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                position: 'right top',
+            });
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: e.message,
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            position: 'right top',
+        });
+    } finally {
+        Notiflix.Loading.remove();
+    }
+}
+
+payhere.onCompleted = function onCompleted(orderId) {
+    console.log("Payment completed. OrderID:" + orderId);
+    // Note: validate the payment and show success or failure page to the customer
+};
+
+// Payment window closed
+payhere.onDismissed = function onDismissed() {
+    // Note: Prompt user to pay again or show an error page
+    console.log("Payment dismissed");
+    Notiflix.Loading.remove();
+};
+
+// Error occurred
+payhere.onError = function onError(error) {
+    // Note: show an error page
+    console.log("Error:"  + error);
+};
