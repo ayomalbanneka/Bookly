@@ -17,6 +17,14 @@ public class District {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<City> cities = new HashSet<>();
 
+    public Set<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<City> cities) {
+        this.cities = cities;
+    }
+
     public int getId() {
         return id;
     }
