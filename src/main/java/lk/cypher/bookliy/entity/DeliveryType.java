@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "delivery_types")
+@NamedQuery(name="DeliveryType.findByName", query="FROM DeliveryType dt WHERE dt.name = :name")
 public class DeliveryType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
