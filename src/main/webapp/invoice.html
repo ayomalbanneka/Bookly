@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Bookly</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 16 16'><path fill='%230d6efd' d='M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783'/></svg>">
+
+    <!-- Simple Notify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.css"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css"/>
+
+    <style>
+        /* Invoice Page Styles */
+        .invoice-page {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Invoice Header */
+        .invoice-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .invoice-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .invoice-actions .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .invoice-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Invoice Card */
+        .invoice-card {
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+
+        .invoice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        /* Company Info */
+        .company-logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .company-details p {
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .company-details i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Invoice Meta */
+        .invoice-meta h4 {
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .invoice-dates {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* Billing & Shipping Info */
+        .billing-info .card,
+        .shipping-info .card {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .billing-info .card:hover,
+        .shipping-info .card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Order Items Table */
+        .order-items .table {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .order-items thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .order-items thead th {
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            border: none;
+        }
+
+        .order-items tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-items tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .order-items tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .product-image {
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .rating {
+            color: #ffc107;
+            font-size: 0.85rem;
+        }
+
+        /* Payment & Shipping Info */
+        .payment-info .card,
+        .shipping-info .card {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .payment-info .card:hover,
+        .shipping-info .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Invoice Totals */
+        .invoice-totals .card {
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .total-line {
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #e9ecef;
+        }
+
+        .total-line:last-child {
+            border-bottom: none;
+        }
+
+        .total-amount {
+            padding-top: 1rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .payment-status .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        /* Invoice Footer */
+        .invoice-footer {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .terms-conditions ul {
+            padding-left: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .terms-conditions li {
+            margin-bottom: 0.25rem;
+        }
+
+        .signature {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 200px;
+            height: 1px;
+            background: #6c757d;
+            margin: 0 auto;
+        }
+
+        /* Invoice Actions Footer */
+        .invoice-actions-footer .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .invoice-actions-footer .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Help Section */
+        .help-section {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .help-option {
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .help-option:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Category Badges */
+        .bg-fiction {
+            background-color: var(--fiction) !important;
+            color: white;
+        }
+
+        .bg-romance {
+            background-color: var(--pink) !important;
+            color: white;
+        }
+
+        .bg-mystery {
+            background-color: var(--mystery) !important;
+            color: white;
+        }
+
+        .bg-sci-fi {
+            background-color: var(--scifi) !important;
+            color: white;
+        }
+
+        .bg-self-help {
+            background-color: var(--selfhelp) !important;
+            color: white;
+        }
+
+        .bg-biography {
+            background-color: var(--biography) !important;
+            color: white;
+        }
+
+        .bg-business {
+            background-color: var(--business) !important;
+            color: white;
+        }
+
+        .bg-children {
+            background-color: var(--children) !important;
+            color: white;
+        }
+
+        /* Print Styles */
+        @media print {
+            .invoice-page {
+                background: white;
+                padding: 0;
+            }
+
+            header,
+            footer,
+            .invoice-header .invoice-actions,
+            .invoice-actions-footer,
+            .help-section {
+                display: none !important;
+            }
+
+            .invoice-card {
+                box-shadow: none !important;
+                border: 1px solid #dee2e6;
+            }
+
+            .invoice-card::before {
+                height: 2px;
+            }
+
+            .card-body {
+                padding: 0 !important;
+            }
+
+            .invoice-card .row {
+                margin-bottom: 1rem !important;
+            }
+
+            .order-items .table {
+                border: 1px solid #dee2e6;
+            }
+
+            .invoice-totals .card {
+                border: 1px solid #dee2e6 !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .invoice-header .display-5 {
+                font-size: 2.5rem;
+            }
+
+            .invoice-meta {
+                margin-top: 1.5rem;
+                text-align: left !important;
+            }
+
+            .invoice-dates .d-flex {
+                justify-content: flex-start !important;
+            }
+
+            .order-items .table thead {
+                display: none;
+            }
+
+            .order-items .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="invoice-page">
+<!-- Header Component -->
+<header class="sticky-top bg-white shadow-sm">
+    <header-content></header-content>
+</header>
+
+<!-- Main Content -->
+<main class="py-5">
+    <div class="container">
+        <!-- Invoice Header -->
+        <div class="invoice-header mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="invoice-icon me-3">
+                            <i class="bi bi-receipt-cutoff"></i>
+                        </div>
+                        <div>
+                            <h1 class="display-5 fw-bold text-primary mb-2">Invoice</h1>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-success">PAID</span>
+                                <span class="badge bg-primary">Completed</span>
+                                <span class="badge bg-info">Digital</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="invoice-actions">
+                        <button class="btn btn-primary me-2" id="printInvoice">
+                            <i class="bi bi-printer me-2"></i>Print
+                        </button>
+                        <button class="btn btn-outline-primary me-2" id="downloadInvoice">
+                            <i class="bi bi-download me-2"></i>Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Card -->
+        <div class="invoice-card card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <!-- Invoice Header Info -->
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <div class="company-info">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="company-logo me-3">
+                                    <i class="bi bi-book-half text-light"></i>
+                                </div>
+                                <div>
+                                    <h3 class="fw-bold mb-0">Bookly</h3>
+                                    <p class="text-muted mb-0">Your Favorite Book Store</p>
+                                </div>
+                            </div>
+                            <div class="company-details">
+                                <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>123 Book Street, Colombo
+                                    01, Sri Lanka</p>
+                                <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>+94 11 234 5678</p>
+                                <p class="mb-0"><i class="bi bi-envelope me-2 text-primary"></i>hello@bookly.lk</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="invoice-meta text-md-end">
+                            <div class="mb-4">
+                                <h4 class="fw-bold text-primary mb-1">INVOICE <span id="invoice-id">#</span></h4>
+                                <p class="text-muted mb-0">Order ID: <span id="order-id"></span></p>
+                            </div>
+                            <div class="invoice-dates">
+                                <div class="d-flex justify-content-md-end mb-2">
+                                    <span class="text-muted me-3" style="min-width: 120px;">Issue Date:</span>
+                                    <span class="fw-bold" id="issue-date">October 25, 2024</span>
+                                </div>
+                                <div class="d-flex justify-content-md-end mb-2">
+                                    <span class="text-muted me-3" style="min-width: 120px;">Due Date:</span>
+                                    <span class="fw-bold" id="due-date">October 25, 2024</span>
+                                </div>
+                                <div class="d-flex justify-content-md-end">
+                                    <span class="text-muted me-3" style="min-width: 120px;">Payment Status:</span>
+                                    <span class="badge bg-success" id="paid-date">Paid on Oct 25, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing & Shipping Info -->
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <div class="billing-info">
+                            <h5 class="fw-bold mb-3 text-primary">
+                                <i class="bi bi-person-circle me-2"></i>Bill To
+                            </h5>
+                            <div class="card bg-light border-0 p-3">
+                                <h6 class="fw-bold mb-2">John David Smith</h6>
+                                <p class="mb-1">john.smith@example.com</p>
+                                <p class="mb-1">+94 77 123 4567</p>
+                                <p class="mb-0">123 Main Street, Colombo 03<br>Sri Lanka</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4 mt-md-0">
+                        <div class="shipping-info">
+                            <h5 class="fw-bold mb-3 text-primary">
+                                <i class="bi bi-truck me-2"></i>Ship To
+                            </h5>
+                            <div class="card bg-light border-0 p-3">
+                                <h6 class="fw-bold mb-2" id="buyer-name">John David Smith</h6>
+                                <p class="mb-1" id="buyer-email">john.smith@example.com</p>
+                                <p class="mb-1" id="buyer-mobile">+94 77 123 4567</p>
+                                <p class="mb-0">
+                                <span id="buyer-address">123 Main Street, Colombo 03</span>
+                                <br><span id="city-name">Colombo</span>,<span id="district-name">Colombo</span></p> <span id="country-name">Sri Lanka</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items Table -->
+                <div class="order-items mb-5">
+                    <h5 class="fw-bold mb-4 text-primary">
+                        <i class="bi bi-cart-check me-2"></i>Order Summary
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-primary text-dark">
+                            <tr>
+                                <th class="border-0" style="width: 50px; color: black;">#</th>
+                                <th class="border-0" style="color: black;">Product</th>
+                                <th class="border-0 text-center" style="color: black;">Category</th>
+                                <th class="border-0 text-center" style="color: black;">Quantity</th>
+                                <th class="border-0 text-center" style="color: black;">Unit Price</th>
+                                <th class="border-0 text-end" style="color: black;">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Item 1 -->
+                            <tr>
+                                <td class="align-middle">1</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-image me-3">
+                                            <img src=""
+                                                 alt="The Great Gatsby"
+                                                 class="rounded"
+                                                 width="50"
+                                                 height="65"
+                                                id="book-image"
+                                            >
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold" id="book-title">The Great Gatsby</h6>
+                                            <p class="text-muted small mb-0" id="book-author">F. Scott Fitzgerald</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <span class="badge bg-fiction" id="book-category"></span>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <span class="fw-bold" id="book-qty">1</span>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <span class="fw-bold" id="book-price">LKR 1,500</span>
+                                </td>
+                                <td class="align-middle text-end">
+                                    <span class="fw-bold text-primary">LKR 1,500</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="payment-info">
+                            <h5 class="fw-bold mb-3 text-primary">
+                                <i class="bi bi-credit-card me-2"></i>Payment Information
+                            </h5>
+                            <div class="card bg-light border-0 p-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Payment Method</label>
+                                            <p class="fw-bold mb-0">
+                                                <i class="bi bi-credit-card-fill me-2"></i>Credit Card (Visa)
+                                            </p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Card Number</label>
+                                            <p class="fw-bold mb-0">**** **** **** 4242</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Transaction ID</label>
+                                            <p class="fw-bold mb-0">TXN-20241025-001</p>
+                                        </div>
+                                        <div>
+                                            <label class="text-muted small mb-1">Payment Date</label>
+                                            <p class="fw-bold mb-0">October 25, 2024 • 14:30</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="shipping-info mt-4">
+                            <h5 class="fw-bold mb-3 text-primary">
+                                <i class="bi bi-truck me-2"></i>Shipping Information
+                            </h5>
+                            <div class="card bg-light border-0 p-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Shipping Method</label>
+                                            <p class="fw-bold mb-0">Express Delivery</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Tracking Number</label>
+                                            <p class="fw-bold mb-0">TRK-20241025-001</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="text-muted small mb-1">Estimated Delivery</label>
+                                            <p class="fw-bold mb-0">October 27-28, 2024</p>
+                                        </div>
+                                        <div>
+                                            <label class="text-muted small mb-1">Shipping Status</label>
+                                            <p class="fw-bold mb-0">
+                                                <span class="badge bg-info">Processing</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mt-4 mt-lg-0">
+                        <div class="invoice-totals">
+                            <div class="card border-0 bg-primary bg-opacity-10 p-3">
+                                <h5 class="fw-bold mb-3 text-primary">Invoice Summary</h5>
+
+                                <div class="total-line d-flex justify-content-between mb-2">
+                                    <span class="text-muted" id="count">Subtotal (4 items)</span>
+                                    <span class="fw-bold" id="subtottal">LKR 5,590</span>
+                                </div>
+
+                                <div class="total-line d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Shipping</span>
+                                    <span class="fw-bold" id="shipping">LKR 250</span>
+                                </div>
+
+                                <hr>
+
+                                <div class="total-amount d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h5 class="fw-bold mb-0">Total Amount</h5>
+                                        <small class="text-muted">Amount Paid</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <h2 class="fw-bold text-primary mb-0" id="total-amount">LKR 5,987.20</h2>
+                                        <small class="text-muted">LKR</small>
+                                    </div>
+                                </div>
+
+                                <div class="payment-status text-center">
+                                    <div class="badge bg-success p-2 mb-2">
+                                        <i class="bi bi-check-circle-fill me-2"></i>Payment Successful
+                                    </div>
+                                    <p class="text-muted small mb-0">Thank you for your purchase!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Footer -->
+                <div class="invoice-footer mt-5 pt-4 border-top">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="terms-conditions">
+                                <h6 class="fw-bold mb-3">Terms & Conditions</h6>
+                                <ul class="small text-muted mb-0">
+                                    <li>This is a computer-generated invoice and does not require a physical
+                                        signature.
+                                    </li>
+                                    <li>Goods once sold will not be taken back.</li>
+                                    <li>All disputes are subject to Sri Lankan jurisdiction.</li>
+                                    <li>For any queries, contact our customer support.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="signature mt-4 mt-md-0">
+                                <div class="signature-line mb-2"></div>
+                                <p class="text-muted small mb-0">Authorized Signature</p>
+                                <p class="fw-bold mb-0">Bookly Store</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Actions Footer -->
+        <div class="invoice-actions-footer mt-4">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="order-history.html" class="btn btn-outline-primary">
+                            <i class="bi bi-clock-history me-2"></i>View Order History
+                        </a>
+                        <a href="shop.html" class="btn btn-outline-secondary">
+                            <i class="bi bi-shop me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+                <!--                <div class="col-md-6 text-md-end">-->
+                <!--                    <div class="d-flex flex-wrap gap-2 justify-content-md-end">-->
+                <!--                        <button class="btn btn-primary" id="emailInvoice">-->
+                <!--                            <i class="bi bi-envelope me-2"></i>Email Invoice-->
+                <!--                        </button>-->
+                <!--                        <button class="btn btn-success" id="reorderItems">-->
+                <!--                            <i class="bi bi-arrow-repeat me-2"></i>Reorder Items-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="help-section card border-0 shadow-sm mt-5">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-question-circle display-4 text-primary mb-3"></i>
+                <h4 class="fw-bold mb-3">Need Help With Your Invoice?</h4>
+                <p class="text-muted mb-4">Our customer support team is here to assist you</p>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="help-option p-3 border rounded-3">
+                            <i class="bi bi-telephone text-primary h3 mb-3"></i>
+                            <h6 class="fw-bold mb-2">Call Us</h6>
+                            <p class="text-muted small mb-0">+94 11 234 5678</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="help-option p-3 border rounded-3">
+                            <i class="bi bi-envelope text-primary h3 mb-3"></i>
+                            <h6 class="fw-bold mb-2">Email Us</h6>
+                            <p class="text-muted small mb-0">support@bookly.lk</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="help-option p-3 border rounded-3">
+                            <i class="bi bi-chat-dots text-primary h3 mb-3"></i>
+                            <h6 class="fw-bold mb-2">Live Chat</h6>
+                            <p class="text-muted small mb-0">Available 24/7</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer Component -->
+<footer class="footer bg-dark text-white py-5">
+    <footer-content></footer-content>
+</footer>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.min.js"></script>
+<!-- Header/Footer Components -->
+<script src="assets/js/header.js"></script>
+<script src="assets/js/footer.js"></script>
+<script src="assets/js/notiflix-aio-3.2.8.min.js"></script>
+<!-- Invoice JavaScript -->
+<script src="assets/js/payment/invoice.js"></script>
+</body>
+</html>
