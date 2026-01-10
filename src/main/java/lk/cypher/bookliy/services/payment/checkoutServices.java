@@ -20,6 +20,7 @@ import java.util.List;
 public class checkoutServices {
     private final OrderServices orderServices = new OrderServices();
 
+    // Load user checkout data
     public String getCheckoutData(HttpServletRequest request) {
         JsonObject responseObject = new JsonObject();
         String message = "";
@@ -67,81 +68,66 @@ public class checkoutServices {
         return AppUtil.gson.toJson(responseObject);
     }
 
+    // Process checkout request
     public String processCheckout(CheckoutRequestDTO requestDTO, HttpServletRequest request) {
-
-        JsonObject responseObj = new JsonObject();
-        String message = "";
+        JsonObject responseObject = new JsonObject();
         boolean status = false;
+        String message = "";
 
-        Session hibernateSession = null;
-        Transaction tx = null;
+        Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
 
         try {
-            hibernateSession = HibernateUtil.getSessionFactory().openSession();
-            tx = hibernateSession.beginTransaction(); // START TRANSACTION FIRST
+            transaction = hibernateSession.beginTransaction(); // START TRANSACTION HERE
 
             User sessionUser = (User) request.getSession().getAttribute("user");
             if (sessionUser == null) {
-                message = "Session expired. Please login again.";
+                message = "Session expired. Please login again and try!";
             } else {
                 User dbUser = hibernateSession.find(User.class, sessionUser.getId());
-
                 if (requestDTO.isCurrentAddress()) {
-
-                    Address address = hibernateSession.createQuery(
-                                    "FROM Address a WHERE a.user = :user AND a.isPrimary = true",
-                                    Address.class)
+                    Address address = hibernateSession.createQuery("FROM Address a WHERE a.user=:user AND a.isPrimary=:primary", Address.class)
                             .setParameter("user", dbUser)
+                            .setParameter("primary", requestDTO.isCurrentAddress())
                             .getSingleResultOrNull();
-
                     if (address == null) {
-                        message = "Address not found. Please add an address.";
+                        message = "Address not found. Please check again!";
                     } else {
                         Order pendingOrder = orderServices.createPendingOrder(dbUser, hibernateSession);
-
-                        if (pendingOrder == null) {
-                            throw new RuntimeException("Order creation failed");
-                        }
-
                         PayHereDTO paymentDetails = createPaymentDetails(hibernateSession, pendingOrder);
-                        responseObj.add("paymentDetails", AppUtil.gson.toJsonTree(paymentDetails));
+                        responseObject.add("paymentDetails", AppUtil.gson.toJsonTree(paymentDetails));
                         status = true;
                     }
-
                 } else {
-
-                    if (requestDTO.getFirstName().isEmpty()) {
-                        message = "First name is required.";
-                    } else if (requestDTO.getLastName().isEmpty()) {
-                        message = "Last name is required.";
+                    if (requestDTO.getFirstName().isBlank()) {
+                        message = "First Name is required!";
+                    } else if (requestDTO.getLastName().isBlank()) {
+                        message = "Last Name is required!";
                     } else if (requestDTO.getCityId() == AppUtil.DEFAULT_SELECTOR_VALUE) {
-                        message = "Please select a city.";
-                    } else if (requestDTO.getLineOne().isEmpty()) {
-                        message = "Address line one is required.";
-                    } else if (requestDTO.getPostalCode().isEmpty()) {
-                        message = "Postal code is required.";
-                    } else if (requestDTO.getMobile().isEmpty()) {
-                        message = "Mobile number is required.";
+                        message = "Please select a city!";
+                    } else if (requestDTO.getLineOne().isBlank()) {
+                        message = "Address line one is required!";
+                    } else if (requestDTO.getPostalCode().isBlank()) {
+                        message = "Postal code is required!";
+                    } else if (!requestDTO.getPostalCode().matches(Validator.POSTAL_CODE_VALIDATION)) {
+                        message = "Enter a valid postal code!";
+                    } else if (requestDTO.getMobile().isBlank()) {
+                        message = "Mobile number is required!";
                     } else if (!requestDTO.getMobile().matches(Validator.MOBILE_VALIDATION)) {
-                        message = "Invalid mobile number.";
+                        message = "Enter a valid mobile number!";
                     } else {
-
                         City city = hibernateSession.find(City.class, requestDTO.getCityId());
                         if (city == null) {
-                            message = "Selected city not found.";
+                            message = "City not found. Select correct city!";
                         } else {
-
-                            Address existingPrimary = hibernateSession.createQuery(
-                                            "FROM Address a WHERE a.user = :user AND a.isPrimary = true",
-                                            Address.class)
+                            Address existingPrimary = hibernateSession.createQuery("FROM Address a WHERE a.user=:user AND a.isPrimary=:primary", Address.class)
                                     .setParameter("user", dbUser)
+                                    .setParameter("primary", true)
                                     .getSingleResultOrNull();
-
                             if (existingPrimary != null) {
                                 existingPrimary.setPrimary(false);
                                 hibernateSession.merge(existingPrimary);
                             }
-
                             Address address = new Address();
                             address.setPrimary(true);
                             address.setLine1(requestDTO.getLineOne());
@@ -150,48 +136,43 @@ public class checkoutServices {
                             address.setMobile(requestDTO.getMobile());
                             address.setCity(city);
                             address.setUser(dbUser);
-
                             hibernateSession.persist(address);
 
                             Order pendingOrder = orderServices.createPendingOrder(dbUser, hibernateSession);
-
-                            if (pendingOrder == null) {
-                                throw new RuntimeException("Order creation failed");
-                            }
-
                             PayHereDTO paymentDetails = createPaymentDetails(hibernateSession, pendingOrder);
-                            responseObj.add("paymentDetails", AppUtil.gson.toJsonTree(paymentDetails));
+                            responseObject.add("paymentDetails", AppUtil.gson.toJsonTree(paymentDetails));
                             status = true;
                         }
                     }
                 }
             }
 
-            if (status) {
-                tx.commit(); // COMMIT ONLY ON SUCCESS
-            } else {
-                tx.rollback();
+            // Commit only if successful
+            if (status && transaction != null) {
+                transaction.commit();
+            } else if (transaction != null) {
+                transaction.rollback();
             }
 
         } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback(); // SAFETY ROLLBACK
+            if (transaction != null) {
+                transaction.rollback();
             }
-            message = e.getMessage();
             e.printStackTrace();
+            message = "An error occurred during checkout: " + e.getMessage();
+            status = false;
         } finally {
-            if (hibernateSession != null) {
-                hibernateSession.close();
-            }
+            hibernateSession.close();
         }
 
-        responseObj.addProperty("message", message);
-        responseObj.addProperty("status", status);
-        return AppUtil.gson.toJson(responseObj);
+        responseObject.addProperty("status", status);
+        responseObject.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObject);
     }
 
+    // Create payment details for PayHere
     private PayHereDTO createPaymentDetails(Session hibernateSession, Order o) {
-        String order_id = "#000" + o.getId();
+        String order_id = "000" + o.getId();
         String returnUrl = ENV.get("app.public.url") + "/api/payments/return";
         String cancelUrl = ENV.get("app.public.url") + "/api/payments/cancel";
         String notifyUrl = ENV.get("app.public.url") + "/api/payments/notify";
@@ -257,6 +238,7 @@ public class checkoutServices {
         return payHereDTO;
     }
 
+    // Generate AddressDTO from Address entity
     private static AddressDTO getAddressDTO(Address primaryAddress) {
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setId(primaryAddress.getId());
