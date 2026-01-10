@@ -478,8 +478,9 @@ async function checkout() {
     }
 }
 
-payhere.onCompleted = function onCompleted(orderId) {
+payhere.onCompleted = async function onCompleted(orderId) {
     console.log("Payment completed. OrderID:" + orderId);
+    await verifyOrder(orderId);
     // Note: validate the payment and show success or failure page to the customer
 };
 
@@ -495,3 +496,25 @@ payhere.onError = function onError(error) {
     // Note: show an error page
     console.log("Error:"  + error);
 };
+
+async function verifyOrder(orderId) {
+    try {
+        const response = await fetch(`api/orders/verify-order?orderId=${orderId}`);
+        if (response.ok) {
+            const data = await response.json();
+            if(data.status){
+                window.location = `invoice.html?orderId=${orderId}`;
+            }else{
+                //redirect to fail page
+            }
+        } else {
+            Notiflix.Notify.failure('Failed to verify order.', {
+                position: 'center-top'
+            });
+        }
+    } catch (e) {
+        Notiflix.Notify.failure(e.message, {
+            position: 'center-top'
+        });
+    }
+}
