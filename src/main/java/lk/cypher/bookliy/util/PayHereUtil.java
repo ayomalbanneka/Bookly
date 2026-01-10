@@ -34,8 +34,8 @@ public class PayHereUtil {
     public static boolean validateNotify(MultivaluedMap<String, String> form) {
         String merchantId = form.getFirst("merchant_id");
         String orderId = form.getFirst("order_id");
-        String payHereAmount = form.getFirst("payment_amount");
-        String payHereCurrency = form.getFirst("payment_currency");
+        String payHereAmount = form.getFirst("payhere_amount");
+        String payHereCurrency = form.getFirst("payhere_currency");
         String statusCode = form.getFirst("status_code");
         String md5sig = form.getFirst("md5sig");
         String localSignature = md5(

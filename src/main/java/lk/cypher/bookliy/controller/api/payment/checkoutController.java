@@ -36,43 +36,4 @@ public class checkoutController {
         String responseJson = new checkoutServices().processCheckout(checkoutRequestDTO, request);
         return Response.ok().entity(responseJson).build();
     }
-
-    @Path("/return")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response paymentSuccess(@QueryParam("orderId") String orderId) {
-        return Response.seeOther(URI.create(ENV.get("app.url") + "/invoice.html?orderId=" + orderId)).build();
-    }
-
-    @Path("/cancel")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response paymentCancel() {
-        return Response.ok("Payment Canceled").build();
-    }
-
-    @Path("/notify")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response paymentNotify(MultivaluedMap<String, String> form) {
-        String orderId = form.getFirst("orderId");
-        String statusCode = form.getFirst("statusCode");
-
-        if (!PayHereUtil.validateNotify(form)) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("INVALID SIGNATURE")
-                    .build();
-        }
-
-        OrderServices orderService = new OrderServices();
-        if (Integer.parseInt(statusCode) == PayHereUtil.PAYMENT_SUCCESS) {
-            // Payment Success Logic Here
-            orderService.completeOrder(orderId);
-        } else {
-            // Payment Failure Logic Here
-            orderService.failedOrder(orderId);
-        }
-
-        return Response.ok().build();
-    }
 }

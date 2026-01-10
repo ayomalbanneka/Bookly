@@ -11,7 +11,7 @@ public class AppUtil {
     public static final String APP_COUNTRY = "Sri Lanka"; //PayHere Payment Gateway Country
     public static final int FIRST_RESULT_VALUE = 0;
     public static final int MAX_RESULT_VALUE = 9;
-    public static final int DEAFUALT_RATING_VALUE = 0;
+    public static final int DEFAULT_RATING_VALUE = 0;
 
     public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
