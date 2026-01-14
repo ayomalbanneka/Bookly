@@ -647,74 +647,336 @@ async function loadAdvancedSearchData() {
 // Update product view
 let allProductsData = null; // Store all products globally for filtering
 
-// Render products
+// Pagination variables
+let currentPage = 1;
+const itemsPerPage = 9;
+let filteredProducts = []; // Store filtered products for pagination
+
+// Update product view with pagination
 function updateProductView(data) {
     allProductsData = data;
 
     const bookCount = document.getElementById('bookCount');
     bookCount.innerText = data.allProductCount;
 
-    const productContainer = document.getElementById('productsContainer');
-    let htmlContent = '';
-
+    // Store all products for filtering
+    filteredProducts = [];
     data.allProducts.forEach((product) => {
         product.stockDTOList.forEach((stock) => {
-            let priceFormatted = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(stock.price);
-
-            // Determine stock status - IMPORTANT: Check if stock.stock exists
-            const stockQty = stock.stock || 0;
-            const isInStock = stockQty > 0;
-            const stockStatus = isInStock ? 'in-stock' : 'out-of-stock';
-
-            htmlContent += `
-            <div class="col-md-4 col-sm-6 product-item" 
-                 data-category="${product.categoryName.toLowerCase()}"
-                 data-availability="${stockStatus}">
-                    <a href="single-product.html?productId=${product.productId}" class="text-decoration-none text-dark">
-                        <div class="product-card">
-                    <div class="product-image-container">
-                        <img src="${product.images[0]}"
-                             alt="${product.title}"
-                             class="img-fluid">
-                        <span class="product-badge bg-${product.categoryName.toLowerCase()}">${product.categoryName}</span>
-                        <div class="product-actions">
-                            <button class="wishlist-toggle" title="Add to Wishlist">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                            <button class="quick-view" title="Quick View">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h5 class="product-title text-truncate">${product.title}</h5>
-                        <p class="product-author">${product.author}</p>
-                        <div class="product-price">
-                            <span class="current-price">LKR ${priceFormatted}</span>
-                        </div>
-                        <div class="product-stock-info mb-2">
-                            <small class="${isInStock ? 'text-success' : 'text-danger'}">
-                                ${isInStock ? `${stockQty} in stock` : 'Out of stock'}
-                            </small>
-                        </div>
-                        <div class="product-actions-bottom">
-                            <button class="add-to-cart" 
-                                    onclick="addToCart(${stock.stockId},1)"
-                                    ${!isInStock ? 'disabled' : ''}>
-                                <i class="bi bi-cart-plus me-2"></i>
-                                ${isInStock ? 'Add to Cart' : 'Out of Stock'}
-                            </button>
-                        </div>
-                    </div>
-                </div>     
-                    </a>
-               
-            </div>
-            `;
+            filteredProducts.push({
+                product: product,
+                stock: stock
+            });
         });
     });
 
+    // Reset to page 1
+    currentPage = 1;
+
+    // Render products and pagination
+    renderProducts();
+    initializePriceFilter();
+}
+
+// Render products for current page
+function renderProducts() {
+    const productContainer = document.getElementById('productsContainer');
+    let htmlContent = '';
+
+    // Calculate start and end indices
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // Get products for current page
+    const pageProducts = filteredProducts.slice(startIndex, endIndex);
+
+    pageProducts.forEach((item) => {
+        const product = item.product;
+        const stock = item.stock;
+
+        let priceFormatted = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(stock.price);
+
+        const stockQty = stock.stock || 0;
+        const isInStock = stockQty > 0;
+        const stockStatus = isInStock ? 'in-stock' : 'out-of-stock';
+
+        htmlContent += `
+        <div class="col-md-4 col-sm-6 product-item" 
+             data-category="${product.categoryName.toLowerCase()}"
+             data-availability="${stockStatus}"
+             data-price="${stock.price}">
+                <a href="single-product.html?productId=${product.productId}" class="text-decoration-none text-dark">
+                    <div class="product-card">
+                <div class="product-image-container">
+                    <img src="${product.images[0]}"
+                         alt="${product.title}"
+                         class="img-fluid">
+                    <span class="product-badge bg-${product.categoryName.toLowerCase()}">${product.categoryName}</span>
+                    <div class="product-actions">
+                        <button class="wishlist-toggle" title="Add to Wishlist">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                        <button class="quick-view" title="Quick View">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h5 class="product-title text-truncate">${product.title}</h5>
+                    <p class="product-author">${product.author}</p>
+                    <div class="product-price">
+                        <span class="current-price">LKR ${priceFormatted}</span>
+                    </div>
+                    <div class="product-stock-info mb-2">
+                        <small class="${isInStock ? 'text-success' : 'text-danger'}">
+                            ${isInStock ? `${stockQty} in stock` : 'Out of stock'}
+                        </small>
+                    </div>
+                    <div class="product-actions-bottom">
+                        <button class="add-to-cart" 
+                                onclick="addToCart(${stock.stockId},1)"
+                                ${!isInStock ? 'disabled' : ''}>
+                            <i class="bi bi-cart-plus me-2"></i>
+                            ${isInStock ? 'Add to Cart' : 'Out of Stock'}
+                        </button>
+                    </div>
+                </div>
+            </div>     
+                </a>
+           
+        </div>
+        `;
+    });
+
     productContainer.innerHTML = htmlContent;
+
+    // Update pagination
+    updatePagination();
+
+    // Scroll to top of products
+    productContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Update pagination UI
+function updatePagination() {
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const paginationContainer = document.getElementById('paginationContainer');
+
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+
+    paginationContainer.style.display = 'block';
+
+    let paginationHTML = '<ul class="pagination justify-content-center">';
+
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;" tabindex="-1">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+    `;
+
+    // Page numbers with smart pagination
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // First page + ellipsis
+    if (startPage > 1) {
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(1); return false;">1</a>
+            </li>
+        `;
+        if (startPage > 2) {
+            paginationHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+            `;
+        }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+            </li>
+        `;
+    }
+
+    // Ellipsis + last page
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+            `;
+        }
+        paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">${totalPages}</a>
+            </li>
+        `;
+    }
+
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+    `;
+
+    paginationHTML += '</ul>';
+
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+// Change page function
+function changePage(page) {
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+    if (page < 1 || page > totalPages) {
+        return;
+    }
+
+    currentPage = page;
+    renderProducts();
+}
+
+// Get price range from products
+function getPriceRange() {
+    if (!allProductsData || !allProductsData.allProducts) {
+        return { min: 0, max: 10000 };
+    }
+
+    let minPrice = Infinity;
+    let maxPrice = 0;
+
+    allProductsData.allProducts.forEach(product => {
+        product.stockDTOList.forEach(stock => {
+            const price = parseFloat(stock.price);
+            if (price < minPrice) minPrice = price;
+            if (price > maxPrice) maxPrice = price;
+        });
+    });
+
+    return {
+        min: Math.floor(minPrice),
+        max: Math.ceil(maxPrice)
+    };
+}
+
+// Initialize price filter
+function initializePriceFilter() {
+    const priceRange = getPriceRange();
+
+    const minSlider = document.getElementById('priceRangeMin');
+    const maxSlider = document.getElementById('priceRangeMax');
+    const minInput = document.getElementById('minPriceInput');
+    const maxInput = document.getElementById('maxPriceInput');
+    const minDisplay = document.getElementById('priceMinDisplay');
+    const maxDisplay = document.getElementById('priceMaxDisplay');
+
+    // Set initial values
+    minSlider.min = priceRange.min;
+    minSlider.max = priceRange.max;
+    minSlider.value = priceRange.min;
+
+    maxSlider.min = priceRange.min;
+    maxSlider.max = priceRange.max;
+    maxSlider.value = priceRange.max;
+
+    minInput.min = priceRange.min;
+    minInput.max = priceRange.max;
+    minInput.value = priceRange.min;
+
+    maxInput.min = priceRange.min;
+    maxInput.max = priceRange.max;
+    maxInput.value = priceRange.max;
+
+    minDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(priceRange.min);
+    maxDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(priceRange.max);
+
+    // Update price labels
+    const priceLabels = document.querySelector('.price-labels');
+    if (priceLabels) {
+        const midPrice = Math.round((priceRange.min + priceRange.max) / 2);
+        priceLabels.innerHTML = `
+            <small class="text-muted">LKR ${priceRange.min.toLocaleString()}</small>
+            <small class="text-muted">LKR ${midPrice.toLocaleString()}</small>
+            <small class="text-muted">LKR ${priceRange.max.toLocaleString()}</small>
+        `;
+    }
+
+    // Event listeners for sliders
+    minSlider.addEventListener('input', function() {
+        let minVal = parseInt(this.value);
+        let maxVal = parseInt(maxSlider.value);
+
+        if (minVal >= maxVal) {
+            minVal = maxVal - 1;
+            this.value = minVal;
+        }
+
+        minInput.value = minVal;
+        minDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(minVal);
+        applyAllFilters();
+    });
+
+    maxSlider.addEventListener('input', function() {
+        let maxVal = parseInt(this.value);
+        let minVal = parseInt(minSlider.value);
+
+        if (maxVal <= minVal) {
+            maxVal = minVal + 1;
+            this.value = maxVal;
+        }
+
+        maxInput.value = maxVal;
+        maxDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(maxVal);
+        applyAllFilters();
+    });
+
+    // Event listeners for inputs
+    minInput.addEventListener('change', function() {
+        let minVal = parseInt(this.value);
+        let maxVal = parseInt(maxInput.value);
+
+        if (minVal < priceRange.min) minVal = priceRange.min;
+        if (minVal >= maxVal) minVal = maxVal - 1;
+
+        this.value = minVal;
+        minSlider.value = minVal;
+        minDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(minVal);
+        applyAllFilters();
+    });
+
+    maxInput.addEventListener('change', function() {
+        let maxVal = parseInt(this.value);
+        let minVal = parseInt(minInput.value);
+
+        if (maxVal > priceRange.max) maxVal = priceRange.max;
+        if (maxVal <= minVal) maxVal = minVal + 1;
+
+        this.value = maxVal;
+        maxSlider.value = maxVal;
+        maxDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(maxVal);
+        applyAllFilters();
+    });
 }
 
 // Render categories
@@ -833,72 +1095,29 @@ async function sortProducts(sortBy) {
     }
 }
 
-// Update product view with sorted products
+// Update product view with sorted products and pagination
 function updateSortedProductView(sortedProducts) {
     // Update the global data
     if (allProductsData) {
         allProductsData.allProducts = sortedProducts;
     }
 
-    const productContainer = document.getElementById('productsContainer');
-    let htmlContent = '';
-
+    // Update filtered products for pagination
+    filteredProducts = [];
     sortedProducts.forEach((product) => {
         product.stockDTOList.forEach((stock) => {
-            let priceFormatted = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(stock.price);
-
-            const stockQty = stock.stock || 0;
-            const isInStock = stockQty > 0;
-            const stockStatus = isInStock ? 'in-stock' : 'out-of-stock';
-
-            htmlContent += `
-            <div class="col-md-4 col-sm-6 product-item" 
-                 data-category="${product.categoryName.toLowerCase()}"
-                 data-availability="${stockStatus}">
-                <a href="single-product.html?productId=${product.productId}" class="text-decoration-none text-dark">
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <img src="${product.images[0]}"
-                                 alt="${product.title}"
-                                 class="img-fluid">
-                            <span class="product-badge bg-${product.categoryName.toLowerCase()}">${product.categoryName}</span>
-                            <div class="product-actions">
-                                <button class="wishlist-toggle" title="Add to Wishlist">
-                                    <i class="bi bi-heart"></i>
-                                </button>
-                                <button class="quick-view" title="Quick View">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <h5 class="product-title text-truncate">${product.title}</h5>
-                            <p class="product-author">${product.author}</p>
-                            <div class="product-price">
-                                <span class="current-price">LKR ${priceFormatted}</span>
-                            </div>
-                            <div class="product-stock-info mb-2">
-                                <small class="${isInStock ? 'text-success' : 'text-danger'}">
-                                    ${isInStock ? `${stockQty} in stock` : 'Out of stock'}
-                                </small>
-                            </div>
-                            <div class="product-actions-bottom">
-                                <button class="add-to-cart" 
-                                        onclick="addToCart(${stock.stockId},1)"
-                                        ${!isInStock ? 'disabled' : ''}>
-                                    <i class="bi bi-cart-plus me-2"></i>
-                                    ${isInStock ? 'Add to Cart' : 'Out of Stock'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>     
-                </a>
-            </div>
-            `;
+            filteredProducts.push({
+                product: product,
+                stock: stock
+            });
         });
     });
 
-    productContainer.innerHTML = htmlContent;
+    // Reset to page 1
+    currentPage = 1;
+
+    // Apply filters (this will update filteredProducts and re-render)
+    applyAllFilters();
 }
 
 // Filter functions
@@ -926,26 +1145,7 @@ function filterByCategory(event) {
         }
     }
 
-    // Get selected categories
-    const checkedBoxes = document.querySelectorAll('.category-filter:checked');
-    const selectedCategories = Array.from(checkedBoxes).map(cb => cb.value);
-
-    // Filter products
-    const allProducts = document.querySelectorAll('.product-item');
-    let visibleCount = 0;
-
-    allProducts.forEach(product => {
-        const productCategory = product.getAttribute('data-category');
-
-        if (selectedCategories.includes('all') || selectedCategories.includes(productCategory)) {
-            product.style.display = '';
-            visibleCount++;
-        } else {
-            product.style.display = 'none';
-        }
-    });
-
-    // Apply all filters
+    // Apply all filters (this will update pagination)
     applyAllFilters();
 }
 
@@ -963,7 +1163,7 @@ function filterByAvailability(event) {
         return;
     }
 
-    // Apply all filters
+    // Apply all filters (this will update pagination)
     applyAllFilters();
 }
 
@@ -977,38 +1177,114 @@ function applyAllFilters() {
     const availabilityCheckboxes = document.querySelectorAll('.availability-filter:checked');
     const selectedAvailability = Array.from(availabilityCheckboxes).map(cb => cb.value);
 
-    // Filter products
-    const allProducts = document.querySelectorAll('.product-item');
-    let visibleCount = 0;
+    // Get price range
+    const minPrice = parseInt(document.getElementById('priceRangeMin')?.value || 0);
+    const maxPrice = parseInt(document.getElementById('priceRangeMax')?.value || 999999);
 
-    allProducts.forEach(product => {
-        const productCategory = product.getAttribute('data-category');
-        const productAvailability = product.getAttribute('data-availability');
+    // Build filtered products array based on current allProductsData
+    if (!allProductsData || !allProductsData.allProducts) {
+        return;
+    }
 
-        // Check if product matches filters
-        const categoryMatch = selectedCategories.includes('all') ||
-            selectedCategories.includes(productCategory);
-        const availabilityMatch = selectedAvailability.length === 0 ||
-            selectedAvailability.includes(productAvailability);
+    filteredProducts = [];
 
-        if (categoryMatch && availabilityMatch) {
-            product.style.display = '';
-            visibleCount++;
-        } else {
-            product.style.display = 'none';
-        }
+    allProductsData.allProducts.forEach((product) => {
+        product.stockDTOList.forEach((stock) => {
+            const productCategory = product.categoryName.toLowerCase();
+            const stockQty = stock.stock || 0;
+            const isInStock = stockQty > 0;
+            const productAvailability = isInStock ? 'in-stock' : 'out-of-stock';
+            const productPrice = parseFloat(stock.price);
+
+            // Check if product matches filters
+            const categoryMatch = selectedCategories.includes('all') ||
+                selectedCategories.includes(productCategory);
+            const availabilityMatch = selectedAvailability.length === 0 ||
+                selectedAvailability.includes(productAvailability);
+            const priceMatch = productPrice >= minPrice && productPrice <= maxPrice;
+
+            if (categoryMatch && availabilityMatch && priceMatch) {
+                filteredProducts.push({
+                    product: product,
+                    stock: stock
+                });
+            }
+        });
     });
 
-    // Update book count with format: "Showing X of Y books"
+    // Reset to page 1 when filters change
+    currentPage = 1;
+
+    // Render products with new filters
+    renderProducts();
+
+    // Update book count
     const bookCount = document.getElementById('bookCount');
     if (bookCount) {
-        // Add a small fade effect
         bookCount.style.opacity = '0.5';
         setTimeout(() => {
-            bookCount.innerText = visibleCount;
+            bookCount.innerText = filteredProducts.length;
             bookCount.style.opacity = '1';
         }, 150);
     }
+}
+
+// Reset all filters
+function resetFilters() {
+    // Reset category filters
+    const allCheckbox = document.getElementById('catAll');
+    const categoryCheckboxes = document.querySelectorAll('.category-filter:not(#catAll)');
+
+    if (allCheckbox) {
+        allCheckbox.checked = true;
+    }
+    categoryCheckboxes.forEach(cb => cb.checked = false);
+
+
+    // Reset price range
+    const priceRange = getPriceRange();
+
+    const minSlider = document.getElementById('priceRangeMin');
+    const maxSlider = document.getElementById('priceRangeMax');
+    const minInput = document.getElementById('minPriceInput');
+    const maxInput = document.getElementById('maxPriceInput');
+    const minDisplay = document.getElementById('priceMinDisplay');
+    const maxDisplay = document.getElementById('priceMaxDisplay');
+
+    if (minSlider && maxSlider && minInput && maxInput && minDisplay && maxDisplay) {
+        minSlider.value = priceRange.min;
+        maxSlider.value = priceRange.max;
+        minInput.value = priceRange.min;
+        maxInput.value = priceRange.max;
+        minDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(priceRange.min);
+        maxDisplay.textContent = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(priceRange.max);
+    }
+
+    // Reset sort to default
+    const currentSort = document.getElementById('currentSort');
+    if (currentSort) {
+        currentSort.textContent = 'Sort by';
+    }
+
+    // Apply filters (this will show all products)
+    applyAllFilters();
+
+    // Show success notification
+    new Notify({
+        status: 'success',
+        title: 'Filters Reset',
+        text: 'All filters have been reset successfully',
+        effect: 'fade',
+        speed: 300,
+        showIcon: true,
+        showCloseButton: true,
+        autoclose: true,
+        autotimeout: 2000,
+        notificationsGap: null,
+        notificationsPadding: null,
+        type: 'outline',
+        position: 'right top',
+    });
 }
 
 async function removeItemFromCart(cartId) {
