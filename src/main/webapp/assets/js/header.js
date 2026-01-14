@@ -119,3 +119,143 @@ class HeaderContent extends HTMLElement {
 }
 
 customElements.define('header-content', HeaderContent);
+
+async function fetchSearchResults(query) {
+    if (!query.trim()) {
+        return [];
+    }
+
+    try {
+        const response = await fetch(`api/common/basic-search?title=${encodeURIComponent(query)}`);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data)
+
+            if (data.status && data.basicSearchData && Array.isArray(data.basicSearchData)) {
+                // Map API data to expected format
+                return data.basicSearchData.map(book => ({
+                    id: book.StockId,
+                    productId: book.productId,
+                    title: book.title,
+                    author: book.author,
+                    price: parseFloat(book.price) || 0,
+                    category: book.category,
+                    cover: book.image,
+                    rating: parseFloat(book.rating) || 5
+                }));
+            } else {
+                console.warn('No search results found');
+                return [];
+            }
+        } else {
+            console.error('Error fetching search results:', response.status);
+            return [];
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+        return [];
+    }
+}
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const initialState = document.getElementById('initialState');
+const loadingState = document.getElementById('loadingState');
+const noResultsState = document.getElementById('noResultsState');
+const resultsContainer = document.getElementById('resultsContainer');
+const listView = document.getElementById('searchListView');
+const resultCount = document.getElementById('resultCount');
+const gridViewBtn = document.getElementById('gridViewBtn');
+const listViewBtn = document.getElementById('listViewBtn');
+
+let currentView = 'grid';
+
+// Highlight matching text
+function highlightText(text, query) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+}
+
+// Create list view item
+function createListItem(book, query) {
+    return `
+            <a class="text-decoration-none" href="single-product.html?productId=${book.productId}">
+                <div class="list-result-item border-bottom py-3">
+                    <div class="row align-items-center">
+                         <div class="col-auto">
+                            <img src="${book.cover}" class="book-cover-list" alt="${book.title}">
+                        </div>
+                        <div class="col">
+                            <span class="badge bg-primary category-badge mb-2">${book.category}</span>
+                            <h5 class="mb-1">${highlightText(book.title, query)}</h5>
+                            <p class="text-muted mb-2">by ${highlightText(book.author, query)}</p>
+                        </div>
+                        <div class="col-auto text-end">
+                            <div class="price-tag mb-3">LKR ${book.price.toFixed(2)}</div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </a>
+    `;
+}
+
+// Perform search
+async function performSearch(query) {
+    // Hide all states
+    initialState.classList.add('d-none');
+    loadingState.classList.add('d-none');
+    noResultsState.classList.add('d-none');
+    resultsContainer.classList.add('d-none');
+
+    if (!query.trim()) {
+        initialState.classList.remove('d-none');
+        return;
+    }
+
+    // Show loading
+    loadingState.classList.remove('d-none');
+
+    // Fetch results from API
+    const results = await fetchSearchResults(query);
+
+    loadingState.classList.add('d-none');
+
+    if (results.length === 0) {
+        noResultsState.classList.remove('d-none');
+        return;
+    }
+
+    // Display results
+    resultCount.textContent = results.length;
+    listView.innerHTML = results.map(book => createListItem(book, query)).join('');
+    resultsContainer.classList.remove('d-none');
+}
+
+// Event listeners
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    // Debounce search to avoid too many API calls
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        performSearch(e.target.value);
+    }, 800);
+});
+
+listViewBtn.addEventListener('click', () => {
+    currentView = 'list';
+    listView.classList.remove('d-none');
+    listViewBtn.classList.add('active');
+    gridViewBtn.classList.remove('active');
+});
+
+// Reset search when modal is closed
+document.getElementById('searchModal').addEventListener('hidden.bs.modal', () => {
+    searchInput.value = '';
+    initialState.classList.remove('d-none');
+    loadingState.classList.add('d-none');
+    noResultsState.classList.add('d-none');
+    resultsContainer.classList.add('d-none');
+});
