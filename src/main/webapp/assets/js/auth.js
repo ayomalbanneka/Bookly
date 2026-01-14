@@ -41,8 +41,8 @@ async function createAccount() {
     const firstName = document.getElementById("firstName").value;
     const lastName = document.getElementById("lastName").value;
     const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+    const password = document.getElementById("passwordField").value;
+    const confirmPassword = document.getElementById("confirmPasswordField").value;
     const termsAccepted = document.getElementById("terms").checked;
 
     if (!termsAccepted) {

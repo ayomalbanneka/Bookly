@@ -9,6 +9,14 @@ import lk.cypher.bookliy.services.CommonServices;
 
 @Path("/common")
 public class CommonController {
+    @Path("/basic-search")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadBasicSearchData(@QueryParam("title") String title) {
+        String responseJson = new CommonServices().getBasicSearchData(title);
+        return Response.ok().entity(responseJson).build();
+    }
+
     @Path("/single-product")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

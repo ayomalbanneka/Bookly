@@ -1,12 +1,10 @@
 package lk.cypher.bookliy.services;
 
 import com.google.gson.JsonObject;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lk.cypher.bookliy.dto.CartDTO;
-import lk.cypher.bookliy.dto.DeliveryTypeDTO;
-import lk.cypher.bookliy.dto.ProductDTO;
-import lk.cypher.bookliy.dto.StockDTO;
+import lk.cypher.bookliy.dto.*;
 import lk.cypher.bookliy.entity.*;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
@@ -19,6 +17,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommonServices {
+
+    public String getBasicSearchData(String title) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+        // Basic search logic to be implemented here
+
+        if (!title.isBlank()) {
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+
+            List<Stock> stockList = hibernateSession.createQuery("FROM Stock s WHERE s.product.title LIKE :title"
+                            , Stock.class)
+                    .setParameter("title", "%" + title + "%")
+                    .getResultList();
+
+            if (stockList.isEmpty()) {
+                message = "No products found matching the search criteria.";
+            } else {
+                List<SearchResponseDTO> searchResponseDTOS = getSearchResponseDTOS(stockList);
+                responseObj.add("basicSearchData", AppUtil.gson.toJsonTree(searchResponseDTOS));
+                status = true;
+
+                hibernateSession.close();
+            }
+        }
+
+        // Basic search logic to be implemented here - end
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    private static List<SearchResponseDTO> getSearchResponseDTOS(List<Stock> stockList) {
+        List<SearchResponseDTO> searchResponseDTOS = new ArrayList<>();
+        for (Stock stock : stockList) {
+            SearchResponseDTO dto = new SearchResponseDTO();
+            dto.setStockId(stock.getId());
+            dto.setProductId(stock.getProduct().getId());
+            dto.setTitle(stock.getProduct().getTitle());
+            dto.setAuthor(stock.getProduct().getAuthor());
+            dto.setCategory(stock.getProduct().getCategory().getName());
+            dto.setCategoryId(String.valueOf(stock.getProduct().getCategory().getId()));
+            dto.setPrice(stock.getPrice());
+            dto.setImage(stock.getProduct().getImages().get(0));
+            searchResponseDTOS.add(dto);
+        }
+        return searchResponseDTOS;
+    }
 
     // Get all products
     public String getAllProducts() {
