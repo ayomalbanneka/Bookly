@@ -17,4 +17,20 @@ public class AdminContentController {
         String responseJson = new AdminContentServices().loadAllCategories();
         return Response.ok().entity(responseJson).build();
     }
+
+    @Path("/books")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response loadAllBooks() {
+        String responseJson = new AdminContentServices().loadAllBooks();
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/orders")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response loadAllOrders() {
+        String responseJson = new AdminContentServices().loadAllOrders();
+        return Response.ok().entity(responseJson).build();
+    }
 }

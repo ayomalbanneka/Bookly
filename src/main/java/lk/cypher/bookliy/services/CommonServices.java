@@ -18,6 +18,77 @@ import java.util.List;
 
 public class CommonServices {
 
+    public String getOrdersAndPendingOrder(HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        HttpSession httpSession = request.getSession();
+        User sessionUser = (User) httpSession.getAttribute("user");
+
+        if (sessionUser != null) {
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+            try {
+                List<Order> orderList = hibernateSession.createQuery(
+                                "FROM Order o WHERE o.user.id=:userId ORDER BY o.createdAt DESC",
+                                Order.class)
+                        .setParameter("userId", sessionUser.getId())
+                        .getResultList();
+
+                List<OrderDTO> orderDTOList = new ArrayList<>();
+                for (Order order : orderList) {
+                    OrderDTO orderDTO = new OrderDTO();
+                    orderDTO.setOrderId(order.getId());
+                    orderDTO.setOrderDate(order.getCreatedAt().toString());
+                    orderDTO.setStatus(order.getStatus().getValue());
+
+                    // Calculate delivery cost
+                    double deliveryCost = 0.0;
+                    if (order.getDeliveryType() != null) {
+                        deliveryCost = order.getDeliveryType().getPrice();
+                    }
+                    orderDTO.setDeliveryCost(deliveryCost);
+
+                    // Calculate items total
+                    double itemsTotal = 0.0;
+                    List<OrderItem> orderItems = hibernateSession.createQuery(
+                                    "FROM OrderItem oi WHERE oi.order.id=:orderId",
+                                    OrderItem.class)
+                            .setParameter("orderId", order.getId())
+                            .getResultList();
+
+                    for (OrderItem orderItem : orderItems) {
+                        Stock stock = orderItem.getStock();
+                        double itemPrice = stock.getPrice();
+
+                        itemsTotal += (itemPrice * orderItem.getQty());
+                    }
+                    orderDTO.setItemsTotal(itemsTotal);
+
+                    // Calculate total amount (items total + delivery cost)
+                    orderDTO.setTotalAmount(itemsTotal + deliveryCost);
+
+                    orderDTOList.add(orderDTO);
+                }
+
+                responseObj.add("orders", AppUtil.gson.toJsonTree(orderDTOList));
+                status = true;
+                message = "Orders loaded successfully";
+            } catch (Exception e) {
+                message = "Error loading orders: " + e.getMessage();
+                e.printStackTrace();
+            } finally {
+                hibernateSession.close();
+            }
+        } else {
+            message = "User not logged in. Please log in to view orders.";
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
     public String getBasicSearchData(String title) {
         JsonObject responseObj = new JsonObject();
         boolean status = false;

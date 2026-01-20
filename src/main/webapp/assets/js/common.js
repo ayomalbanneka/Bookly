@@ -20,6 +20,9 @@ window.addEventListener('load', async () => {
             await loadAdvancedSearchData();
         }
 
+        if (window.location.pathname.includes('orders.html')) {
+            await showOrdersAndPendingOrder();
+        }
 
     } catch (e) {
         console.log("Error loading initial data:", e);
@@ -1362,4 +1365,111 @@ async function removeItemFromCart(cartId) {
             position: 'right top',
         })
     }
+}
+
+async function showOrdersAndPendingOrder(){
+    try {
+        const response = await fetch('api/common/orders-and-pending-order');
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.status) {
+                displayOrders(data.orders);
+            } else {
+                if (data.message.includes('not logged in')) {
+                    window.location.href = 'login.html';
+                } else {
+                    new Notify({
+                        status: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to load orders',
+                        effect: 'fade',
+                        speed: 300,
+                        showIcon: true,
+                        showCloseButton: true,
+                        autoclose: true,
+                        autotimeout: 3000,
+                        type: 'outline',
+                        position: 'right top',
+                    })
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error:', e);
+    } finally {
+        Notiflix.Loading.remove();
+    }
+}
+
+function displayOrders(orders) {
+    const tbody = document.getElementById('ordersTableBody');
+
+    if (!orders || orders.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-5">
+                    <p class="text-muted">No orders found</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = '';
+
+    orders.forEach(order => {
+        const orderDate = new Date(order.orderDate);
+        const formattedDate = orderDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        let statusBadge = 'bg-warning';
+        let actionButton = '';
+
+        if (order.status.toUpperCase() === 'COMPLETED') {
+            statusBadge = 'bg-success';
+            actionButton = `
+                <button class="btn btn-sm btn-outline-primary" onclick="viewOrder(${order.orderId})">
+                    View Details
+                </button>
+            `;
+        } else if (order.status.toUpperCase() === 'PENDING' || order.status.toUpperCase() === 'PENDING PAYMENT') {
+            statusBadge = 'bg-warning';
+            actionButton = `
+                <button class="btn btn-sm btn-primary" onclick="redirectToCheckout(${order.orderId})">
+                    Complete Payment
+                </button>
+            `;
+        } else if (order.status.toUpperCase() === 'CANCELLED') {
+            statusBadge = 'bg-danger';
+        }
+
+        const row = `
+            <tr>
+                <td><strong>ORD-${String(order.orderId).padStart(6, '0')}</strong></td>
+                <td>${formattedDate}</td>
+                <td>
+                    <strong>LKR ${order.totalAmount.toFixed(2)}</strong><br>
+                    <small class="text-muted">Items: LKR${order.itemsTotal.toFixed(2)} + Delivery: LKR${order.deliveryCost.toFixed(2)}</small>
+                </td>
+                <td><span class="badge ${statusBadge}">${order.status}</span></td>
+                <td>${actionButton}</td>
+            </tr>
+        `;
+
+        tbody.innerHTML += row;
+    });
+}
+
+function viewOrder(orderId) {
+    console.log('View order:', orderId);
+    // TODO: Show order details
+}
+
+function redirectToCheckout(orderId) {
+    window.location.href = `checkout.html?orderId=${orderId}`;
 }
