@@ -19,9 +19,352 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Simple Notify -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.css"/>
-
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="assets/richtexteditor/rte_theme_default.css"/>
 </head>
+
+<style>
+    /* Tab Content Styles */
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Content Header */
+    .content-header {
+        margin-bottom: 2rem;
+    }
+
+    .content-header h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .content-header p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 1rem 0.75rem;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Product Cell */
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .product-image {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .product-name {
+        font-weight: 500;
+        color: #0f172a;
+        margin-bottom: 0.125rem;
+    }
+
+    .product-author {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.125rem;
+    }
+
+    .product-isbn {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    /* Customer Info */
+    .customer-info {
+        min-width: 0;
+    }
+
+    .customer-name {
+        font-weight: 500;
+        color: #0f172a;
+        margin-bottom: 0.125rem;
+    }
+
+    .customer-email {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* User Cell */
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar.small {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-id {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    /* Table Actions */
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    .btn-action.text-danger:hover {
+        color: #dc2626;
+        border-color: #fecaca;
+        background: #fef2f2;
+    }
+
+    /* Card Actions */
+    .card-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .search-box.small {
+        width: 200px;
+    }
+
+    .search-box.small input {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem 0.375rem 2rem;
+    }
+
+    /* Categories Grid */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .category-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.2s;
+    }
+
+    .category-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .category-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .category-content h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-stats {
+        margin-top: 1rem;
+    }
+
+    /* Stats List */
+    .stats-list,
+    .insights-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .stat-item,
+    .insight-item {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-item:last-child,
+    .insight-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .stat-label,
+    .insight-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-value,
+    .insight-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .insight-detail {
+        font-size: 0.875rem;
+        color: #10b981;
+    }
+
+    .insight-detail:not(.positive) {
+        color: #ef4444;
+    }
+
+    /* Small Stat Cards */
+    .stat-card.small {
+        padding: 1.25rem;
+    }
+
+    .stat-card.small .stat-content {
+        text-align: center;
+    }
+
+    .stat-card.small .stat-value {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card.small .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+        }
+
+        .search-box.small {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .table-actions {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .btn-action {
+            width: 28px;
+            height: 28px;
+        }
+    }
+</style>
+
 <body class="admin-panel">
 <!-- Mobile Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -168,158 +511,403 @@
         </div>
     </header>
 
-    <!-- Dashboard Content -->
+    <!-- Content Areas -->
     <div class="content-area">
-        <!-- Stats Overview -->
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon users">
-                        <i class="bi bi-people-fill"></i>
+        <!-- Dashboard Content -->
+        <div class="tab-content active" id="dashboardContent">
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i>
+                            12.5%
+                        </div>
                     </div>
-                    <div class="stat-trend up">
-                        <i class="bi bi-arrow-up"></i>
-                        12.5%
+                    <div class="stat-content">
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-label">Active Users</div>
+                        <div class="stat-description">Currently online</div>
                     </div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">1,248</div>
-                    <div class="stat-label">Active Users</div>
-                    <div class="stat-description">Currently online</div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon revenue">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i>
+                            8.2%
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">LKR 24,890</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                        <div class="stat-description">This month</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orders">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="bi bi-arrow-up"></i>
+                            5.7%
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">324</div>
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-description">Processed today</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon products">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="stat-trend down">
+                            <i class="bi bi-arrow-down"></i>
+                            2.1%
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">1,847</div>
+                        <div class="stat-label">Products</div>
+                        <div class="stat-description">In inventory</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon revenue">
-                        <i class="bi bi-currency-dollar"></i>
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container large">
+                    <div class="chart-header">
+                        <h3>Revenue Analytics</h3>
+                        <div class="chart-controls">
+                            <select class="form-select form-select-sm">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option selected>Last 90 days</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="stat-trend up">
-                        <i class="bi bi-arrow-up"></i>
-                        8.2%
+                    <div class="chart-body">
+                        <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">LKR 24,890</div>
-                    <div class="stat-label">Monthly Revenue</div>
-                    <div class="stat-description">This month</div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Sales Distribution</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="salesChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon orders">
-                        <i class="bi bi-cart-check"></i>
+            <!-- Recent Activity & Top Products -->
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="#" class="view-all">View All</a>
                     </div>
-                    <div class="stat-trend up">
-                        <i class="bi bi-arrow-up"></i>
-                        5.7%
+                    <div class="card-body">
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <i class="bi bi-cart-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New Order Received</div>
+                                    <div class="activity-details">Order #BL-2024-156 • $45.99</div>
+                                    <div class="activity-time">2 min ago</div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon primary">
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New User Registration</div>
+                                    <div class="activity-details">Sarah Johnson joined Bookly</div>
+                                    <div class="activity-time">15 min ago</div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon warning">
+                                    <i class="bi bi-star"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Product Review</div>
+                                    <div class="activity-details">"The Midnight Garden" - 5 stars</div>
+                                    <div class="activity-time">1 hour ago</div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon info">
+                                    <i class="bi bi-box"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Inventory Updated</div>
+                                    <div class="activity-details">"House of Sky Breath" restocked</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value">324</div>
-                    <div class="stat-label">Total Orders</div>
-                    <div class="stat-description">Processed today</div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Top Products</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="product-list">
+                            <div class="product-item">
+                                <div class="product-rank">1</div>
+                                <div class="product-info">
+                                    <div class="product-name">House of Sky Breath</div>
+                                    <div class="product-sales">124 sales</div>
+                                </div>
+                                <div class="product-revenue">$3,096</div>
+                            </div>
+
+                            <div class="product-item">
+                                <div class="product-rank">2</div>
+                                <div class="product-info">
+                                    <div class="product-name">The Midnight Garden</div>
+                                    <div class="product-sales">98 sales</div>
+                                </div>
+                                <div class="product-revenue">$2,450</div>
+                            </div>
+
+                            <div class="product-item">
+                                <div class="product-rank">3</div>
+                                <div class="product-info">
+                                    <div class="product-name">Heartland Stars</div>
+                                    <div class="product-sales">76 sales</div>
+                                </div>
+                                <div class="product-revenue">$1,900</div>
+                            </div>
+
+                            <div class="product-item">
+                                <div class="product-rank">4</div>
+                                <div class="product-info">
+                                    <div class="product-name">Heavenly Bodies</div>
+                                    <div class="product-sales">65 sales</div>
+                                </div>
+                                <div class="product-revenue">$1,625</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon products">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
-                    <div class="stat-trend down">
-                        <i class="bi bi-arrow-down"></i>
-                        2.1%
-                    </div>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">1,847</div>
-                    <div class="stat-label">Products</div>
-                    <div class="stat-description">In inventory</div>
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="actions-grid">
+                    <button class="action-card" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <div class="action-icon primary">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title">Add Product</div>
+                            <div class="action-description">Create new book listing</div>
+                        </div>
+                    </button>
+
+                    <button class="action-card">
+                        <div class="action-icon success">
+                            <i class="bi bi-cart-plus"></i>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title">Process Order</div>
+                            <div class="action-description">Manage customer orders</div>
+                        </div>
+                    </button>
+
+                    <button class="action-card">
+                        <div class="action-icon warning">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title">View Reports</div>
+                            <div class="action-description">Sales analytics</div>
+                        </div>
+                    </button>
+
+                    <button class="action-card">
+                        <div class="action-icon info">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title">Manage Users</div>
+                            <div class="action-description">Customer accounts</div>
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-container large">
-                <div class="chart-header">
-                    <h3>Revenue Analytics</h3>
-                    <div class="chart-controls">
-                        <select class="form-select form-select-sm">
-                            <option>Last 7 days</option>
-                            <option>Last 30 days</option>
-                            <option selected>Last 90 days</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="chart-body">
-                    <canvas id="revenueChart"></canvas>
-                </div>
+        <!-- Products Content -->
+        <div class="tab-content" id="productsContent">
+            <div class="content-header">
+                <h2>Products Management</h2>
+                <p>Manage your book inventory, pricing, and details</p>
             </div>
 
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3>Sales Distribution</h3>
-                </div>
-                <div class="chart-body">
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity & Top Products -->
-        <div class="content-grid">
             <div class="content-card">
                 <div class="card-header">
-                    <h3>Recent Activity</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <h3>All Products</h3>
+                    <div class="card-actions">
+                        <div class="search-box small">
+                            <i class="bi bi-search"></i>
+                            <input type="text" placeholder="Search products...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="bi bi-plus"></i>
+                            Add Product
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon success">
-                                <i class="bi bi-cart-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New Order Received</div>
-                                <div class="activity-details">Order #BL-2024-156 • $45.99</div>
-                                <div class="activity-time">2 min ago</div>
-                            </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="productsTable">
+                            <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div class="product-cell">
+                                        <div class="product-image">
+                                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=48&h=48&fit=crop"
+                                                 alt="Book">
+                                        </div>
+                                        <div class="product-info">
+                                            <div class="product-name">House of Sky Breath</div>
+                                            <div class="product-author">Sarah J. Maas</div>
+                                            <div class="product-isbn">ISBN: 9781635575569</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">Fantasy</span>
+                                </td>
+                                <td>
+                                    <div class="product-price">$24.99</div>
+                                </td>
+                                <td>
+                                    <div class="stock-status">
+                                        <span class="badge bg-success">In Stock (47)</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">Active</span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn-action" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn-action" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn-action text-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- More product rows... -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">Showing 1 to 10 of 24 products</div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="activity-item">
-                            <div class="activity-icon primary">
-                                <i class="bi bi-person-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New User Registration</div>
-                                <div class="activity-details">Sarah Johnson joined Bookly</div>
-                                <div class="activity-time">15 min ago</div>
-                            </div>
-                        </div>
+        <!-- Orders Content -->
+        <div class="tab-content" id="ordersContent">
+            <div class="content-header">
+                <h2>Order Management</h2>
+                <p>Process, track, and manage customer orders</p>
+            </div>
 
-                        <div class="activity-item">
-                            <div class="activity-icon warning">
-                                <i class="bi bi-star"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Product Review</div>
-                                <div class="activity-details">"The Midnight Garden" - 5 stars</div>
-                                <div class="activity-time">1 hour ago</div>
-                            </div>
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card small">
+                        <div class="stat-content">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Pending Orders</div>
                         </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon info">
-                                <i class="bi bi-box"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Inventory Updated</div>
-                                <div class="activity-details">"House of Sky Breath" restocked</div>
-                                <div class="activity-time">2 hours ago</div>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card small">
+                        <div class="stat-content">
+                            <div class="stat-value">45</div>
+                            <div class="stat-label">Processing</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card small">
+                        <div class="stat-content">
+                            <div class="stat-value">324</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card small">
+                        <div class="stat-content">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Cancelled</div>
                         </div>
                     </div>
                 </div>
@@ -327,94 +915,256 @@
 
             <div class="content-card">
                 <div class="card-header">
-                    <h3>Top Products</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <h3>Recent Orders</h3>
+                    <div class="card-actions">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm active">All</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm">Pending</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm">Processing</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm">Completed</button>
+                        </div>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-download"></i>
+                            Export
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="product-list">
-                        <div class="product-item">
-                            <div class="product-rank">1</div>
-                            <div class="product-info">
-                                <div class="product-name">House of Sky Breath</div>
-                                <div class="product-sales">124 sales</div>
-                            </div>
-                            <div class="product-revenue">$3,096</div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="ordersTable">
+                            <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <a href="#" class="text-primary"></a>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-name"></div>
+                                        <div class="customer-email"></div>
+                                    </div>
+                                </td>
+                                <td>Nov 28, 2024</td>
+                                <td>$45.99</td>
+                                <td>
+                                    <span class="badge bg-warning"></span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success"></span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline-primary"></button>
+                                        <button class="btn btn-sm btn-outline-secondary"></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- More order rows... -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="product-item">
-                            <div class="product-rank">2</div>
-                            <div class="product-info">
-                                <div class="product-name">The Midnight Garden</div>
-                                <div class="product-sales">98 sales</div>
-                            </div>
-                            <div class="product-revenue">$2,450</div>
-                        </div>
+        <!-- Users Content -->
+        <div class="tab-content" id="usersContent">
+            <div class="content-header">
+                <h2>User Management</h2>
+                <p>Manage customer accounts and permissions</p>
+            </div>
 
-                        <div class="product-item">
-                            <div class="product-rank">3</div>
-                            <div class="product-info">
-                                <div class="product-name">Heartland Stars</div>
-                                <div class="product-sales">76 sales</div>
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>All Users</h3>
+                            <div class="card-actions">
+                                <div class="search-box small">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" placeholder="Search users...">
+                                </div>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="bi bi-person-plus"></i>
+                                    Add User
+                                </button>
                             </div>
-                            <div class="product-revenue">$1,900</div>
                         </div>
-
-                        <div class="product-item">
-                            <div class="product-rank">4</div>
-                            <div class="product-info">
-                                <div class="product-name">Heavenly Bodies</div>
-                                <div class="product-sales">65 sales</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="usersTable">
+                                    <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar small">
+                                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop"
+                                                         alt="User">
+                                                </div>
+                                                <div class="user-info">
+                                                    <div class="user-name">Emma Wilson</div>
+                                                    <div class="user-id">ID: USR-001</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>emma@example.com</td>
+                                        <td>
+                                            <span class="badge bg-primary">Customer</span>
+                                        </td>
+                                        <td>Jan 15, 2024</td>
+                                        <td>
+                                            <span class="badge bg-success">Active</span>
+                                        </td>
+                                        <td>
+                                            <div class="table-actions">
+                                                <button class="btn-action" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn-action" title="View">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- More user rows... -->
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="product-revenue">$1,625</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>User Statistics</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <div class="stat-label">Total Users</div>
+                                    <div class="stat-value">1,248</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Active Today</div>
+                                    <div class="stat-value">156</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">New This Month</div>
+                                    <div class="stat-value">84</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Conversion Rate</div>
+                                    <div class="stat-value">3.2%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card mt-4">
+                        <div class="card-header">
+                            <h3>Role Distribution</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="rolesChart" style="height: 200px;"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h3>Quick Actions</h3>
-            <div class="actions-grid">
-                <button class="action-card" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    <div class="action-icon primary">
-                        <i class="bi bi-plus-lg"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">Add Product</div>
-                        <div class="action-description">Create new book listing</div>
-                    </div>
-                </button>
+        <!-- Categories Content -->
+        <div class="tab-content" id="categoriesContent">
+            <div class="content-header">
+                <h2>Category Management</h2>
+                <p>Organize your books into categories and genres</p>
+            </div>
 
-                <button class="action-card">
-                    <div class="action-icon success">
-                        <i class="bi bi-cart-plus"></i>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>All Categories</h3>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#addCategoryModal">
+                                <i class="bi bi-plus"></i>
+                                Add Category
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="categories-grid">
+                                <div class="category-card">
+                                    <div class="category-header">
+                                        <div class="category-icon">
+                                            <i class="bi bi-stars"></i>
+                                        </div>
+                                        <div class="category-actions">
+                                            <button class="btn-action">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn-action text-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="category-content">
+                                        <h4>Fiction</h4>
+                                        <p class="text-muted">Imaginative storytelling</p>
+                                        <div class="category-stats">
+                                            <span class="badge bg-light text-dark">456 Products</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- More category cards... -->
+                            </div>
+                        </div>
                     </div>
-                    <div class="action-content">
-                        <div class="action-title">Process Order</div>
-                        <div class="action-description">Manage customer orders</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Category Insights</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="insights-list">
+                                <div class="insight-item">
+                                    <div class="insight-label">Most Popular</div>
+                                    <div class="insight-value">Fiction</div>
+                                    <div class="insight-detail">32% of total sales</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-label">Fastest Growing</div>
+                                    <div class="insight-value">Business</div>
+                                    <div class="insight-detail">+45% this month</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-label">Highest Revenue</div>
+                                    <div class="insight-value">Non-Fiction</div>
+                                    <div class="insight-detail">$12,450 this month</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </button>
-
-                <button class="action-card">
-                    <div class="action-icon warning">
-                        <i class="bi bi-graph-up"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">View Reports</div>
-                        <div class="action-description">Sales analytics</div>
-                    </div>
-                </button>
-
-                <button class="action-card">
-                    <div class="action-icon info">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div class="action-content">
-                        <div class="action-title">Manage Users</div>
-                        <div class="action-description">Customer accounts</div>
-                    </div>
-                </button>
+                </div>
             </div>
         </div>
     </div>
@@ -458,7 +1208,8 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Published Date</label>
-                            <input type="date" class="form-control" placeholder="Select Date" step="0.01" id="publishDate"
+                            <input type="date" class="form-control" placeholder="Select Date" step="0.01"
+                                   id="publishDate"
                                    required>
                         </div>
                         <div class="col-md-4">
@@ -479,7 +1230,8 @@
 
                         <div class="col-md-4">
                             <label class="form-label">Genre</label>
-                            <input type="text" class="form-control" placeholder="Ex: Self Help, Nonfiction, Audiobook, etc" id="genre" required>
+                            <input type="text" class="form-control"
+                                   placeholder="Ex: Self Help, Nonfiction, Audiobook, etc" id="genre" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Category</label>
@@ -512,10 +1264,57 @@
     </div>
 </div>
 
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Category Name</label>
+                        <input type="text" class="form-control" placeholder="Enter category name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="3" placeholder="Enter category description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Category</label>
+                        <select class="form-select">
+                            <option value="">None (Top Level)</option>
+                            <option value="1">Fiction</option>
+                            <option value="2">Non-Fiction</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Icon</label>
+                        <select class="form-select">
+                            <option value="book">Book</option>
+                            <option value="stars">Stars</option>
+                            <option value="heart">Heart</option>
+                            <option value="lightbulb">Lightbulb</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <!-- Rich Text Editor JS -->
 <script type="text/javascript" src="assets/richtexteditor/rte.js"></script>
 <script type="text/javascript" src="assets/richtexteditor/plugins/all_plugins.js"></script>
-
 <!-- Simple Notify JS -->
 <script src="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.min.js"></script>
 <!-- Bootstrap JS -->
