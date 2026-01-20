@@ -345,20 +345,16 @@ function makeOrderSummary(data) {
     // Update subtotal
     subtotalElement.textContent = `LKR ${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-    // Calculate shipping per product (not per quantity)
-    const shippingPerProduct = deliveryTypeList.length > 0 ? deliveryTypeList[0].price : 0;
-    const totalShipping = cartList.length * shippingPerProduct;
+    // Calculate shipping once per order
+    const shippingCost = deliveryTypeList.length > 0 ? deliveryTypeList[0].price : 0;
 
-    // Update shipping with breakdown
-    const shippingText = cartList.length > 1
-        ? `${cartList.length} products × LKR ${shippingPerProduct.toLocaleString('en-US', {minimumFractionDigits: 2})}`
-        : `1 product`;
-
-    shippingElement.innerHTML = `LKR ${totalShipping.toLocaleString('en-US', {minimumFractionDigits: 2})}<br><small class="text-muted">(${shippingText})</small>`;
+    // Update shipping
+    shippingElement.textContent = `LKR ${shippingCost.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
     // Calculate and update total
-    let grandTotal = subtotal + totalShipping;
+    let grandTotal = subtotal + shippingCost;
     totalElement.textContent = `LKR ${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
 }
 
 async function checkout() {
