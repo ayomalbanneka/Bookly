@@ -9,6 +9,14 @@ import lk.cypher.bookliy.services.CommonServices;
 
 @Path("/common")
 public class CommonController {
+    @Path("/orders-and-pending-order")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadOrdersAndPendingOrder(@Context HttpServletRequest request) {
+        String responseJson = new CommonServices().getOrdersAndPendingOrder(request);
+        return Response.ok().entity(responseJson).build();
+    }
+
     @Path("/basic-search")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
