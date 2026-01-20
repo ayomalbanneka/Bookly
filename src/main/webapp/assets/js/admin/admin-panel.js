@@ -8,7 +8,62 @@ class AdminPanel {
         this.initializeSidebar();
         this.initializeCharts();
         this.initializeEventListeners();
-        this.initializeModal();
+        this.initializeDataTables();
+        this.hideAllTabContents();
+        this.showTab('dashboard');
+    }
+
+    hideAllTabContents() {
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+    }
+
+    showTab(tabName) {
+        this.hideAllTabContents();
+
+        const tabContent = document.getElementById(`${tabName}Content`);
+        if (tabContent) {
+            tabContent.classList.add('active');
+        }
+
+        // Update active nav item
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        const activeNav = document.querySelector(`[data-tab="${tabName}"]`);
+        if (activeNav) {
+            activeNav.classList.add('active');
+        }
+
+        // Update page title and breadcrumb
+        this.updatePageTitle(tabName);
+    }
+
+    updatePageTitle(tabName) {
+        const pageTitle = document.querySelector('.page-title');
+        const breadcrumbActive = document.querySelector('.breadcrumb .active');
+
+        const tabTitles = {
+            dashboard: 'Dashboard',
+            products: 'Products',
+            orders: 'Orders',
+            users: 'Users',
+            analytics: 'Analytics',
+            categories: 'Categories',
+            reviews: 'Reviews',
+            settings: 'Settings'
+        };
+
+        if (tabTitles[tabName]) {
+            if (pageTitle) {
+                pageTitle.textContent = tabTitles[tabName];
+            }
+            if (breadcrumbActive) {
+                breadcrumbActive.textContent = tabTitles[tabName];
+            }
+        }
     }
 
     initializeSidebar() {
@@ -61,6 +116,16 @@ class AdminPanel {
 
     initializeCharts() {
         // Revenue Chart
+        this.createRevenueChart();
+
+        // Sales Distribution Chart
+        this.createSalesChart();
+
+        // Roles Chart for Users page
+        this.createRolesChart();
+    }
+
+    createRevenueChart() {
         const revenueCtx = document.getElementById('revenueChart');
         if (revenueCtx) {
             new Chart(revenueCtx, {
@@ -133,8 +198,9 @@ class AdminPanel {
                 }
             });
         }
+    }
 
-        // Sales Distribution Chart
+    createSalesChart() {
         const salesCtx = document.getElementById('salesChart');
         if (salesCtx) {
             new Chart(salesCtx, {
@@ -193,6 +259,79 @@ class AdminPanel {
         }
     }
 
+    createRolesChart() {
+        const rolesCtx = document.getElementById('rolesChart');
+        if (rolesCtx) {
+            new Chart(rolesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Customers', 'Admins', 'Editors', 'Authors'],
+                    datasets: [{
+                        data: [75, 10, 8, 7],
+                        backgroundColor: [
+                            '#6366f1',
+                            '#10b981',
+                            '#f59e0b',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    initializeDataTables() {
+        // Initialize DataTables if they exist
+        if ($.fn.DataTable) {
+            $('#productsTable').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                ordering: true,
+                pageLength: 10,
+                language: {
+                    emptyTable: "No products found"
+                }
+            });
+
+            $('#ordersTable').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                ordering: true,
+                pageLength: 10
+            });
+
+            $('#usersTable').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                ordering: true,
+                pageLength: 10
+            });
+        }
+    }
+
     initializeEventListeners() {
         // Tab navigation
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -224,73 +363,8 @@ class AdminPanel {
         }
     }
 
-    // initializeModal() {
-    //     const submitBtn = document.getElementById('submitProduct');
-    //     const productForm = document.getElementById('productForm');
-    //     const modal = document.getElementById('addProductModal');
-    //
-    //     if (submitBtn && productForm) {
-    //         submitBtn.addEventListener('click', () => {
-    //             if (productForm.checkValidity()) {
-    //                 // Get form data
-    //                 const formData = new FormData(productForm);
-    //                 const productData = Object.fromEntries(formData.entries());
-    //
-    //                 // Show success notification
-    //                 this.showNotification('Success', 'Product added successfully!', 'success');
-    //
-    //                 // Reset form
-    //                 productForm.reset();
-    //
-    //                 // Close modal using Bootstrap's modal instance
-    //                 const bsModal = bootstrap.Modal.getInstance(modal);
-    //                 if (bsModal) {
-    //                     bsModal.hide();
-    //                 }
-    //             } else {
-    //                 // Show validation errors
-    //                 productForm.reportValidity();
-    //                 this.showNotification('Error', 'Please fill in all required fields', 'error');
-    //             }
-    //         });
-    //     }
-    // }
-
     switchTab(tabName) {
-        // Update active nav item
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        const activeItem = document.querySelector(`[data-tab="${tabName}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
-        }
-
-        // Update page title and breadcrumb
-        const pageTitle = document.querySelector('.page-title');
-        const breadcrumbActive = document.querySelector('.breadcrumb .active');
-
-        const tabTitles = {
-            dashboard: 'Dashboard',
-            products: 'Products',
-            orders: 'Orders',
-            users: 'Users',
-            analytics: 'Analytics',
-            categories: 'Categories',
-            reviews: 'Reviews',
-            settings: 'Settings'
-        };
-
-        if (tabTitles[tabName]) {
-            if (pageTitle) {
-                pageTitle.textContent = tabTitles[tabName];
-            }
-            if (breadcrumbActive) {
-                breadcrumbActive.textContent = tabTitles[tabName];
-            }
-        }
-
+        this.showTab(tabName);
     }
 
     handleQuickAction(action) {
@@ -304,15 +378,15 @@ class AdminPanel {
             },
             'Process Order': () => {
                 this.showNotification('Order Processing', 'Redirecting to orders...', 'info');
-                setTimeout(() => this.switchTab('orders'), 1000);
+                this.switchTab('orders');
             },
             'View Reports': () => {
                 this.showNotification('Reports', 'Loading analytics...', 'info');
-                setTimeout(() => this.switchTab('analytics'), 1000);
+                this.switchTab('analytics');
             },
             'Manage Users': () => {
                 this.showNotification('User Management', 'Loading users...', 'info');
-                setTimeout(() => this.switchTab('users'), 1000);
+                this.switchTab('users');
             }
         };
 
@@ -323,14 +397,11 @@ class AdminPanel {
 
     handleSearch(query) {
         if (query.length > 2) {
-            // Implement search logic based on current tab
             console.log('Searching for:', query);
-            // You can add actual search functionality here
         }
     }
 
     showNotification(title, message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
 
@@ -361,7 +432,6 @@ class AdminPanel {
             </div>
         `;
 
-        // Add styles
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -378,7 +448,6 @@ class AdminPanel {
 
         document.body.appendChild(notification);
 
-        // Auto remove after 5 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOutRight 0.3s ease-in';
             setTimeout(() => {
@@ -392,15 +461,12 @@ class AdminPanel {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if Bootstrap is loaded
     if (typeof bootstrap === 'undefined') {
         console.error('Bootstrap is not loaded. Please ensure Bootstrap JS is included before this script.');
         return;
     }
 
-    // Initialize Admin Panel
     new AdminPanel();
-
     console.log('Admin Panel initialized successfully');
 });
 
@@ -411,7 +477,6 @@ window.addEventListener('load', async () => {
     });
     try {
         await loadCategories();
-
     } catch (e) {
         console.error("Error loading initial data:", e);
     } finally {
@@ -726,3 +791,361 @@ function renderDropDowns(selector, list, suffix) {
         selector.appendChild(option); // Append the option to the select element
     })
 }
+
+class LoadBooks {
+    constructor() {
+        // Initialize instance variables
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
+        this.allProducts = [];
+
+        // Bind methods to ensure 'this' context is preserved
+        this.changePage = this.changePage.bind(this);
+        this.changeItemsPerPage = this.changeItemsPerPage.bind(this);
+        this.editProduct = this.editProduct.bind(this);
+        this.viewProduct = this.viewProduct.bind(this);
+        this.deleteProduct = this.deleteProduct.bind(this);
+
+        // Store instance reference globally for onclick handlers
+        window.booksManager = this;
+
+        this.init();
+    }
+
+    init() {
+        // Just load books - don't call other methods directly
+        this.loadAllBooks();
+    }
+
+    // Load all books from the server
+    async loadAllBooks() {
+        try {
+            const response = await fetch('api/admin/data/books', {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+
+                if (data.status) {
+                    this.allProducts = data.allProducts;
+                    this.currentPage = 1;
+                    this.displayBooks();
+                } else {
+                    console.error("Failed to load books:", data.message);
+                }
+            } else {
+                console.error("Failed to load books:", response.statusText);
+            }
+        } catch (e) {
+            console.error("Error loading books:", e);
+        }
+    }
+
+    // Display books in the table with pagination
+    displayBooks() {
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = '';
+
+        if (!this.allProducts || this.allProducts.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <p class="text-muted">No products found</p>
+                    </td>
+                </tr>
+            `;
+            this.updatePagination(0);
+            return;
+        }
+
+        // Calculate pagination
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const paginatedProducts = this.allProducts.slice(startIndex, endIndex);
+
+        // Display products for current page
+        paginatedProducts.forEach(product => {
+            const row = this.createProductRow(product);
+            tbody.appendChild(row);
+        });
+
+        // Update pagination
+        this.updatePagination(this.allProducts.length);
+    }
+
+    // Create a table row for a product
+    createProductRow(product) {
+        const tr = document.createElement('tr');
+
+        // Get first stock item for price and quantity
+        const firstStock = product.stockDTOList && product.stockDTOList.length > 0
+            ? product.stockDTOList[0]
+            : null;
+
+        const price = firstStock ? `LKR ${firstStock.price.toFixed(2)}` : 'N/A';
+        const stock = firstStock ? firstStock.stock : 0;
+
+        // Determine stock status
+        let stockBadge;
+        if (stock === 0) {
+            stockBadge = '<span class="badge bg-danger">Out of Stock</span>';
+        } else if (stock < 10) {
+            stockBadge = `<span class="badge bg-warning">Low Stock (${stock})</span>`;
+        } else {
+            stockBadge = `<span class="badge bg-success">In Stock (${stock})</span>`;
+        }
+
+        // Get first image or use placeholder
+        const imageUrl = product.images && product.images.length > 0
+            ? product.images[0]
+            : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=48&h=48&fit=crop';
+
+        tr.innerHTML = `
+            <td>
+                <div class="product-cell">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.title}" onerror="this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=48&h=48&fit=crop'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.title}</div>
+                        <div class="product-author">${product.author}</div>
+                        <div class="product-isbn">ID: ${product.productId}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-light text-dark">${product.categoryName}</span>
+            </td>
+            <td>
+                <div class="product-price">${price}</div>
+            </td>
+            <td>
+                <div class="stock-status">
+                    ${stockBadge}
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-success">Active</span>
+            </td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-action" title="Edit" onclick="window.booksManager.editProduct(${product.productId})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-action" title="View" onclick="window.booksManager.viewProduct(${product.productId})">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn-action text-danger" title="Delete" onclick="window.booksManager.deleteProduct(${product.productId})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+
+        return tr;
+    }
+
+    // Update pagination controls
+    updatePagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / this.itemsPerPage);
+        const startItem = totalItems === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+        const endItem = Math.min(this.currentPage * this.itemsPerPage, totalItems);
+
+        // Update showing text
+        const showingText = document.querySelector('.card-footer .text-muted');
+        if (showingText) {
+            showingText.textContent = `Showing ${startItem} to ${endItem} of ${totalItems} products`;
+        }
+
+        // Update pagination buttons
+        const pagination = document.querySelector('.pagination');
+        if (!pagination) return;
+
+        pagination.innerHTML = '';
+
+        // Previous button
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${this.currentPage === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `
+            <a class="page-link" href="#" onclick="window.booksManager.changePage(${this.currentPage - 1}); return false;">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        `;
+        pagination.appendChild(prevLi);
+
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust start page if we're near the end
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // First page
+        if (startPage > 1) {
+            const firstLi = document.createElement('li');
+            firstLi.className = 'page-item';
+            firstLi.innerHTML = `<a class="page-link" href="#" onclick="window.booksManager.changePage(1); return false;">1</a>`;
+            pagination.appendChild(firstLi);
+
+            if (startPage > 2) {
+                const dotsLi = document.createElement('li');
+                dotsLi.className = 'page-item disabled';
+                dotsLi.innerHTML = `<a class="page-link" href="#">...</a>`;
+                pagination.appendChild(dotsLi);
+            }
+        }
+
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const pageLi = document.createElement('li');
+            pageLi.className = `page-item ${i === this.currentPage ? 'active' : ''}`;
+            pageLi.innerHTML = `<a class="page-link" href="#" onclick="window.booksManager.changePage(${i}); return false;">${i}</a>`;
+            pagination.appendChild(pageLi);
+        }
+
+        // Last page
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dotsLi = document.createElement('li');
+                dotsLi.className = 'page-item disabled';
+                dotsLi.innerHTML = `<a class="page-link" href="#">...</a>`;
+                pagination.appendChild(dotsLi);
+            }
+
+            const lastLi = document.createElement('li');
+            lastLi.className = 'page-item';
+            lastLi.innerHTML = `<a class="page-link" href="#" onclick="window.booksManager.changePage(${totalPages}); return false;">${totalPages}</a>`;
+            pagination.appendChild(lastLi);
+        }
+
+        // Next button
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${this.currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+        nextLi.innerHTML = `
+            <a class="page-link" href="#" onclick="window.booksManager.changePage(${this.currentPage + 1}); return false;">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        `;
+        pagination.appendChild(nextLi);
+    }
+
+    // Change page
+    changePage(page) {
+        const totalPages = Math.ceil(this.allProducts.length / this.itemsPerPage);
+
+        if (page < 1 || page > totalPages) {
+            return;
+        }
+
+        this.currentPage = page;
+        this.displayBooks();
+
+        // Scroll to top of table
+        document.querySelector('#productsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Change items per page
+    changeItemsPerPage(newItemsPerPage) {
+        this.itemsPerPage = newItemsPerPage;
+        this.currentPage = 1;
+        this.displayBooks();
+    }
+
+    // Placeholder functions for product actions
+    editProduct(productId) {
+        console.log('Edit product:', productId);
+        // Add your edit logic here
+    }
+
+    viewProduct(productId) {
+        console.log('View product:', productId);
+        // Add your view logic here
+    }
+
+    deleteProduct(productId) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            console.log('Delete product:', productId);
+            // Add your delete logic here
+            // After deletion, refresh the list:
+            this.loadAllBooks();
+        }
+    }
+}
+
+class loadOrders{
+    constructor() {
+        // Implementation for loading orders can be added here
+        this.init();
+    }
+
+    init(){
+        this.loadAllOrders();
+    }
+
+    async loadAllOrders(){
+        try{
+            const response = await fetch('api/admin/data/orders', {
+                method: 'GET',
+            });
+
+            if(response.ok){
+                const data = await response.json();
+                console.log(data);
+                loadOrderData(data)
+            }
+        }catch (e) {
+            console.error("Error loading orders:", e);
+        }
+    }
+}
+
+function loadOrderData(data){
+    const ordersTbody = document.querySelector('#ordersTable tbody');
+    ordersTbody.innerHTML = '';
+
+    if(!data.allOrders || data.allOrders.length === 0){
+        ordersTbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">
+                    <p class="text-muted">No orders found</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    data.allOrders.forEach(order => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><a href="invoice.html?orderId=${order.orderId}" target="_blank" class="text-primary">#${order.orderId}</a></td>
+            <td>
+                <div class="customer-info">
+                    <div class="customer-name">${order.customerName}</div>
+                    <div class="customer-email">${order.email}</div>
+                </div>
+            </td>
+            <td>${new Date(order.orderDate).toLocaleDateString()}</td>
+            <td>LKR ${order.totalAmount.toFixed(2)}</td>
+            <td><span class="badge bg-info text-dark">${order.status}</span></td>
+            <td><span class="badge bg-success">Paid</span></td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn btn-sm btn-outline-primary">Process</button>
+                    <button class="btn btn-sm btn-outline-secondary">View</button>
+                </div>
+            </td>
+        `;
+        ordersTbody.appendChild(tr);
+    });
+}
+
+// Load books when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        new LoadBooks();
+        new loadOrders()
+    });
