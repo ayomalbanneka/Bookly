@@ -206,7 +206,7 @@ class AdminPanel {
             new Chart(salesCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fiction', 'Non-Fiction', 'Romance', 'Mystery', 'Sci-Fi', 'Biography','Business', 'Children'],
+                    labels: ['Fiction', 'Non-Fiction', 'Romance', 'Mystery', 'Sci-Fi', 'Biography', 'Business', 'Children'],
                     datasets: [{
                         data: [35, 25, 20, 15, 5, 10, 8, 12],
                         backgroundColor: [
@@ -477,6 +477,8 @@ window.addEventListener('load', async () => {
     });
     try {
         await loadCategories();
+        await loadAllOrders();
+        await loadAllUsers();
     } catch (e) {
         console.error("Error loading initial data:", e);
     } finally {
@@ -848,6 +850,8 @@ class LoadBooks {
         const tbody = document.querySelector('#productsTable tbody');
         tbody.innerHTML = '';
 
+        const allBookCount = document.getElementById("books-count").innerHTML = this.allProducts.length;
+
         if (!this.allProducts || this.allProducts.length === 0) {
             tbody.innerHTML = `
                 <tr>
@@ -1046,7 +1050,7 @@ class LoadBooks {
         this.displayBooks();
 
         // Scroll to top of table
-        document.querySelector('#productsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelector('#productsTable').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
     // Change items per page
@@ -1077,38 +1081,30 @@ class LoadBooks {
     }
 }
 
-class loadOrders{
-    constructor() {
-        // Implementation for loading orders can be added here
-        this.init();
-    }
+async function loadAllOrders() {
+    try {
+        const response = await fetch('api/admin/data/orders', {
+            method: 'GET',
+        });
 
-    init(){
-        this.loadAllOrders();
-    }
-
-    async loadAllOrders(){
-        try{
-            const response = await fetch('api/admin/data/orders', {
-                method: 'GET',
-            });
-
-            if(response.ok){
-                const data = await response.json();
-                console.log(data);
-                loadOrderData(data)
-            }
-        }catch (e) {
-            console.error("Error loading orders:", e);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+            loadOrderData(data)
         }
+    } catch (e) {
+        console.error("Error loading orders:", e);
     }
 }
 
-function loadOrderData(data){
+function loadOrderData(data) {
     const ordersTbody = document.querySelector('#ordersTable tbody');
     ordersTbody.innerHTML = '';
 
-    if(!data.allOrders || data.allOrders.length === 0){
+    const orderCount = document.getElementById("order-count").innerHTML =
+        data.allOrders.status === "COMPLETED" ? data.allOrders.length  : 0;
+
+    if (!data.allOrders || data.allOrders.length === 0) {
         ordersTbody.innerHTML = `
             <tr>
                 <td colspan="7" class="text-center py-4">
@@ -1131,8 +1127,11 @@ function loadOrderData(data){
             </td>
             <td>${new Date(order.orderDate).toLocaleDateString()}</td>
             <td>LKR ${order.totalAmount.toFixed(2)}</td>
-            <td><span class="badge bg-info text-dark">${order.status}</span></td>
-            <td><span class="badge bg-success">Paid</span></td>
+            <td><span class="badge ${order.status === "PENDING" ? "bg-warning text-dark":"bg-success text-white"} 
+            text-dark">${order.status}</span></td>
+            
+            <td><span class="badge ${order.status === "PENDING" ? "bg-warning text-dark":"bg-success text-white"}">
+            ${order.status === "PENDING" ? "Payment Pending":"Paid"}</span></td>
             <td>
                 <div class="table-actions">
                     <button class="btn btn-sm btn-outline-primary">Process</button>
@@ -1144,8 +1143,74 @@ function loadOrderData(data){
     });
 }
 
-// Load books when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        new LoadBooks();
-        new loadOrders()
+async function loadAllUsers(){
+    try {
+        const response = await fetch('api/admin/data/users', {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if(data.status){
+                console.log(data);
+                loadUserData(data)
+            }else{
+                console.error("Failed to load users data:", data.message);
+            }
+        }else{
+            console.error("Failed to load users:", response.statusText);
+        }
+    } catch (e) {
+        console.error("Error loading users:", e);
+    }
+}
+
+function loadUserData(data) {
+    const usersTbody = document.querySelector('#usersTable tbody');
+    usersTbody.innerHTML = '';
+
+    const userCount = document.getElementById("user-count").innerHTML = data.users.length;
+
+    if (!data.users || data.users.length === 0) {
+        usersTbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <p class="text-muted">No users found</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    data.users.forEach(user => {
+        const tr = document.createElement('tr');
+
+        const fullName = `${user.firstName} ${user.lastName}`;
+        user.fullName = fullName; // Add fullName property for easier access
+
+        tr.innerHTML = `
+            <td>${user.id}</td>
+            <td>
+                <div class="user-info">
+                    <div class="user-name">${user.fullName}</div>
+                    <div class="user-email">${user.email}</div>
+                </div>
+            </td>
+            <td>${user.sinceAt}</td>
+            <td><span class="badge ${user.status === "PENDING" ? "bg-warning":"bg-success"}">${user.status}</span></td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                    <button class="btn btn-sm btn-outline-secondary">View</button>
+                </div>
+            </td>
+        `;
+        usersTbody.appendChild(tr);
     });
+}
+
+// Load books when the page loads
+document.addEventListener('DOMContentLoaded', function () {
+    new LoadBooks();
+    // new loadOrders()
+});

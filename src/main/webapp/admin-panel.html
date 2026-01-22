@@ -36,8 +36,12 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 
     /* Content Header */
@@ -408,21 +412,21 @@
                     <i class="bi bi-box-seam"></i>
                 </div>
                 <span class="nav-text">Products</span>
-                <span class="nav-badge">24</span>
+                <span class="nav-badge" id="books-count"></span>
             </a>
             <a href="#" class="nav-item" data-tab="orders">
                 <div class="nav-icon">
                     <i class="bi bi-cart"></i>
                 </div>
                 <span class="nav-text">Orders</span>
-                <span class="nav-badge">12</span>
+                <span class="nav-badge" id="order-count"></span>
             </a>
             <a href="#" class="nav-item" data-tab="users">
                 <div class="nav-icon">
                     <i class="bi bi-people"></i>
                 </div>
                 <span class="nav-text">Users</span>
-                <span class="nav-badge">156</span>
+                <span class="nav-badge" id="user-count"></span>
             </a>
         </div>
 
@@ -460,7 +464,7 @@
                      alt="Admin">
             </div>
             <div class="user-info">
-                <div class="user-name">Alex Morgan</div>
+                <div class="user-name text-white" id="adminName"></div>
                 <div class="user-role">Administrator</div>
             </div>
             <button class="user-menu">
@@ -773,15 +777,14 @@
 
             <div class="content-card">
                 <div class="card-header">
-                    <h3>All Products</h3>
+                    <h3 class="ms-2">All Books</h3>
                     <div class="card-actions">
                         <div class="search-box small">
                             <i class="bi bi-search"></i>
                             <input type="text" placeholder="Search products...">
-                        </div>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        </div><button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
                             <i class="bi bi-plus"></i>
-                            Add Product
+                            <span class="d-none d-sm-inline mt-2">Add Product</span>
                         </button>
                     </div>
                 </div>
@@ -954,8 +957,8 @@
                                         <div class="customer-email"></div>
                                     </div>
                                 </td>
-                                <td>Nov 28, 2024</td>
-                                <td>$45.99</td>
+                                <td></td>
+                                <td></td>
                                 <td>
                                     <span class="badge bg-warning"></span>
                                 </td>
@@ -980,24 +983,24 @@
         <!-- Users Content -->
         <div class="tab-content" id="usersContent">
             <div class="content-header">
-                <h2>User Management</h2>
+                <h2>Customer Management</h2>
                 <p>Manage customer accounts and permissions</p>
             </div>
 
             <div class="row mb-4">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="content-card">
                         <div class="card-header">
-                            <h3>All Users</h3>
+                            <h3 class="ms-2">All Users</h3>
                             <div class="card-actions">
-                                <div class="search-box small">
+                                <div class="search-box small mx-5 mt-2">
                                     <i class="bi bi-search"></i>
                                     <input type="text" placeholder="Search users...">
                                 </div>
-                                <button class="btn btn-primary btn-sm">
-                                    <i class="bi bi-person-plus"></i>
-                                    Add User
-                                </button>
+                                <!--                                <button class="btn btn-primary btn-sm mx-5">-->
+                                <!--                                    <i class="bi bi-person-plus"></i>-->
+                                <!--                                    Add User-->
+                                <!--                                </button>-->
                             </div>
                         </div>
                         <div class="card-body">
@@ -1007,7 +1010,6 @@
                                     <tr>
                                         <th>User</th>
                                         <th>Email</th>
-                                        <th>Role</th>
                                         <th>Joined</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -1017,10 +1019,6 @@
                                     <tr>
                                         <td>
                                             <div class="user-cell">
-                                                <div class="user-avatar small">
-                                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop"
-                                                         alt="User">
-                                                </div>
                                                 <div class="user-info">
                                                     <div class="user-name">Emma Wilson</div>
                                                     <div class="user-id">ID: USR-001</div>
@@ -1050,42 +1048,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h3>User Statistics</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="stats-list">
-                                <div class="stat-item">
-                                    <div class="stat-label">Total Users</div>
-                                    <div class="stat-value">1,248</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">Active Today</div>
-                                    <div class="stat-value">156</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">New This Month</div>
-                                    <div class="stat-value">84</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">Conversion Rate</div>
-                                    <div class="stat-value">3.2%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="content-card mt-4">
-                        <div class="card-header">
-                            <h3>Role Distribution</h3>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="rolesChart" style="height: 200px;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1308,6 +1270,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Fetch admin data when page loads
+    fetch('api/admin/auth/current-logged-admin')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                document.getElementById('adminName').textContent =
+                    data.firstName + ' ' + data.lastName;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+</script>
 
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
