@@ -10,6 +10,14 @@ import lk.cypher.bookliy.services.admin.AdminContentServices;
 @Path("/admin/data")
 public class AdminContentController {
 
+    @Path("/users")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response loadAllUsers() {
+        String responseJson = new AdminContentServices().loadAllUsers();
+        return Response.ok().entity(responseJson).build();
+    }
+
     @Path("/categories")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
