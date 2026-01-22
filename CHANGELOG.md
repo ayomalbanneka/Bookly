@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/ayomalbanneka/Bookly/compare/v1.2.0...v1.2.1) (2026-01-22)
+
+
+### Documentation
+
+* add README.md for project overview and setup instructions ([1626b6a](https://github.com/ayomalbanneka/Bookly/commit/1626b6a0be41a2f0e6537f862cf5873beeb766fe))
+* add README.md for project overview and setup instructions ([815ac3e](https://github.com/ayomalbanneka/Bookly/commit/815ac3e3b794830cdd92833bd4506ad70108337c))
+
 ## [1.2.0](https://github.com/ayomalbanneka/Bookly/compare/v1.1.0...v1.2.0) (2026-01-22)
 
 
