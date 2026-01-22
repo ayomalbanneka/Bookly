@@ -19,6 +19,7 @@ public class UserDTO implements Serializable {
     private String sinceAt;
     private String newPassword;
     private String confirmPassword;
+    private String status;
 
     public UserDTO(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -37,6 +38,14 @@ public class UserDTO implements Serializable {
     }
 
     public UserDTO() {
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getLineOne() {
