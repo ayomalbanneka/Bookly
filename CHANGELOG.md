@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/ayomalbanneka/Bookly/compare/v1.1.0...v1.2.0) (2026-01-22)
+
+
+### Features
+
+* add endpoint to load all users in admin panel ([e6bb82b](https://github.com/ayomalbanneka/Bookly/commit/e6bb82bf3182b74d56bf8fd8973a5bccabb821d0))
+* add endpoint to retrieve current logged-in admin details ([3329626](https://github.com/ayomalbanneka/Bookly/commit/33296269df2de6048f74e6f32b36cc634c84dea2))
+* add function to load all users in admin panel ([cb9b823](https://github.com/ayomalbanneka/Bookly/commit/cb9b823922c0ac48402cbfe0483eeb7f7fa0851e))
+* add status field to UserDTO with getter and setter methods ([db36166](https://github.com/ayomalbanneka/Bookly/commit/db361663ad8a610c47cda71ec50aa3e8d9ec155d))
+* implement functions to load all orders and users in admin panel ([0575b43](https://github.com/ayomalbanneka/Bookly/commit/0575b433b890bdba9273b0ae468f7cf421c39ec9))
+* update admin panel to dynamically display user counts and admin name ([80bf6a0](https://github.com/ayomalbanneka/Bookly/commit/80bf6a020b3e427c12c74be7ac35618f0abc7d8e))
+
 ## [1.1.0](https://github.com/ayomalbanneka/Bookly/compare/v1.0.1...v1.1.0) (2026-01-20)
 
 
