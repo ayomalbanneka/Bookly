@@ -4,19 +4,54 @@ import com.google.gson.JsonObject;
 import lk.cypher.bookliy.dto.OrderDTO;
 import lk.cypher.bookliy.dto.ProductDTO;
 import lk.cypher.bookliy.dto.StockDTO;
-import lk.cypher.bookliy.entity.Category;
-import lk.cypher.bookliy.entity.Order;
-import lk.cypher.bookliy.entity.Product;
-import lk.cypher.bookliy.entity.Stock;
-import lk.cypher.bookliy.entity.OrderItem;
+import lk.cypher.bookliy.dto.UserDTO;
+import lk.cypher.bookliy.entity.*;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
 import org.hibernate.Session;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdminContentServices {
+    public String loadAllUsers() {
+        JsonObject responseObject = new JsonObject();
+        String message = "";
+        boolean status = false;
+
+        Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+        List<User> userList = hibernateSession.createQuery("FROM User u", User.class).getResultList();
+
+        List<UserDTO> userDTOList = new ArrayList<>();
+        for (User user : userList) {
+            UserDTO userDTO = new UserDTO();
+
+            LocalDateTime createdAt = user.getCreatedAt();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy");
+            String sinceAt = createdAt.format(formatter);
+            userDTO.setSinceAt(sinceAt);
+
+            userDTO.setId(user.getId());
+            userDTO.setFirstName(user.getFirstName());
+            userDTO.setLastName(user.getLastName());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setStatus(user.getStatus().getValue());
+            userDTOList.add(userDTO);
+        }
+        responseObject.add("users", AppUtil.gson.toJsonTree(userDTOList));
+
+        hibernateSession.close();
+
+        status = true;
+        message = "All users retrieved successfully.";
+
+        responseObject.addProperty("status", status);
+        responseObject.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObject);
+    }
+
     public String loadAllCategories() {
         JsonObject responseObject = new JsonObject();
 
