@@ -290,7 +290,7 @@
 .user-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: white;
+    color: #000000;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
