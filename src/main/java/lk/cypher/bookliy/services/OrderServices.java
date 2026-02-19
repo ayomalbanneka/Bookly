@@ -174,4 +174,38 @@ public class OrderServices {
         responseObject.addProperty("message", message);
         return AppUtil.gson.toJson(responseObject);
     }
+
+    // Complete the order after client-side payment confirmation and verify it
+    public String completeAndVerify(String orderId) {
+        JsonObject responseObject = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        try {
+            int oId = Integer.parseInt(orderId.replaceAll(Validator.NON_DIGIT_PATTERN, ""));
+
+            try (Session hibernateSession = HibernateUtil.getSessionFactory().openSession()) {
+                Order order = hibernateSession.find(Order.class, oId);
+                if (order == null) {
+                    message = "Incorrect order details. Please check credentials!";
+                } else if (order.getStatus().getValue().equals(String.valueOf(Status.Type.COMPLETED))) {
+                    // Already completed (e.g., notify URL already processed it)
+                    status = true;
+                    message = "Order already completed.";
+                } else {
+                    // Order is still pending, complete it now
+                    completeOrder(orderId);
+                    status = true;
+                    message = "Order completed successfully.";
+                }
+            }
+        } catch (Exception e) {
+            message = "Failed to complete order: " + e.getMessage();
+            e.printStackTrace();
+        }
+
+        responseObject.addProperty("status", status);
+        responseObject.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObject);
+    }
 }

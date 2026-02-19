@@ -1378,7 +1378,7 @@ async function showOrdersAndPendingOrder(){
                 displayOrders(data.orders);
             } else {
                 if (data.message.includes('not logged in')) {
-                    window.location.href = 'login.html';
+                    window.location.href = 'sign-in.html';
                 } else {
                     new Notify({
                         status: 'error',
@@ -1466,8 +1466,7 @@ function displayOrders(orders) {
 }
 
 function viewOrder(orderId) {
-    console.log('View order:', orderId);
-    // TODO: Show order details
+    window.location.href = `invoice.html?orderId=${orderId}`;
 }
 
 function redirectToCheckout(orderId) {
