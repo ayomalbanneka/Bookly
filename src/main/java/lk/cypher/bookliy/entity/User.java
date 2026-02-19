@@ -48,6 +48,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private Set<Cart> carts = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<Wishlist> wishlists = new HashSet<>();
+
     public int getId() {
         return id;
     }
@@ -146,5 +149,13 @@ public class User extends BaseEntity {
 
     public void setCarts(Set<Cart> carts) {
         this.carts = carts;
+    }
+
+    public Set<Wishlist> getWishlists() {
+        return wishlists;
+    }
+
+    public void setWishlists(Set<Wishlist> wishlists) {
+        this.wishlists = wishlists;
     }
 }

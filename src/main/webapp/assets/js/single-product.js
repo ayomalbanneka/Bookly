@@ -1,5 +1,6 @@
 let params = new URLSearchParams(window.location.search);
 const productId = params.get("productId");
+let currentStockId = null;
 
 window.addEventListener('load', async () => {
     Notiflix.Loading.dots("Data is Loading...", {
@@ -10,6 +11,7 @@ window.addEventListener('load', async () => {
         await loadSingleProductDetails();
         await loadRelatedProducts();
         initializeQuantityControls();
+        initializeWishlistButton();
     } catch (e) {
         console.log("Error loading initial data:", e);
     } finally {
@@ -47,6 +49,12 @@ async function loadSingleProductDetails() {
             document.getElementById("language").innerHTML = product.language;
             document.getElementById("book-name").innerHTML = product.title;
             document.getElementById("description").innerHTML = product.description;
+
+            // Store stockId for wishlist
+            currentStockId = product.stockDTOList[0].stockId;
+
+            // Check if product is in wishlist
+            await checkWishlistStatus(currentStockId);
 
             const addToCartBtn = document.getElementById('add-to-cart');
             addToCartBtn.addEventListener('click', async (evt) => {
@@ -174,4 +182,115 @@ function initializeQuantityControls() {
             qtyInput.value = minValue;
         }
     });
+}
+
+// Initialize wishlist button
+function initializeWishlistButton() {
+    const wishlistBtn = document.getElementById('add-to-wishlist');
+    if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', async () => {
+            await toggleWishlist();
+        });
+    }
+}
+
+// Check if product is in wishlist
+async function checkWishlistStatus(stockId) {
+    try {
+        const response = await fetch(`api/wishlist/check?stockId=${stockId}`);
+        if (response.ok) {
+            const data = await response.json();
+            updateWishlistButton(data.inWishlist);
+        }
+    } catch (e) {
+        console.log("Error checking wishlist status:", e);
+    }
+}
+
+// Toggle wishlist (add/remove)
+async function toggleWishlist() {
+    if (!currentStockId) {
+        new Notify({
+            status: 'warning',
+            title: 'Warning',
+            text: 'Product not loaded. Please refresh the page.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch(`api/wishlist/add?stockId=${currentStockId}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                updateWishlistButton(true);
+                new Notify({
+                    status: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top'
+                });
+            } else {
+                new Notify({
+                    status: 'warning',
+                    title: 'Info',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    type: 'outline',
+                    position: 'right top'
+                });
+            }
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'Error',
+            text: 'Failed to add to wishlist. Please login first.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+        console.log("Error adding to wishlist:", e);
+    }
+}
+
+// Update wishlist button appearance
+function updateWishlistButton(isInWishlist) {
+    const wishlistBtn = document.getElementById('add-to-wishlist');
+    if (wishlistBtn) {
+        if (isInWishlist) {
+            wishlistBtn.innerHTML = '<i class="bi bi-heart-fill me-2"></i> In Wishlist';
+            wishlistBtn.classList.remove('btn-outline-primary');
+            wishlistBtn.classList.add('btn-danger');
+        } else {
+            wishlistBtn.innerHTML = '<i class="bi bi-heart me-2"></i> Wishlist';
+            wishlistBtn.classList.remove('btn-danger');
+            wishlistBtn.classList.add('btn-outline-primary');
+        }
+    }
 }

@@ -396,6 +396,7 @@ async function checkout() {
     termsNotify.style.display = 'none';
 
     const userData = {
+        isCurrentAddress: document.getElementById('showPrimaryAddress').checked,
         firstName: firstName.value,
         lastName: lastName.value,
         email: emailAddress.value,
@@ -476,7 +477,7 @@ async function checkout() {
 
 payhere.onCompleted = async function onCompleted(orderId) {
     console.log("Payment completed. OrderID:" + orderId);
-    await verifyOrder(orderId);
+    await completeAndVerifyOrder(orderId);
     // Note: validate the payment and show success or failure page to the customer
 };
 
@@ -492,6 +493,33 @@ payhere.onError = function onError(error) {
     // Note: show an error page
     console.log("Error:"  + error);
 };
+
+async function completeAndVerifyOrder(orderId) {
+    try {
+        // First, call complete-order to mark the order as COMPLETED
+        const completeResponse = await fetch(`api/orders/complete-order?orderId=${orderId}`, {
+            method: 'POST'
+        });
+        if (completeResponse.ok) {
+            const completeData = await completeResponse.json();
+            if (completeData.status) {
+                window.location = `invoice.html?orderId=${orderId}`;
+            } else {
+                Notiflix.Notify.failure(completeData.message || 'Failed to complete order.', {
+                    position: 'center-top'
+                });
+            }
+        } else {
+            Notiflix.Notify.failure('Failed to complete order.', {
+                position: 'center-top'
+            });
+        }
+    } catch (e) {
+        Notiflix.Notify.failure(e.message, {
+            position: 'center-top'
+        });
+    }
+}
 
 async function verifyOrder(orderId) {
     try {

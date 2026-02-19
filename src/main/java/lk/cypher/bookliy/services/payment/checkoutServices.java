@@ -207,14 +207,13 @@ public class checkoutServices {
             subtotal += orderItem.getStock().getPrice() * orderItem.getQty();
         }
         List<DeliveryType> deliveryTypeList = hibernateSession.createQuery("FROM DeliveryType d", DeliveryType.class).getResultList();
-        double shippingPerProduct = deliveryTypeList.isEmpty() ? 0 : deliveryTypeList.getFirst().getPrice();
-        double totalShipping = orderItems.size() * shippingPerProduct;
+        double shippingCost = deliveryTypeList.isEmpty() ? 0 : deliveryTypeList.getFirst().getPrice();
 
         // Add shipping to items description
-        items.append(", Shipping (").append(orderItems.size()).append(" products)");
+        items.append(", Shipping");
 
         // Calculate grand total
-        double amount = subtotal + totalShipping;
+        double amount = subtotal + shippingCost;
 
         String hasValue = PayHereUtil.generateHash(order_id, amount);
         PayHereDTO payHereDTO = new PayHereDTO();
