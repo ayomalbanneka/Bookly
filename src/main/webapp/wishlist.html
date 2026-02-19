@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - Bookly</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .wishlist-container {
+            padding: 40px 0;
+            min-height: 60vh;
+        }
+
+        .wishlist-header {
+            margin-bottom: 30px;
+        }
+
+        .wishlist-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .wishlist-header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .wishlist-item {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .wishlist-item:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .wishlist-item-image {
+            width: 100px;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .wishlist-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .wishlist-item-details {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .wishlist-item-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .wishlist-item-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .wishlist-item-title a:hover {
+            color: #667eea;
+        }
+
+        .wishlist-item-author {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .wishlist-item-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .wishlist-item-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .wishlist-item-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .wishlist-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-cart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: #fff;
+        }
+
+        .btn-remove {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .stock-status {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .stock-status.in-stock {
+            color: #10b981;
+        }
+
+        .stock-status.out-of-stock {
+            color: #ef4444;
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-wishlist i {
+            font-size: 80px;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .empty-wishlist h3 {
+            font-size: 1.5rem;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        .empty-wishlist p {
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+
+        .wishlist-count-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .wishlist-item-details {
+                padding: 15px 0;
+            }
+
+            .wishlist-item-actions {
+                align-items: center;
+                width: 100%;
+            }
+
+            .wishlist-item-image {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<!--Header-->
+<header class="sticky-top bg-white shadow-sm">
+    <header-content></header-content>
+</header>
+
+<!-- Wishlist Content -->
+<div class="wishlist-container">
+    <div class="container">
+        <div class="wishlist-header">
+            <h1><i class="bi bi-heart me-2"></i>My Wishlist <span class="wishlist-count-badge" id="wishlistCount">0 items</span>
+            </h1>
+            <p>Save your favorite books for later</p>
+        </div>
+
+        <div id="wishlistItems">
+            <!-- Wishlist items will be loaded here -->
+        </div>
+
+        <div id="emptyWishlist" class="empty-wishlist" style="display: none;">
+            <i class="bi bi-heart"></i>
+            <h3>Your wishlist is empty</h3>
+            <p>Browse our collection and save your favorite books!</p>
+            <a href="shop.html" class="btn btn-primary btn-lg">
+                <i class="bi bi-shop me-2"></i>Start Shopping
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer bg-dark text-white py-5">
+    <footer-content></footer-content>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Load wishlist items on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadWishlistItems();
+        await loadWishlistCount();
+    });
+
+    // Load wishlist items
+    async function loadWishlistItems() {
+        try {
+            const response = await fetch('api/wishlist/items', {
+                method: 'GET'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.status && data.wishlistItems && data.wishlistItems.length > 0) {
+                    renderWishlistItems(data.wishlistItems);
+                    document.getElementById('emptyWishlist').style.display = 'none';
+                    document.getElementById('wishlistCount').textContent = data.itemCount + ' items';
+                } else {
+                    document.getElementById('wishlistItems').innerHTML = '';
+                    document.getElementById('emptyWishlist').style.display = 'block';
+                    document.getElementById('wishlistCount').textContent = '0 items';
+                }
+            }
+        } catch (e) {
+            console.error('Error loading wishlist:', e);
+        }
+    }
+
+    // Render wishlist items
+    function renderWishlistItems(items) {
+        const container = document.getElementById('wishlistItems');
+        container.innerHTML = '';
+
+        items.forEach(item => {
+            const stockStatus = item.stock > 0
+                ? `<span class="stock-status in-stock"><i class="bi bi-check-circle me-1"></i>In Stock (${item.stock})</span>`
+                : `<span class="stock-status out-of-stock"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>`;
+
+            const itemHtml = `
+                    <div class="wishlist-item d-flex" id="wishlist-item-${item.wishlistId}">
+                        <div class="wishlist-item-image">
+                            <img src="${item.image || 'assets/images/placeholder.jpg'}" alt="${item.title}">
+                        </div>
+                        <div class="wishlist-item-details">
+                            <h5 class="wishlist-item-title">
+                                <a href="single-product.html?productId=${item.productId}">${item.title}</a>
+                            </h5>
+                            <p class="wishlist-item-author">by ${item.author}</p>
+                            <span class="wishlist-item-category">${item.category}</span>
+                            <div class="wishlist-item-price">LKR ${item.price.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                            ${stockStatus}
+                            <p class="wishlist-item-date"><i class="bi bi-clock me-1"></i>Added on ${item.addedDate}</p>
+                        </div>
+                        <div class="wishlist-item-actions">
+                            <button class="btn btn-outline-primary" onclick="moveToCart(${item.wishlistId})" ${item.stock <= 0 ? 'disabled' : ''}>
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                            <button class="btn btn-remove" onclick="removeFromWishlist(${item.wishlistId})">
+                                <i class="bi bi-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+            container.innerHTML += itemHtml;
+        });
+    }
+
+    // Remove item from wishlist
+    async function removeFromWishlist(wishlistId) {
+        try {
+            const response = await fetch(`api/wishlist/remove/${wishlistId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status) {
+                    // Remove item from DOM
+                    const itemElement = document.getElementById(`wishlist-item-${wishlistId}`);
+                    if (itemElement) {
+                        itemElement.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => {
+                            itemElement.remove();
+                            // Check if wishlist is empty
+                            if (document.getElementById('wishlistItems').children.length === 0) {
+                                document.getElementById('emptyWishlist').style.display = 'block';
+                                document.getElementById('wishlistCount').textContent = '0 items';
+                            }
+                        }, 300);
+                    }
+                    await loadWishlistCount();
+                } else {
+                    alert(data.message);
+                }
+            }
+        } catch (e) {
+            console.error('Error removing from wishlist:', e);
+        }
+    }
+
+    // Move item from wishlist to cart
+    async function moveToCart(wishlistId) {
+        try {
+            const response = await fetch(`api/wishlist/move-to-cart/${wishlistId}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status) {
+                    // Remove item from DOM
+                    const itemElement = document.getElementById(`wishlist-item-${wishlistId}`);
+                    if (itemElement) {
+                        itemElement.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => {
+                            itemElement.remove();
+                            if (document.getElementById('wishlistItems').children.length === 0) {
+                                document.getElementById('emptyWishlist').style.display = 'block';
+                                document.getElementById('wishlistCount').textContent = '0 items';
+                            }
+                        }, 300);
+                    }
+                    await loadWishlistCount();
+                    alert('Item moved to cart successfully!');
+                } else {
+                    alert(data.message);
+                }
+            }
+        } catch (e) {
+            console.error('Error moving to cart:', e);
+        }
+    }
+
+    // Load wishlist count for navigation
+    async function loadWishlistCount() {
+        try {
+            const response = await fetch('api/wishlist/count', {
+                method: 'GET'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('wishlistCountNav').textContent = data.count || 0;
+            }
+        } catch (e) {
+            console.error('Error loading wishlist count:', e);
+        }
+    }
+</script>
+
+<style>
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+    }
+</style>
+
+<script src="assets/js/header.js"></script>
+<script src="assets/js/footer.js"></script>
+</body>
+</html>
+

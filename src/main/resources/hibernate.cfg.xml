@@ -27,5 +27,6 @@
         <mapping class="lk.cypher.bookliy.entity.Stock"/>
         <mapping class="lk.cypher.bookliy.entity.Category"/>
         <mapping class="lk.cypher.bookliy.entity.Admin"/>
+        <mapping class="lk.cypher.bookliy.entity.Wishlist"/>
     </session-factory>
 </hibernate-configuration>
