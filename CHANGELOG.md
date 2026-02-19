@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/ayomalbanneka/Bookly/compare/v1.2.1...v1.3.0) (2026-02-19)
+
+
+### Features
+
+* implement order completion and verification process in checkout flow ([c0fe8fa](https://github.com/ayomalbanneka/Bookly/commit/c0fe8fa13e11f63674ee3b67278b3b219888f24d))
+
 ## [1.2.1](https://github.com/ayomalbanneka/Bookly/compare/v1.2.0...v1.2.1) (2026-01-22)
 
 
