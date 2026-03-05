@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/ayomalbanneka/Bookly/compare/v1.3.0...v1.4.0) (2026-03-05)
+
+
+### Features
+
+* add endpoint to load dashboard statistics ([fe2b335](https://github.com/ayomalbanneka/Bookly/commit/fe2b33556d960f2619689a5a4bb12ae1f2ecaf0e))
+* add order confirmation email functionality ([ab10e4b](https://github.com/ayomalbanneka/Bookly/commit/ab10e4b56067a97d6cf5155184d6b421dd141a2a))
+* add order confirmation email sending functionality ([fabcc8d](https://github.com/ayomalbanneka/Bookly/commit/fabcc8d0e539adb0d92cbc293acc61583e0f5f9c))
+* implement dashboard statistics loading functionality ([16b34dc](https://github.com/ayomalbanneka/Bookly/commit/16b34dcb0f5ff9bea0f4ab22e0302eec632a88aa))
+* refactor shipping cost calculation in invoice service ([cb46d0b](https://github.com/ayomalbanneka/Bookly/commit/cb46d0b92a1963f2b043c9ec0b40b49ff7b7b754))
+* simplify shipping cost calculation to flat rate for the entire order ([ccf539d](https://github.com/ayomalbanneka/Bookly/commit/ccf539d22a157b64d8e2ff0f863b81e558bff2b4))
+* simplify shipping cost calculation to flat rate for the entire order ([7ed8060](https://github.com/ayomalbanneka/Bookly/commit/7ed80602a87c2bf29ac113df3be0cb821cb1c085))
+
 ## [1.3.0](https://github.com/ayomalbanneka/Bookly/compare/v1.2.1...v1.3.0) (2026-02-19)
 
 
