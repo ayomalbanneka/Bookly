@@ -2,6 +2,8 @@ package lk.cypher.bookliy.services;
 
 import com.google.gson.JsonObject;
 import lk.cypher.bookliy.entity.*;
+import lk.cypher.bookliy.mail.OrderConfirmationMail;
+import lk.cypher.bookliy.provider.MailServiceProvider;
 import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
 import lk.cypher.bookliy.validation.Validator;
@@ -121,6 +123,16 @@ public class OrderServices {
                     hibernateSession.remove(cart); // completely remove from db
                 }
                 transaction.commit();
+
+                // Send order confirmation email
+                try {
+                    OrderConfirmationMail confirmationMail = new OrderConfirmationMail(order);
+                    MailServiceProvider.getInstance().sendMail(confirmationMail);
+                    System.out.println("Order confirmation email queued for order ID: " + oId);
+                } catch (Exception emailEx) {
+                    // Don't fail the order if email sending fails
+                    System.err.println("Failed to send order confirmation email for order ID: " + oId + " - " + emailEx.getMessage());
+                }
             } catch (HibernateException e) {
                 transaction.rollback();
                 throw new RuntimeException("Failed to complete order: " + e.getMessage(), e);

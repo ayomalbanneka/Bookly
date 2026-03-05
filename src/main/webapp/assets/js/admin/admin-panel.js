@@ -476,6 +476,7 @@ window.addEventListener('load', async () => {
         svgColor: "#000cf5"
     });
     try {
+        await loadDashboardStats();
         await loadCategories();
         await loadAllOrders();
         await loadAllUsers();
@@ -485,6 +486,51 @@ window.addEventListener('load', async () => {
         Notiflix.Loading.remove(1000);
     }
 })
+
+// Load Dashboard Stats
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('api/admin/data/dashboard-stats', {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                // Active Users
+                const activeUsersEl = document.getElementById('dashboard-active-users');
+                if (activeUsersEl) {
+                    activeUsersEl.textContent = Number(data.activeUsers).toLocaleString();
+                }
+
+                // Monthly Revenue
+                const monthlyRevenueEl = document.getElementById('dashboard-monthly-revenue');
+                if (monthlyRevenueEl) {
+                    monthlyRevenueEl.textContent = 'LKR ' + Number(data.monthlyRevenue).toLocaleString('en-LK', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+
+                // Today Orders
+                const todayOrdersEl = document.getElementById('dashboard-today-orders');
+                if (todayOrdersEl) {
+                    todayOrdersEl.textContent = Number(data.todayOrders).toLocaleString();
+                }
+
+                // Products in Inventory
+                const inventoryEl = document.getElementById('dashboard-inventory');
+                if (inventoryEl) {
+                    inventoryEl.textContent = Number(data.productsInInventory).toLocaleString();
+                }
+            } else {
+                console.error("Failed to load dashboard stats:", data.message);
+            }
+        }
+    } catch (e) {
+        console.error("Error loading dashboard stats:", e);
+    }
+}
 
 // Load Categories for Product Form
 async function loadCategories() {

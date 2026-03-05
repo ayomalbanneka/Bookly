@@ -10,6 +10,7 @@ import lk.cypher.bookliy.util.AppUtil;
 import lk.cypher.bookliy.util.HibernateUtil;
 import org.hibernate.Session;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -210,6 +211,91 @@ public class AdminContentServices {
         responseObj.addProperty("status", status);
         responseObj.addProperty("message", message);
 
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String loadDashboardStats() {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        Session hibernateSession = null;
+
+        try {
+            hibernateSession = HibernateUtil.getSessionFactory().openSession();
+
+            // 1. Active Users - users with ACTIVE or VERIFIED status
+            Long activeUsers = hibernateSession.createQuery(
+                            "SELECT COUNT(u) FROM User u WHERE u.status.value IN (:statuses)", Long.class)
+                    .setParameter("statuses", java.util.Arrays.asList(
+                            String.valueOf(Status.Type.ACTIVE),
+                            String.valueOf(Status.Type.VERIFIED)))
+                    .getSingleResult();
+            responseObj.addProperty("activeUsers", activeUsers != null ? activeUsers : 0);
+
+            // 2. Monthly Revenue - sum of completed orders this month
+            LocalDate now = LocalDate.now();
+            LocalDateTime monthStart = now.withDayOfMonth(1).atStartOfDay();
+            LocalDateTime monthEnd = now.plusMonths(1).withDayOfMonth(1).atStartOfDay();
+
+            List<Order> completedOrdersThisMonth = hibernateSession.createQuery(
+                            "FROM Order o WHERE o.status.value = :status AND o.createdAt >= :monthStart AND o.createdAt < :monthEnd",
+                            Order.class)
+                    .setParameter("status", String.valueOf(Status.Type.COMPLETED))
+                    .setParameter("monthStart", monthStart)
+                    .setParameter("monthEnd", monthEnd)
+                    .getResultList();
+
+            double monthlyRevenue = 0.0;
+            for (Order order : completedOrdersThisMonth) {
+                if (order.getOrderItems() != null) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        if (item.getStock() != null) {
+                            monthlyRevenue += item.getStock().getPrice() * item.getQty();
+                        }
+                    }
+                }
+                if (order.getDeliveryType() != null && order.getDeliveryType().getPrice() != null) {
+                    monthlyRevenue += order.getDeliveryType().getPrice();
+                }
+            }
+            responseObj.addProperty("monthlyRevenue", monthlyRevenue);
+
+            // 3. Total Orders Processed Today
+            LocalDateTime todayStart = now.atStartOfDay();
+            LocalDateTime todayEnd = now.plusDays(1).atStartOfDay();
+
+            Long todayOrders = hibernateSession.createQuery(
+                            "SELECT COUNT(o) FROM Order o WHERE o.status.value = :status AND o.createdAt >= :todayStart AND o.createdAt < :todayEnd",
+                            Long.class)
+                    .setParameter("status", String.valueOf(Status.Type.COMPLETED))
+                    .setParameter("todayStart", todayStart)
+                    .setParameter("todayEnd", todayEnd)
+                    .getSingleResult();
+            responseObj.addProperty("todayOrders", todayOrders != null ? todayOrders : 0);
+
+            // 4. Products in Inventory (total stock qty across all active stocks)
+            Long totalInventory = hibernateSession.createQuery(
+                            "SELECT COALESCE(SUM(s.qty), 0) FROM Stock s WHERE s.status.value = :status", Long.class)
+                    .setParameter("status", String.valueOf(Status.Type.ACTIVE))
+                    .getSingleResult();
+            responseObj.addProperty("productsInInventory", totalInventory != null ? totalInventory : 0);
+
+            status = true;
+            message = "Dashboard stats loaded successfully.";
+
+        } catch (Exception e) {
+            status = false;
+            message = "Error loading dashboard stats: " + e.getMessage();
+            e.printStackTrace();
+        } finally {
+            if (hibernateSession != null && hibernateSession.isOpen()) {
+                hibernateSession.close();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
         return AppUtil.gson.toJson(responseObj);
     }
 

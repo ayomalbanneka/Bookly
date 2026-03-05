@@ -47,6 +47,22 @@ public class InvoiceServices {
 
                 List<InvoiceItemDTO> itemDTOS = new ArrayList<>();
                 double shippingCharges = 0;
+
+                // Calculate shipping cost (flat rate for the entire order)
+                try {
+                    DeliveryType shippingCostType = hibernateSession
+                            .createNamedQuery("DeliveryType.findByName", DeliveryType.class)
+                            .setParameter("name", "Shipping Cost")
+                            .getSingleResult();
+
+                    if (shippingCostType != null && shippingCostType.getPrice() != null) {
+                        shippingCharges = shippingCostType.getPrice();
+                    }
+                } catch (Exception e) {
+                    // Log error or use default shipping cost
+                    throw new RuntimeException("Failed to retrieve shipping cost: " + e.getMessage());
+                }
+
                 for (OrderItem orderItem : order.getOrderItems()) {
                     InvoiceItemDTO itemDTO = new InvoiceItemDTO();
                     itemDTO.setItemName(orderItem.getStock().getProduct().getTitle());
@@ -57,22 +73,6 @@ public class InvoiceServices {
                     itemDTO.setAuthors(orderItem.getStock().getProduct().getAuthor());
 
                     itemDTOS.add(itemDTO);
-
-                    // Calculate shipping cost
-                    try {
-                        DeliveryType shippingCostType = hibernateSession
-                                .createNamedQuery("DeliveryType.findByName", DeliveryType.class)
-                                .setParameter("name", "Shipping Cost")
-                                .getSingleResult();
-
-                        if (shippingCostType != null && shippingCostType.getPrice() != null) {
-                            shippingCharges += shippingCostType.getPrice();
-                        }
-                    } catch (Exception e) {
-                        // Log error or use default shipping cost
-                        throw new RuntimeException("Failed to retrieve shipping cost: " + e.getMessage());
-                    }
-
                 }
                 invoiceDTO.setShippingCharges(shippingCharges);
                 invoiceDTO.setInvoiceItemDTOList(itemDTOS);

@@ -417,9 +417,9 @@ async function loadCartItems() {
                     let totalShipping = 0;
                     const deliveryTypeList = data.deliveryTypeList;
 
-                    // Calculate shipping cost per product (each product gets one shipping charge)
+                    // Calculate shipping cost (flat rate for the entire order)
                     const shippingPerProduct = deliveryTypeList.length > 0 ? deliveryTypeList[0].price : 0;
-                    totalShipping = data.cartItems.length * shippingPerProduct;
+                    totalShipping = shippingPerProduct;
 
                     data.cartItems.forEach((item) => {
                         let itemsTotal = parseFloat(item.price) * parseInt(item.qty);
@@ -450,7 +450,8 @@ async function loadCartItems() {
                                     </div>
                                     <div class="mobile-price d-md-none">
                                         <span class="current-price">LKR 
-                                        ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)}</span>
+                                        ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(itemsTotal)}</span>
+                                        ${item.qty > 1 ? `<small class="text-muted d-block">LKR ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)} each</small>` : ''}
                                     </div>
                                 </div>
 
@@ -476,7 +477,8 @@ async function loadCartItems() {
                                         <div class="col-6 col-md-6 text-end">
                                             <div class="price-container d-none d-md-block">
                                                 <div class="current-price">LKR 
-                                                ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)}</div>
+                                                ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(itemsTotal)}</div>
+                                                ${item.qty > 1 ? `<small class="text-muted">LKR ${new Intl.NumberFormat("en-US", {minimumFractionDigits: 2}).format(item.price)} each</small>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -528,7 +530,7 @@ async function loadCartItems() {
                                 <span>LKR ${formattedSubtotal}</span>
                             </div>
                             <div class="summary-row">
-                                <span>Shipping (${data.cartItems.length} ${data.cartItems.length === 1 ? 'product' : 'products'} × LKR ${shippingPerProduct.toLocaleString('en-US', {minimumFractionDigits: 2})})</span>
+                                <span>Shipping</span>
                                 <span class="text-success">LKR ${formattedShipping}</span>
                             </div>
                             <div class="summary-divider"></div>
