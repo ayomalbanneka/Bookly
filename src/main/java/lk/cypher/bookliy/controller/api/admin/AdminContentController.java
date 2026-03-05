@@ -3,12 +3,21 @@ package lk.cypher.bookliy.controller.api.admin;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lk.cypher.bookliy.services.admin.AdminContentServices;
 
 @Path("/admin/data")
 public class AdminContentController {
+
+    @Path("/dashboard-stats")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadDashboardStats() {
+        String responseJson = new AdminContentServices().loadDashboardStats();
+        return Response.ok().entity(responseJson).build();
+    }
 
     @Path("/users")
     @GET
