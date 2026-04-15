@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/ayomalbanneka/Bookly/compare/v1.4.0...v1.5.0) (2026-04-15)
+
+
+### Features
+
+* implement Buy Now functionality with address handling and payment processing ([7ba5a2e](https://github.com/ayomalbanneka/Bookly/commit/7ba5a2ec46807369774e464e031b03f4038ce93b))
+* implement Buy Now functionality with address handling and payment processing ([630a763](https://github.com/ayomalbanneka/Bookly/commit/630a763a4d11ba67446d7553671c44ac3ad6734e))
+
 ## [1.4.0](https://github.com/ayomalbanneka/Bookly/compare/v1.3.0...v1.4.0) (2026-03-05)
 
 
