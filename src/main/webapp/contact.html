@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookly - Contact Us</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 16 16'><path fill='%230d6efd' d='M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783'/></svg>">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Simple Notify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    /* Bookly Contact Page Styles */
+
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #2e59d9;
+        --secondary-color: #6c757d;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-bg: #f8f9fc;
+        --dark-text: #5a5c69;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .navbar {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+        transform: translateY(-2px);
+    }
+
+    .navbar-nav .nav-link.active {
+        font-weight: 600;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 5px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+        color: white;
+        padding: 80px 0;
+        margin-bottom: 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.1;
+    }
+
+    .hero-section h1 {
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        animation: fadeInDown 1s ease;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        animation: fadeInUp 1s ease;
+    }
+
+    /* Contact Cards */
+    .contact-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .contact-card:hover .icon-circle {
+        transform: scale(1.1);
+    }
+
+    .icon-circle.bg-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    }
+
+    .icon-circle.bg-success {
+        background: linear-gradient(135deg, var(--success-color), #0e8e5e);
+    }
+
+    .icon-circle.bg-info {
+        background: linear-gradient(135deg, var(--info-color), #1d7a8c);
+    }
+
+    .contact-card h4 {
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Form Styles */
+    .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e1e5eb;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+    }
+
+    /* Map Container */
+    .map-container {
+        overflow: hidden;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .map-container iframe {
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .map-container:hover iframe {
+        transform: scale(1.02);
+    }
+
+    /* Store Hours */
+    .store-hours {
+        font-size: 1rem;
+    }
+
+    .store-hours .border-bottom {
+        border-color: #e1e5eb !important;
+    }
+
+    /* FAQ Section */
+    .accordion-item {
+        border: none;
+        margin-bottom: 1rem;
+        border-radius: 10px !important;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .accordion-button {
+        background-color: white;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(78, 115, 223, 0.125);
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+        filter: brightness(0) invert(1);
+    }
+
+    /* Social Section */
+    .social-section {
+        background-color: var(--light-bg);
+        border-top: 1px solid #e1e5eb;
+        border-bottom: 1px solid #e1e5eb;
+    }
+
+    .social-links .btn {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .social-links .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .social-links .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .social-links .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .social-links .btn-outline-info {
+        border-color: var(--info-color);
+        color: var(--info-color);
+    }
+
+    .social-links .btn-outline-info:hover {
+        background-color: var(--info-color);
+        color: white;
+    }
+
+    .social-links .btn-outline-danger {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .social-links .btn-outline-danger:hover {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    /* Footer */
+    footer {
+        background-color: #2c3e50 !important;
+    }
+
+    footer a:hover {
+        color: var(--primary-color) !important;
+    }
+
+    footer .input-group .form-control {
+        border: none;
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    footer .input-group .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+
+    footer .input-group .btn-primary {
+        background: var(--primary-color);
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        body {
+            padding-top: 56px;
+        }
+
+        .hero-section {
+            padding: 50px 0;
+        }
+
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+
+        .hero-section p {
+            font-size: 1rem;
+        }
+
+        .contact-card {
+            padding: 1.5rem;
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+        }
+
+        .social-links .btn {
+            margin: 0.5rem;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .accordion-button {
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .btn-lg {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .social-links .btn {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+    }
+</style>
+
+<body>
+<header class="sticky-top bg-white shadow-sm">
+    <header-content></header-content>
+</header>
+
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Get in Touch</h1>
+                <p class="lead mb-0">We'd love to hear from you! Whether you have questions about orders, need book recommendations, or just want to say hello.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Information Cards -->
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="contact-card text-center">
+                <div class="icon-circle bg-primary">
+                    <i class="fas fa-map-marker-alt fa-2x text-white"></i>
+                </div>
+                <h4 class="mt-3">Visit Us</h4>
+                <p class="text-muted">123 Book Lovers Lane<br>New York, NY 10001<br>United States</p>
+                <a href="#" class="text-primary text-decoration-none">Get Directions <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card text-center">
+                <div class="icon-circle bg-success">
+                    <i class="fas fa-phone-alt fa-2x text-white"></i>
+                </div>
+                <h4 class="mt-3">Call Us</h4>
+                <p class="text-muted mb-2">Customer Service:<br><strong class="text-dark">+1 (800) 123-4567</strong></p>
+                <p class="text-muted mb-2">Bookstore:<br><strong class="text-dark">+1 (212) 555-8900</strong></p>
+                <p class="text-muted">Mon-Fri: 9am - 6pm EST</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card text-center">
+                <div class="icon-circle bg-info">
+                    <i class="fas fa-envelope fa-2x text-white"></i>
+                </div>
+                <h4 class="mt-3">Email Us</h4>
+                <p class="text-muted mb-2">General Inquiries:<br><strong class="text-dark">hello@bookly.com</strong></p>
+                <p class="text-muted mb-2">Support:<br><strong class="text-dark">support@bookly.com</strong></p>
+                <p class="text-muted">Orders:<br><strong class="text-dark">orders@bookly.com</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Form and Map Section -->
+<div class="container mt-5 mb-5">
+    <div class="row g-4">
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="mb-4"><i class="fas fa-paper-plane text-primary me-2"></i>Send Us a Message</h3>
+                    <form id="contactForm" onsubmit="contactUs(event)">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="col-12">
+                                <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                                <select class="form-select" id="subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="order">Order Inquiry</option>
+                                    <option value="product">Product Question</option>
+                                    <option value="return">Return/Refund</option>
+                                    <option value="feedback">Feedback/Suggestion</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="message" rows="5" required placeholder="Tell us how we can help..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="newsletter">
+                                    <label class="form-check-label" for="newsletter">
+                                        Subscribe to our newsletter for book recommendations and exclusive offers
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map and Store Hours -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="mb-3"><i class="fas fa-clock text-primary me-2"></i>Store Hours</h3>
+                    <div class="store-hours">
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Monday - Friday</span>
+                            <strong>9:00 AM - 8:00 PM</strong>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Saturday</span>
+                            <strong>10:00 AM - 6:00 PM</strong>
+                        </div>
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Sunday</span>
+                            <strong>11:00 AM - 5:00 PM</strong>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span>Holidays</span>
+                            <strong class="text-danger">Closed</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="text-center mb-4"><i class="fas fa-question-circle text-primary me-2"></i>Frequently Asked Questions</h3>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    How long does shipping take?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Standard shipping typically takes 3-5 business days. Express shipping is available for 1-2 business days. International shipping may take 7-14 business days depending on location.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    What is your return policy?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    We accept returns within 30 days of purchase. Books must be in original condition. Please contact our support team to initiate a return and receive a return shipping label.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Do you offer gift cards?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! We offer digital gift cards in various denominations. They can be purchased online and are delivered via email. Perfect for book lovers!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Can I track my order?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Absolutely! Once your order ships, you'll receive a tracking number via email. You can also track your order from your account dashboard.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Social Media Section -->
+<div class="social-section py-5">
+    <div class="container text-center">
+        <h3 class="mb-4">Connect With Us</h3>
+        <p class="mb-4">Follow us on social media for book recommendations, author events, and exclusive offers</p>
+        <div class="social-links">
+            <a href="#" class="btn btn-outline-primary btn-lg mx-2"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="#" class="btn btn-outline-info btn-lg mx-2"><i class="fab fa-twitter"></i> Twitter</a>
+            <a href="#" class="btn btn-outline-danger btn-lg mx-2"><i class="fab fa-instagram"></i> Instagram</a>
+            <a href="#" class="btn btn-outline-primary btn-lg mx-2"><i class="fab fa-goodreads-g"></i> Goodreads</a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-5 mt-5">
+    <footer-content></footer-content>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="https://cdn.jsdelivr.net/npm/simple-notify/dist/simple-notify.min.js"></script>
+<script src="assets/js/footer.js" defer></script>
+<script src="assets/js/header.js" defer></script>
+<script src="assets/js/common.js" defer></script>
+</body>
+</html>

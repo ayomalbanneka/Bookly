@@ -1474,3 +1474,50 @@ function viewOrder(orderId) {
 function redirectToCheckout(orderId) {
     window.location.href = `checkout.html?orderId=${orderId}`;
 }
+
+async function contactUs(event) {
+    event.preventDefault(); // prevent page reload
+
+    // Get form values
+    const firstName = document.getElementById("firstName").value;
+    const lastName = document.getElementById("lastName").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const subject = document.getElementById("subject").value;
+    const message = document.getElementById("message").value;
+    const newsletter = document.getElementById("newsletter").checked ? "Yes" : "No";
+
+    // Web3Forms API
+    const formData = {
+        access_key: "3e949e08-2127-4c1c-b6f2-382686fc3984",
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        subject: subject,
+        message: message,
+        newsletter: newsletter
+    };
+
+     await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(formData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ Message sent successfully!");
+                document.getElementById("contactForm").reset();
+            } else {
+                alert("❌ Failed to send message. Try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("⚠️ Something went wrong!");
+        });
+}
