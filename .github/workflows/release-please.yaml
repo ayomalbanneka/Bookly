@@ -17,6 +17,6 @@ jobs:
       - name: Run Release Please
         uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.BOOKLY }}
+          token: ${{ secrets.TOKEN_GITHUB }}
           config-file: .release-please.json
           manifest-file: .release-please-manifest.json
