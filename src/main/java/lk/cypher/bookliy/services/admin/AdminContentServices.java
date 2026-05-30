@@ -58,7 +58,19 @@ public class AdminContentServices {
 
         Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
         List<Category> categoryList = hibernateSession.createQuery("from Category c", Category.class).list();
-        responseObject.add("categories", AppUtil.gson.toJsonTree(AdminContentServices.categories(categoryList)));
+        List<JsonObject> categories = new ArrayList<>();
+        for (Category category : categoryList) {
+            JsonObject categoryObject = new JsonObject();
+            categoryObject.addProperty("id", category.getId());
+            categoryObject.addProperty("name", category.getName());
+            Long productCount = hibernateSession.createQuery(
+                            "SELECT COUNT(p) FROM Product p WHERE p.category = :category", Long.class)
+                    .setParameter("category", category)
+                    .getSingleResult();
+            categoryObject.addProperty("productCount", productCount != null ? productCount : 0);
+            categories.add(categoryObject);
+        }
+        responseObject.add("categories", AppUtil.gson.toJsonTree(categories));
         hibernateSession.close();
 
         return AppUtil.gson.toJson(responseObject);
@@ -102,8 +114,16 @@ public class AdminContentServices {
                 productDTO.setProductId(product.getId());
                 productDTO.setTitle(product.getTitle());
                 productDTO.setAuthor(product.getAuthor());
+                productDTO.setCategoryId(product.getCategory().getId());
                 productDTO.setCategoryName(product.getCategory().getName());
                 productDTO.setImages(product.getImages());
+                productDTO.setIsbn(product.getIsbn());
+                productDTO.setLanguage(product.getLanguage());
+                productDTO.setPublisher(product.getPublisher());
+                productDTO.setPublishedDate(product.getPublishedDate());
+                productDTO.setPages(product.getPages());
+                productDTO.setGenre(product.getGenre());
+                productDTO.setDescription(product.getDescription());
 
                 List<StockDTO> stockDTOList = new ArrayList<>();
                 for (Stock stock : product.getStocks()) {

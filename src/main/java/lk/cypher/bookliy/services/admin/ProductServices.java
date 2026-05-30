@@ -14,6 +14,8 @@ import org.hibernate.Transaction;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class ProductServices {
 
@@ -103,6 +105,8 @@ public class ProductServices {
 
                 if (admin == null) {
                     message = "Admin not found. Please login again.";
+                } else if (!admin.getStatus().getValue().equals(String.valueOf(Status.Type.APPROVED))) {
+                    message = "Your admin account is not approved. Please contact support.";
                 } else {
                     if (!admin.getStatus().getValue().equals(String.valueOf(Status.Type.APPROVED))) {
                         message = "Your admin account is not approved. Please contact support.";
@@ -170,5 +174,175 @@ public class ProductServices {
         responseObj.addProperty("status", status);
         responseObj.addProperty("message", message);
         return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String updateProductDetails(int productId, ProductDTO productDTO, @Context HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        if (productId <= 0) {
+            message = "Invalid product Id.";
+        } else if (productDTO == null) {
+            message = "Invalid product data.";
+        } else if (productDTO.getTitle() == null || productDTO.getTitle().isBlank()) {
+            message = "Product title cannot be empty";
+        } else if (productDTO.getAuthor() == null || productDTO.getAuthor().isBlank()) {
+            message = "Product author cannot be empty";
+        } else if (productDTO.getPrice() <= 0) {
+            message = "Product price must be greater than zero";
+        } else if (productDTO.getIsbn() == null || productDTO.getIsbn().isBlank()) {
+            message = "Product ISBN cannot be empty";
+        } else if (productDTO.getLanguage() == null || productDTO.getLanguage().isBlank()) {
+            message = "Product language cannot be empty";
+        } else if (productDTO.getPublishedDate() == null || productDTO.getPublishedDate().isBlank()) {
+            message = "Published Date cannot be empty";
+        } else if (productDTO.getPublisher() == null || productDTO.getPublisher().isBlank()) {
+            message = "Product publisher cannot be empty";
+        } else if (productDTO.getStock() < 0) {
+            message = "Product quantity cannot be negative";
+        } else if (productDTO.getCategoryId() <= 0) {
+            message = "Invalid category selected. Please select a valid category.";
+        } else if (productDTO.getDescription() == null || productDTO.getDescription().isBlank()) {
+            message = "Product description cannot be empty";
+        } else {
+            HttpSession httpSession = request.getSession(false);
+            if (httpSession == null || httpSession.getAttribute("admin") == null) {
+                message = "Session is invalid. Please login again.";
+            } else {
+                Admin sessionUser = (Admin) httpSession.getAttribute("admin");
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                Admin admin = hibernateSession.createQuery("FROM Admin a WHERE a.id=:id", Admin.class)
+                        .setParameter("id", sessionUser.getId())
+                        .getSingleResultOrNull();
+
+                if (admin == null) {
+                    message = "Admin not found. Please login again.";
+                } else if (!admin.getStatus().getValue().equals(String.valueOf(Status.Type.APPROVED))) {
+                    message = "Your admin account is not approved. Please contact support.";
+                } else {
+                    Product product = hibernateSession.find(Product.class, productId);
+                    if (product == null) {
+                        message = "Product not found.";
+                    } else {
+                        Category category = hibernateSession.find(Category.class, productDTO.getCategoryId());
+                        if (category == null) {
+                            message = "Category not found. Please contact support.";
+                        } else {
+                            Transaction transaction = hibernateSession.beginTransaction();
+                            try {
+                                product.setTitle(productDTO.getTitle());
+                                product.setAuthor(productDTO.getAuthor());
+                                product.setDescription(productDTO.getDescription());
+                                product.setCategory(category);
+                                product.setIsbn(productDTO.getIsbn());
+                                product.setLanguage(productDTO.getLanguage());
+                                product.setPublisher(productDTO.getPublisher());
+                                product.setGenre(productDTO.getGenre());
+                                product.setPages(productDTO.getPages());
+                                product.setAdmin(admin);
+                                product.setPublishedDate(formatPublishedDate(productDTO.getPublishedDate()));
+
+                                Stock stock = product.getStocks().stream().findFirst().orElse(null);
+                                if (stock == null) {
+                                    stock = new Stock();
+                                    stock.setProduct(product);
+                                    Discount defaultDiscount = hibernateSession.createNamedQuery("Discount.findDefault", Discount.class)
+                                            .getSingleResult();
+                                    Status activeStatus = hibernateSession.createNamedQuery("Status.findByValue", Status.class)
+                                            .setParameter("value", Status.Type.ACTIVE.toString())
+                                            .getSingleResult();
+                                    stock.setDiscount(defaultDiscount);
+                                    stock.setStatus(activeStatus);
+                                    hibernateSession.persist(stock);
+                                }
+                                stock.setPrice(productDTO.getPrice());
+                                stock.setQty(productDTO.getStock());
+
+                                hibernateSession.merge(product);
+                                hibernateSession.merge(stock);
+                                transaction.commit();
+                                status = true;
+                                message = "Product updated successfully.";
+                            } catch (HibernateException e) {
+                                transaction.rollback();
+                                e.printStackTrace();
+                                message = "Failed to update product. Please try again.";
+                            } finally {
+                                hibernateSession.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String deleteProduct(int productId, @Context HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+
+        if (productId <= 0) {
+            message = "Invalid product Id.";
+        } else {
+            HttpSession httpSession = request.getSession(false);
+            if (httpSession == null || httpSession.getAttribute("admin") == null) {
+                message = "Session is invalid. Please login again.";
+            } else {
+                Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                Transaction transaction = hibernateSession.beginTransaction();
+                try {
+                    Product product = hibernateSession.find(Product.class, productId);
+                    if (product == null) {
+                        message = "Product not found.";
+                    } else {
+                        hibernateSession.createQuery("DELETE FROM Stock s WHERE s.product = :product")
+                                .setParameter("product", product)
+                                .executeUpdate();
+                        hibernateSession.remove(product);
+                        transaction.commit();
+                        status = true;
+                        message = "Product deleted successfully.";
+                    }
+                } catch (HibernateException e) {
+                    transaction.rollback();
+                    e.printStackTrace();
+                    message = "Failed to delete product. Please try again.";
+                } finally {
+                    hibernateSession.close();
+                }
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    private String formatPublishedDate(String publishedDate) {
+        if (publishedDate == null || publishedDate.isBlank()) {
+            return publishedDate;
+        }
+        String normalized = publishedDate.trim();
+        if (normalized.contains("T")) {
+            normalized = normalized.split("T")[0];
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+        try {
+            LocalDate parsed = LocalDate.parse(normalized);
+            return parsed.format(formatter);
+        } catch (DateTimeParseException e) {
+            try {
+                LocalDate parsed = LocalDate.parse(normalized, formatter);
+                return parsed.format(formatter);
+            } catch (DateTimeParseException ignored) {
+                return publishedDate;
+            }
+        }
     }
 }
