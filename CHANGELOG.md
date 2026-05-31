@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/ayomalbanneka/Bookly/compare/v1.5.0...v1.6.0) (2026-05-31)
+
+
+### Features
+
+* Add admin controllers, services and product APIs ([8cd2267](https://github.com/ayomalbanneka/Bookly/commit/8cd2267ea110d086d48176a1a4ac74828cf188ea))
+* Enhance address management with default address functionality and UI updates ([ff31ee1](https://github.com/ayomalbanneka/Bookly/commit/ff31ee1a3abdf3c4e3c222e8c3cffa9bb028ff30))
+
 ## [1.5.0](https://github.com/ayomalbanneka/Bookly/compare/v1.4.0...v1.5.0) (2026-04-15)
 
 
