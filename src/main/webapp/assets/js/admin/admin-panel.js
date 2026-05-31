@@ -32,9 +32,8 @@ class AdminPanel {
         const pageTitle = document.querySelector('.page-title');
         const breadcrumbActive = document.querySelector('.breadcrumb .active');
         const tabTitles = {
-            dashboard: 'Dashboard', products: 'Products', orders: 'Orders',
-            users: 'Users', analytics: 'Analytics', categories: 'Categories',
-            reviews: 'Reviews', settings: 'Settings'
+            dashboard: 'Dashboard', products: 'Books', orders: 'Orders',
+            users: 'Users', categories: 'Categories'
         };
         if (tabTitles[tabName]) {
             if (pageTitle) pageTitle.textContent = tabTitles[tabName];
@@ -220,7 +219,6 @@ class AdminPanel {
                 if (modalElement) new bootstrap.Modal(modalElement).show();
             },
             'Process Order': () => { this.switchTab('orders'); },
-            'View Reports': () => { this.switchTab('analytics'); },
             'Manage Users': () => { this.switchTab('users'); }
         };
         if (actions[action]) actions[action]();
@@ -248,9 +246,83 @@ async function loadDashboardStats() {
                 set('dashboard-monthly-revenue', 'LKR ' + Number(data.monthlyRevenue).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                 set('dashboard-today-orders', Number(data.todayOrders).toLocaleString());
                 set('dashboard-inventory', Number(data.productsInInventory).toLocaleString());
+                renderRecentActivity(data.recentActivity || []);
+                renderTopBooks(data.topBooks || []);
             }
         }
     } catch (e) { console.error("Error loading dashboard stats:", e); }
+}
+
+function renderRecentActivity(activities) {
+    const list = document.getElementById('recentActivityList');
+    if (!list) return;
+
+    if (!activities || activities.length === 0) {
+        list.innerHTML = '<p class="text-muted">No recent activity yet.</p>';
+        return;
+    }
+
+    const iconMap = {
+        ORDER: { icon: 'bi-cart-check', color: 'success' },
+        USER: { icon: 'bi-person-plus', color: 'primary' }
+    };
+
+    list.innerHTML = '';
+    activities.forEach(activity => {
+        const config = iconMap[activity.type] || { icon: 'bi-info-circle', color: 'info' };
+        const item = document.createElement('div');
+        item.className = 'activity-item';
+        item.innerHTML = `
+            <div class="activity-icon ${config.color}"><i class="bi ${config.icon}"></i></div>
+            <div class="activity-content">
+                <div class="activity-title">${activity.title || 'Activity'}</div>
+                <div class="activity-details">${activity.details || ''}</div>
+                <div class="activity-time">${formatRelativeTime(activity.timestamp)}</div>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function renderTopBooks(books) {
+    const list = document.getElementById('topBooksList');
+    if (!list) return;
+
+    if (!books || books.length === 0) {
+        list.innerHTML = '<p class="text-muted">No sales data available.</p>';
+        return;
+    }
+
+    list.innerHTML = '';
+    books.forEach((book, index) => {
+        const item = document.createElement('div');
+        item.className = 'product-item';
+        item.innerHTML = `
+            <div class="product-rank">${index + 1}</div>
+            <div class="product-info">
+                <div class="product-name">${book.title || 'Untitled'}</div>
+                <div class="product-sales">${Number(book.sales || 0).toLocaleString()} sales</div>
+            </div>
+            <div class="product-revenue">LKR ${Number(book.revenue || 0).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function formatRelativeTime(value) {
+    if (!value) return 'Just now';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    const diffMs = Date.now() - date.getTime();
+    const minutes = Math.floor(diffMs / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
 }
 
 // ===================== CATEGORIES =====================
@@ -1122,6 +1194,16 @@ document.addEventListener('DOMContentLoaded', () => {
     new OrdersManager();
     new UsersManager();
 
+    const logoutButton = document.getElementById('confirmAdminLogout');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            const modalEl = document.getElementById('adminLogoutModal');
+            const modalInstance = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+            if (modalInstance) modalInstance.hide();
+            adminSignOut();
+        });
+    }
+
     // Edit image preview
     const editImageInput = document.getElementById('editImageInput');
     if (editImageInput) {
@@ -1167,3 +1249,64 @@ window.addEventListener('load', async () => {
         Notiflix.Loading.remove(800);
     }
 });
+
+async function adminSignOut() {
+    Notiflix.Loading.dots("Signing out...", { clickToClose: true, svgColor: "#6366f1" });
+
+    try {
+        const response = await fetch('api/admin/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            new Notify({
+                status: 'success',
+                title: 'Logout Successful',
+                text: 'You have been logged out successfully.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                type: 'outline',
+                position: 'right top'
+            });
+
+            setTimeout(() => {
+                window.location.href = 'admin-sign-in.html';
+            }, 2000);
+        } else {
+            new Notify({
+                status: 'error',
+                title: 'Sign Out Failed',
+                text: 'Please try again.',
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                type: 'outline',
+                position: 'right top'
+            });
+        }
+    } catch (e) {
+        new Notify({
+            status: 'error',
+            title: 'API Error',
+            text: e.message || 'Unable to sign out.',
+            effect: 'fade',
+            speed: 300,
+            showIcon: true,
+            showCloseButton: true,
+            autoclose: true,
+            autotimeout: 3000,
+            type: 'outline',
+            position: 'right top'
+        });
+    } finally {
+        Notiflix.Loading.remove(800);
+    }
+}

@@ -41,4 +41,33 @@ public class ProfileController {
         String responseJson = new ProfileServices().addNewAddress(jsonData, request);
         return Response.ok().entity(responseJson).build();
     }
+
+    @IsUser
+    @PUT
+    @Path("/default-address")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response setDefaultAddress(String jsonData, @Context HttpServletRequest request) {
+        String responseJson = new ProfileServices().setDefaultAddress(jsonData, request);
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @IsUser
+    @PUT
+    @Path("/update-address")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateAddress(String jsonData, @Context HttpServletRequest request) {
+        String responseJson = new ProfileServices().updateAddress(jsonData, request);
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @IsUser
+    @DELETE
+    @Path("/delete-address/{addressId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteAddress(@PathParam("addressId") int addressId, @Context HttpServletRequest request) {
+        String responseJson = new ProfileServices().deleteAddress(addressId, request);
+        return Response.ok().entity(responseJson).build();
+    }
 }

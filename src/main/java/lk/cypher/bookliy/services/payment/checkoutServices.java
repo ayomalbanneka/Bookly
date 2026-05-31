@@ -120,23 +120,25 @@ public class checkoutServices {
                         if (city == null) {
                             message = "City not found. Select correct city!";
                         } else {
-                            Address existingPrimary = hibernateSession.createQuery("FROM Address a WHERE a.user=:user AND a.isPrimary=:primary", Address.class)
-                                    .setParameter("user", dbUser)
-                                    .setParameter("primary", true)
-                                    .getSingleResultOrNull();
-                            if (existingPrimary != null) {
-                                existingPrimary.setPrimary(false);
-                                hibernateSession.merge(existingPrimary);
+                            String lineOne = requestDTO.getLineOne().trim();
+                            String lineTwo = requestDTO.getLineTwo() == null ? "" : requestDTO.getLineTwo().trim();
+                            String postalCode = requestDTO.getPostalCode().trim();
+                            String mobile = requestDTO.getMobile().trim();
+
+                            Address address = findMatchingAddress(hibernateSession, dbUser, city, lineOne, lineTwo, postalCode, mobile);
+                            if (address == null) {
+                                address = new Address();
+                                address.setPrimary(true);
+                                address.setLine1(lineOne);
+                                address.setLine2(lineTwo);
+                                address.setPostalCode(postalCode);
+                                address.setMobile(mobile);
+                                address.setCity(city);
+                                address.setUser(dbUser);
+                                hibernateSession.persist(address);
                             }
-                            Address address = new Address();
-                            address.setPrimary(true);
-                            address.setLine1(requestDTO.getLineOne());
-                            address.setLine2(requestDTO.getLineTwo());
-                            address.setPostalCode(requestDTO.getPostalCode());
-                            address.setMobile(requestDTO.getMobile());
-                            address.setCity(city);
-                            address.setUser(dbUser);
-                            hibernateSession.persist(address);
+
+                            ensurePrimaryAddress(hibernateSession, dbUser, address);
 
                             Order pendingOrder = orderServices.createPendingOrder(dbUser, hibernateSession);
                             PayHereDTO paymentDetails = createPaymentDetails(hibernateSession, pendingOrder);
@@ -265,5 +267,34 @@ public class checkoutServices {
         addressDTO.setDistrictDTO(districtDTO);
         addressDTO.setCityDTO(cityDTO);
         return addressDTO;
+    }
+
+    private Address findMatchingAddress(Session session, User user, City city, String lineOne, String lineTwo, String postalCode, String mobile) {
+        return session.createQuery(
+                        "FROM Address a WHERE a.user = :user " +
+                                "AND lower(a.line1) = :lineOne " +
+                                "AND lower(coalesce(a.line2, '')) = :lineTwo " +
+                                "AND a.city = :city " +
+                                "AND a.postalCode = :postalCode " +
+                                "AND a.mobile = :mobile",
+                        Address.class)
+                .setParameter("user", user)
+                .setParameter("lineOne", lineOne.toLowerCase())
+                .setParameter("lineTwo", lineTwo.toLowerCase())
+                .setParameter("city", city)
+                .setParameter("postalCode", postalCode)
+                .setParameter("mobile", mobile)
+                .getSingleResultOrNull();
+    }
+
+    private void ensurePrimaryAddress(Session session, User user, Address selected) {
+        session.createQuery("UPDATE Address SET isPrimary = false WHERE user.id = :userId AND id <> :addressId")
+                .setParameter("userId", user.getId())
+                .setParameter("addressId", selected.getId())
+                .executeUpdate();
+        if (!selected.isPrimary()) {
+            selected.setPrimary(true);
+            session.merge(selected);
+        }
     }
 }

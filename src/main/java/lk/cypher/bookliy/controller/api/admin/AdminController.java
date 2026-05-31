@@ -27,6 +27,17 @@ public class AdminController {
         return Response.ok().entity(responseJson).build();
     }
 
+    @Path("/logout")
+    @POST
+    public Response logout(@Context HttpServletRequest request) {
+        HttpSession httpSession = request.getSession(false);
+        if (httpSession != null && httpSession.getAttribute("admin") != null) {
+            httpSession.invalidate();
+            return Response.status(Response.Status.OK).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
     @GET
     @Path("/current-logged-admin")
     @Produces(MediaType.APPLICATION_JSON)

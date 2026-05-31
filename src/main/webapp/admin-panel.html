@@ -120,17 +120,13 @@
                 <div class="nav-icon"><i class="bi bi-speedometer2"></i></div>
                 <span class="nav-text">Dashboard</span>
             </a>
-            <a href="#" class="nav-item" data-tab="analytics">
-                <div class="nav-icon"><i class="bi bi-graph-up"></i></div>
-                <span class="nav-text">Analytics</span>
-            </a>
         </div>
 
         <div class="nav-section">
             <div class="nav-label">MANAGE</div>
             <a href="#" class="nav-item" data-tab="products">
                 <div class="nav-icon"><i class="bi bi-box-seam"></i></div>
-                <span class="nav-text">Products</span>
+                <span class="nav-text">Books</span>
                 <span class="nav-badge" id="books-count"></span>
             </a>
             <a href="#" class="nav-item" data-tab="orders">
@@ -151,18 +147,6 @@
                 <div class="nav-icon"><i class="bi bi-tags"></i></div>
                 <span class="nav-text">Categories</span>
             </a>
-            <a href="#" class="nav-item" data-tab="reviews">
-                <div class="nav-icon"><i class="bi bi-star"></i></div>
-                <span class="nav-text">Reviews</span>
-            </a>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-label">SYSTEM</div>
-            <a href="#" class="nav-item" data-tab="settings">
-                <div class="nav-icon"><i class="bi bi-gear"></i></div>
-                <span class="nav-text">Settings</span>
-            </a>
         </div>
     </div>
 
@@ -177,6 +161,9 @@
             </div>
             <button class="user-menu"><i class="bi bi-three-dots"></i></button>
         </div>
+        <button class="btn btn-outline-light btn-sm w-100 mt-3" data-bs-toggle="modal" data-bs-target="#adminLogoutModal">
+            <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+        </button>
     </div>
 </nav>
 
@@ -209,7 +196,7 @@
                 <div class="divider"></div>
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
                     <i class="bi bi-plus-circle"></i>
-                    <span class="btn-text">New Product</span>
+                    <span class="btn-text">New Books</span>
                 </button>
             </div>
         </div>
@@ -256,7 +243,7 @@
                     </div>
                     <div class="stat-content">
                         <div class="stat-value" id="dashboard-inventory">--</div>
-                        <div class="stat-label">Products</div>
+                        <div class="stat-label">Books</div>
                         <div class="stat-description">In inventory</div>
                     </div>
                 </div>
@@ -289,82 +276,20 @@
                         <a href="#" class="view-all">View All</a>
                     </div>
                     <div class="card-body">
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon success"><i class="bi bi-cart-check"></i></div>
-                                <div class="activity-content">
-                                    <div class="activity-title">New Order Received</div>
-                                    <div class="activity-details">Order #BL-2024-156 • $45.99</div>
-                                    <div class="activity-time">2 min ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon primary"><i class="bi bi-person-plus"></i></div>
-                                <div class="activity-content">
-                                    <div class="activity-title">New User Registration</div>
-                                    <div class="activity-details">Sarah Johnson joined Bookly</div>
-                                    <div class="activity-time">15 min ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon warning"><i class="bi bi-star"></i></div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Product Review</div>
-                                    <div class="activity-details">"The Midnight Garden" - 5 stars</div>
-                                    <div class="activity-time">1 hour ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon info"><i class="bi bi-box"></i></div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Inventory Updated</div>
-                                    <div class="activity-details">"House of Sky Breath" restocked</div>
-                                    <div class="activity-time">2 hours ago</div>
-                                </div>
-                            </div>
+                        <div class="activity-list" id="recentActivityList">
+                            <p class="text-muted">Loading recent activity...</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="content-card">
                     <div class="card-header">
-                        <h3>Top Products</h3>
+                        <h3>Top Books</h3>
                         <a href="#" class="view-all">View All</a>
                     </div>
                     <div class="card-body">
-                        <div class="product-list">
-                            <div class="product-item">
-                                <div class="product-rank">1</div>
-                                <div class="product-info">
-                                    <div class="product-name">House of Sky Breath</div>
-                                    <div class="product-sales">124 sales</div>
-                                </div>
-                                <div class="product-revenue">$3,096</div>
-                            </div>
-                            <div class="product-item">
-                                <div class="product-rank">2</div>
-                                <div class="product-info">
-                                    <div class="product-name">The Midnight Garden</div>
-                                    <div class="product-sales">98 sales</div>
-                                </div>
-                                <div class="product-revenue">$2,450</div>
-                            </div>
-                            <div class="product-item">
-                                <div class="product-rank">3</div>
-                                <div class="product-info">
-                                    <div class="product-name">Heartland Stars</div>
-                                    <div class="product-sales">76 sales</div>
-                                </div>
-                                <div class="product-revenue">$1,900</div>
-                            </div>
-                            <div class="product-item">
-                                <div class="product-rank">4</div>
-                                <div class="product-info">
-                                    <div class="product-name">Heavenly Bodies</div>
-                                    <div class="product-sales">65 sales</div>
-                                </div>
-                                <div class="product-revenue">$1,625</div>
-                            </div>
+                        <div class="product-list" id="topBooksList">
+                            <p class="text-muted">Loading top books...</p>
                         </div>
                     </div>
                 </div>
@@ -388,13 +313,6 @@
                         </div>
                     </button>
                     <button class="action-card">
-                        <div class="action-icon warning"><i class="bi bi-graph-up"></i></div>
-                        <div class="action-content">
-                            <div class="action-title">View Reports</div>
-                            <div class="action-description">Sales analytics</div>
-                        </div>
-                    </button>
-                    <button class="action-card">
                         <div class="action-icon info"><i class="bi bi-people"></i></div>
                         <div class="action-content">
                             <div class="action-title">Manage Users</div>
@@ -408,7 +326,7 @@
         <!-- ===== PRODUCTS ===== -->
         <div class="tab-content" id="productsContent">
             <div class="content-header">
-                <h2>Products Management</h2>
+                <h2>Books Management</h2>
                 <p>Manage your book inventory, pricing, and details</p>
             </div>
 
@@ -431,7 +349,7 @@
                         <table class="table table-hover" id="productsTable">
                             <thead>
                             <tr>
-                                <th>Product</th>
+                                <th>Books</th>
                                 <th>Category</th>
                                 <th>Price</th>
                                 <th>Stock</th>
@@ -927,6 +845,27 @@
             <div class="modal-body" id="viewUserContent"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Logout Modal -->
+<div class="modal fade" id="adminLogoutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Confirm Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-box-arrow-right display-4 text-primary mb-3"></i>
+                <h5 class="mb-3">Are you sure you want to logout?</h5>
+                <p class="text-muted">You'll need to sign in again to access the admin dashboard.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmAdminLogout">Yes, Logout</button>
             </div>
         </div>
     </div>

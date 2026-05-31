@@ -128,27 +128,26 @@ public class BuyNowServices {
                                 if (city == null) {
                                     message = "City not found. Select the correct city!";
                                 } else {
-                                    // Demote existing primary
-                                    Address existingPrimary = hibernateSession.createQuery(
-                                                    "FROM Address a WHERE a.user=:user AND a.isPrimary=:primary", Address.class)
-                                            .setParameter("user", dbUser)
-                                            .setParameter("primary", true)
-                                            .getSingleResultOrNull();
-                                    if (existingPrimary != null) {
-                                        existingPrimary.setPrimary(false);
-                                        hibernateSession.merge(existingPrimary);
+                                    String lineOne = requestDTO.getLineOne().trim();
+                                    String lineTwo = requestDTO.getLineTwo() == null ? "" : requestDTO.getLineTwo().trim();
+                                    String postalCode = requestDTO.getPostalCode().trim();
+                                    String mobile = requestDTO.getMobile().trim();
+
+                                    Address matchingAddress = findMatchingAddress(hibernateSession, dbUser, city, lineOne, lineTwo, postalCode, mobile);
+                                    if (matchingAddress == null) {
+                                        matchingAddress = new Address();
+                                        matchingAddress.setPrimary(true);
+                                        matchingAddress.setLine1(lineOne);
+                                        matchingAddress.setLine2(lineTwo);
+                                        matchingAddress.setPostalCode(postalCode);
+                                        matchingAddress.setMobile(mobile);
+                                        matchingAddress.setCity(city);
+                                        matchingAddress.setUser(dbUser);
+                                        hibernateSession.persist(matchingAddress);
                                     }
 
-                                    Address newAddress = new Address();
-                                    newAddress.setPrimary(true);
-                                    newAddress.setLine1(requestDTO.getLineOne());
-                                    newAddress.setLine2(requestDTO.getLineTwo() != null ? requestDTO.getLineTwo() : "");
-                                    newAddress.setPostalCode(requestDTO.getPostalCode());
-                                    newAddress.setMobile(requestDTO.getMobile());
-                                    newAddress.setCity(city);
-                                    newAddress.setUser(dbUser);
-                                    hibernateSession.persist(newAddress);
-                                    shippingAddress = newAddress;
+                                    ensurePrimaryAddress(hibernateSession, dbUser, matchingAddress);
+                                    shippingAddress = matchingAddress;
                                 }
                             }
                         }
@@ -386,5 +385,34 @@ public class BuyNowServices {
         dto.setDistrictDTO(districtDTO);
 
         return dto;
+    }
+
+    private Address findMatchingAddress(Session session, User user, City city, String lineOne, String lineTwo, String postalCode, String mobile) {
+        return session.createQuery(
+                        "FROM Address a WHERE a.user = :user " +
+                                "AND lower(a.line1) = :lineOne " +
+                                "AND lower(coalesce(a.line2, '')) = :lineTwo " +
+                                "AND a.city = :city " +
+                                "AND a.postalCode = :postalCode " +
+                                "AND a.mobile = :mobile",
+                        Address.class)
+                .setParameter("user", user)
+                .setParameter("lineOne", lineOne.toLowerCase())
+                .setParameter("lineTwo", lineTwo.toLowerCase())
+                .setParameter("city", city)
+                .setParameter("postalCode", postalCode)
+                .setParameter("mobile", mobile)
+                .getSingleResultOrNull();
+    }
+
+    private void ensurePrimaryAddress(Session session, User user, Address selected) {
+        session.createQuery("UPDATE Address SET isPrimary = false WHERE user.id = :userId AND id <> :addressId")
+                .setParameter("userId", user.getId())
+                .setParameter("addressId", selected.getId())
+                .executeUpdate();
+        if (!selected.isPrimary()) {
+            selected.setPrimary(true);
+            session.merge(selected);
+        }
     }
 }
