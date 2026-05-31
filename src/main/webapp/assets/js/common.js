@@ -1510,14 +1510,56 @@ async function contactUs(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("✅ Message sent successfully!");
+                new Notify({
+                    status: 'success',
+                    title: 'Message Sent',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
                 document.getElementById("contactForm").reset();
             } else {
-                alert("❌ Failed to send message. Try again.");
+                new Notify({
+                    status: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    notificationsGap: null,
+                    notificationsPadding: null,
+                    type: 'outline',
+                    position: 'right top',
+                })
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("⚠️ Something went wrong!");
+            new Notify({
+                status: 'warning',
+                title: 'Error',
+                text: data.message,
+                effect: 'fade',
+                speed: 300,
+                showIcon: true,
+                showCloseButton: true,
+                autoclose: true,
+                autotimeout: 3000,
+                notificationsGap: null,
+                notificationsPadding: null,
+                type: 'outline',
+                position: 'right top',
+            })
         });
 }

@@ -48,15 +48,15 @@ class FooterContent extends HTMLElement {
                     <h5 class="fw-bold mb-3">Contact Us</h5>
                     <div class="mb-3">
                         <p class="mb-1">Email us:</p>
-                        <a href="mailto:info@bookly.com" class="text-white text-decoration-underline">info@bookly.com</a>
+                        <a href="mailto:info@bookly.lk" class="text-white text-decoration-underline">info@bookly.lk</a>
                     </div>
                     <div class="mb-3">
                         <p class="mb-1">Call us:</p>
-                        <a href="tel:+947113894655" class="text-white text-decoration-underline">+94 71 1389 4655</a>
+                        <a href="tel:+94112345678" class="text-white text-decoration-underline">+94 11 234 5678</a>
                     </div>
                     <div>
                         <p class="mb-1">Visit us:</p>
-                        <small class="text-white-50">123 Book Street, Reading City, BK 10001</small>
+                        <small class="text-white-50">No. 45, Galle Road, Colombo 03, Sri Lanka</small>
                     </div>
                 </div>
             </div>
