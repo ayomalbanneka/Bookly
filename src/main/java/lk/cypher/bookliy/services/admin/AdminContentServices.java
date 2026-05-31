@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AdminContentServices {
@@ -58,7 +59,19 @@ public class AdminContentServices {
 
         Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
         List<Category> categoryList = hibernateSession.createQuery("from Category c", Category.class).list();
-        responseObject.add("categories", AppUtil.gson.toJsonTree(AdminContentServices.categories(categoryList)));
+        List<JsonObject> categories = new ArrayList<>();
+        for (Category category : categoryList) {
+            JsonObject categoryObject = new JsonObject();
+            categoryObject.addProperty("id", category.getId());
+            categoryObject.addProperty("name", category.getName());
+            Long productCount = hibernateSession.createQuery(
+                            "SELECT COUNT(p) FROM Product p WHERE p.category = :category", Long.class)
+                    .setParameter("category", category)
+                    .getSingleResult();
+            categoryObject.addProperty("productCount", productCount != null ? productCount : 0);
+            categories.add(categoryObject);
+        }
+        responseObject.add("categories", AppUtil.gson.toJsonTree(categories));
         hibernateSession.close();
 
         return AppUtil.gson.toJson(responseObject);
@@ -102,8 +115,16 @@ public class AdminContentServices {
                 productDTO.setProductId(product.getId());
                 productDTO.setTitle(product.getTitle());
                 productDTO.setAuthor(product.getAuthor());
+                productDTO.setCategoryId(product.getCategory().getId());
                 productDTO.setCategoryName(product.getCategory().getName());
                 productDTO.setImages(product.getImages());
+                productDTO.setIsbn(product.getIsbn());
+                productDTO.setLanguage(product.getLanguage());
+                productDTO.setPublisher(product.getPublisher());
+                productDTO.setPublishedDate(product.getPublishedDate());
+                productDTO.setPages(product.getPages());
+                productDTO.setGenre(product.getGenre());
+                productDTO.setDescription(product.getDescription());
 
                 List<StockDTO> stockDTOList = new ArrayList<>();
                 for (Stock stock : product.getStocks()) {
@@ -274,12 +295,83 @@ public class AdminContentServices {
                     .getSingleResult();
             responseObj.addProperty("todayOrders", todayOrders != null ? todayOrders : 0);
 
-            // 4. Products in Inventory (total stock qty across all active stocks)
+            // 4. Products in Inventory (count distinct active products)
             Long totalInventory = hibernateSession.createQuery(
-                            "SELECT COALESCE(SUM(s.qty), 0) FROM Stock s WHERE s.status.value = :status", Long.class)
+                            "SELECT COUNT(DISTINCT s.product.id) FROM Stock s WHERE s.status.value = :status", Long.class)
                     .setParameter("status", String.valueOf(Status.Type.ACTIVE))
                     .getSingleResult();
             responseObj.addProperty("productsInInventory", totalInventory != null ? totalInventory : 0);
+
+            // 5. Recent activity (orders + users)
+            List<ActivityEntry> activityEntries = new ArrayList<>();
+
+            List<Order> recentOrders = hibernateSession.createQuery(
+                            "FROM Order o ORDER BY o.createdAt DESC", Order.class)
+                    .setMaxResults(5)
+                    .getResultList();
+            for (Order order : recentOrders) {
+                double totalAmount = 0.0;
+                if (order.getOrderItems() != null) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        if (item.getStock() != null) {
+                            totalAmount += item.getStock().getPrice() * item.getQty();
+                        }
+                    }
+                }
+                if (order.getDeliveryType() != null && order.getDeliveryType().getPrice() != null) {
+                    totalAmount += order.getDeliveryType().getPrice();
+                }
+
+                JsonObject activity = new JsonObject();
+                activity.addProperty("type", "ORDER");
+                activity.addProperty("title", "New Order Received");
+                activity.addProperty("details", "Order #" + order.getId() + " • LKR " + String.format("%.2f", totalAmount));
+                activity.addProperty("timestamp", order.getCreatedAt().toString());
+                activityEntries.add(new ActivityEntry(order.getCreatedAt(), activity));
+            }
+
+            List<User> recentUsers = hibernateSession.createQuery(
+                            "FROM User u ORDER BY u.createdAt DESC", User.class)
+                    .setMaxResults(5)
+                    .getResultList();
+            for (User user : recentUsers) {
+                String fullName = (user.getFirstName() + " " + user.getLastName()).trim();
+                JsonObject activity = new JsonObject();
+                activity.addProperty("type", "USER");
+                activity.addProperty("title", "New User Registration");
+                activity.addProperty("details", fullName + " joined Bookly");
+                activity.addProperty("timestamp", user.getCreatedAt().toString());
+                activityEntries.add(new ActivityEntry(user.getCreatedAt(), activity));
+            }
+
+            activityEntries.sort(Comparator.comparing(ActivityEntry::timestamp).reversed());
+            List<JsonObject> recentActivity = new ArrayList<>();
+            for (int i = 0; i < Math.min(activityEntries.size(), 6); i++) {
+                recentActivity.add(activityEntries.get(i).payload());
+            }
+            responseObj.add("recentActivity", AppUtil.gson.toJsonTree(recentActivity));
+
+            // 6. Top books by sales
+            List<Object[]> topBookRows = hibernateSession.createQuery(
+                            "SELECT oi.stock.product.id, oi.stock.product.title, SUM(oi.qty), SUM(oi.qty * oi.stock.price) " +
+                                    "FROM OrderItem oi WHERE oi.order.status.value = :status " +
+                                    "GROUP BY oi.stock.product.id, oi.stock.product.title " +
+                                    "ORDER BY SUM(oi.qty) DESC",
+                            Object[].class)
+                    .setParameter("status", String.valueOf(Status.Type.COMPLETED))
+                    .setMaxResults(4)
+                    .getResultList();
+
+            List<JsonObject> topBooks = new ArrayList<>();
+            for (Object[] row : topBookRows) {
+                JsonObject book = new JsonObject();
+                book.addProperty("productId", ((Number) row[0]).intValue());
+                book.addProperty("title", String.valueOf(row[1]));
+                book.addProperty("sales", row[2] != null ? ((Number) row[2]).longValue() : 0);
+                book.addProperty("revenue", row[3] != null ? ((Number) row[3]).doubleValue() : 0.0);
+                topBooks.add(book);
+            }
+            responseObj.add("topBooks", AppUtil.gson.toJsonTree(topBooks));
 
             status = true;
             message = "Dashboard stats loaded successfully.";
@@ -308,5 +400,23 @@ public class AdminContentServices {
             categories.add(categoryObject);
         }
         return categories;
+    }
+
+    private static class ActivityEntry {
+        private final LocalDateTime timestamp;
+        private final JsonObject payload;
+
+        private ActivityEntry(LocalDateTime timestamp, JsonObject payload) {
+            this.timestamp = timestamp;
+            this.payload = payload;
+        }
+
+        public LocalDateTime timestamp() {
+            return timestamp;
+        }
+
+        public JsonObject payload() {
+            return payload;
+        }
     }
 }

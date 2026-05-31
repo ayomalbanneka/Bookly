@@ -149,45 +149,83 @@ document.getElementById('saveProfileBtn').addEventListener('click', async functi
 });
 
 // Edit Address Button Click Handler (using event delegation)
-document.getElementById('addressList').addEventListener('click', function (e) {
+document.getElementById('addressList').addEventListener('click', async function (e) {
+    const setDefaultBtn = e.target.closest('.set-default');
+    if (setDefaultBtn) {
+        const addressId = setDefaultBtn.dataset.addressId;
+        setDefaultAddress(addressId);
+        return;
+    }
+
+    const deleteBtn = e.target.closest('.delete-address');
+    if (deleteBtn) {
+        const addressId = deleteBtn.dataset.addressId;
+        deleteAddress(addressId);
+        return;
+    }
+
     const editBtn = e.target.closest('.edit-address');
     if (editBtn) {
         const addressId = editBtn.dataset.addressId;
-        const addressCard = editBtn.closest('.address-card');
+        const addressData = editBtn.dataset.address ? JSON.parse(editBtn.dataset.address) : null;
 
-        // Parse address from card (in real app, fetch from API)
-        const cardBody = addressCard.querySelector('.card-body');
-        const label = cardBody.querySelector('.card-title').textContent;
-        const addressText = cardBody.querySelector('.card-text').innerHTML;
-
-        // Set the address ID
         document.getElementById('editAddressId').value = addressId;
-        document.getElementById('editAddressLabel').value = label;
+        if (addressData) {
+            await populateEditAddressForm(addressData);
+        }
 
-        // Show the modal
         editAddressModal.show();
     }
 });
 
 // Update Address Handler
 document.getElementById('updateAddressBtn').addEventListener('click', async function () {
+    const line1 = document.getElementById('editAddressLine1').value.trim();
+    const line2 = document.getElementById('editAddressLine2').value.trim();
+    const districtId = document.getElementById('editDistrictSelect').value;
+    const cityId = document.getElementById('editCitySelect').value;
+    const postalCode = document.getElementById('editPostalCode').value.trim();
+    const mobile = document.getElementById('editMobileNumber').value.trim();
+
+    if (!line1) {
+        Notiflix.Notify.failure('Address Line 1 is required.', {position: 'right-top'});
+        return;
+    }
+    if (!line2) {
+        Notiflix.Notify.failure('Address Line 2 is required.', {position: 'right-top'});
+        return;
+    }
+    if (districtId === "0" || !districtId) {
+        Notiflix.Notify.failure('Please select a district.', {position: 'right-top'});
+        return;
+    }
+    if (cityId === "0" || !cityId) {
+        Notiflix.Notify.failure('Please select a city.', {position: 'right-top'});
+        return;
+    }
+    if (!postalCode) {
+        Notiflix.Notify.failure('Postal code is required.', {position: 'right-top'});
+        return;
+    }
+    if (!mobile) {
+        Notiflix.Notify.failure('Mobile number is required.', {position: 'right-top'});
+        return;
+    }
+
     const addressData = {
-        id: document.getElementById('editAddressId').value,
-        label: document.getElementById('editAddressLabel').value,
-        fullName: document.getElementById('editFullName').value,
-        streetAddress: document.getElementById('editStreetAddress').value,
-        city: document.getElementById('editCity').value,
-        state: document.getElementById('editState').value,
-        zipCode: document.getElementById('editZipCode').value,
-        country: document.getElementById('editCountry').value,
-        phone: document.getElementById('editAddressPhone').value,
+        id: parseInt(document.getElementById('editAddressId').value, 10),
+        line1: line1,
+        line2: line2,
+        cityId: parseInt(cityId, 10),
+        postalCode: postalCode,
+        mobile: mobile,
         isDefault: document.getElementById('editSetAsDefault').checked
     };
 
     try {
         Notiflix.Loading.dots("Updating...", {svgColor: "#f5006a"});
 
-        const response = await fetch('api/addresses/update', {
+        const response = await fetch('api/profiles/update-address', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(addressData)
@@ -198,11 +236,12 @@ document.getElementById('updateAddressBtn').addEventListener('click', async func
             if (data.status) {
                 Notiflix.Notify.success('Address updated successfully!', {position: 'right-top'});
                 editAddressModal.hide();
-                // Reload addresses or update DOM
                 location.reload();
             } else {
                 Notiflix.Notify.failure(data.message, {position: 'right-top'});
             }
+        } else {
+            Notiflix.Notify.failure('Failed to update address.', {position: 'right-top'});
         }
     } catch (e) {
         Notiflix.Notify.failure('Failed to update address', {position: 'right-top'});
@@ -551,3 +590,149 @@ async function addNewAddress(event) {
         Notiflix.Loading.remove();
     }
 }
+
+async function setDefaultAddress(addressId) {
+    if (!addressId) {
+        return;
+    }
+
+    try {
+        Notiflix.Loading.dots("Updating default address...", {svgColor: "#000cf5"});
+
+        const response = await fetch('api/profiles/default-address', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({addressId: parseInt(addressId, 10)})
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                Notiflix.Notify.success('Default address updated.', {position: 'right-top'});
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                Notiflix.Notify.failure(data.message || 'Failed to update default address.', {position: 'right-top'});
+            }
+        } else {
+            Notiflix.Notify.failure('Failed to update default address. Please try again.', {position: 'right-top'});
+        }
+    } catch (e) {
+        Notiflix.Notify.failure('Failed to update default address.', {position: 'right-top'});
+    } finally {
+        Notiflix.Loading.remove();
+    }
+}
+
+async function deleteAddress(addressId) {
+    if (!addressId) {
+        return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this address?')) {
+        return;
+    }
+
+    try {
+        Notiflix.Loading.dots("Deleting address...", {svgColor: "#000cf5"});
+        const response = await fetch(`api/profiles/delete-address/${addressId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status) {
+                Notiflix.Notify.success('Address deleted.', {position: 'right-top'});
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                Notiflix.Notify.failure(data.message || 'Failed to delete address.', {position: 'right-top'});
+            }
+        } else {
+            Notiflix.Notify.failure('Failed to delete address.', {position: 'right-top'});
+        }
+    } catch (e) {
+        Notiflix.Notify.failure('Failed to delete address.', {position: 'right-top'});
+    } finally {
+        Notiflix.Loading.remove();
+    }
+}
+
+async function populateEditAddressForm(address) {
+    document.getElementById('editAddressLine1').value = address.lineOne || '';
+    document.getElementById('editAddressLine2').value = address.lineTwo || '';
+    document.getElementById('editPostalCode').value = address.postalCode || '';
+    document.getElementById('editMobileNumber').value = address.mobile || '';
+    document.getElementById('editSetAsDefault').checked = !!address.isPrimary;
+
+    await loadEditDistricts();
+    if (address.districtId) {
+        document.getElementById('editDistrictSelect').value = String(address.districtId);
+        await loadEditCities();
+    }
+    if (address.cityId) {
+        document.getElementById('editCitySelect').value = String(address.cityId);
+    }
+}
+
+async function loadEditDistricts() {
+    const districtSelect = document.getElementById('editDistrictSelect');
+    if (!districtSelect) {
+        return;
+    }
+
+    const response = await fetch('api/data/districts', {method: 'GET', credentials: 'include'});
+    if (!response.ok) {
+        return;
+    }
+    const data = await response.json();
+    districtSelect.innerHTML = `<option value="0">Select District</option>`;
+    if (data.districts && data.districts.length > 0) {
+        data.districts.forEach((district) => {
+            const option = document.createElement('option');
+            option.value = district.id;
+            option.innerHTML = district.name;
+            districtSelect.appendChild(option);
+        });
+    }
+}
+
+async function loadEditCities() {
+    const districtSelect = document.getElementById('editDistrictSelect');
+    const citySelect = document.getElementById('editCitySelect');
+    if (!districtSelect || !citySelect) {
+        return;
+    }
+
+    const selectedDistrictId = districtSelect.value;
+    if (selectedDistrictId === "0" || !selectedDistrictId) {
+        citySelect.innerHTML = `<option value="0">Select City</option>`;
+        return;
+    }
+
+    const response = await fetch(`api/data/${selectedDistrictId}/cities`, {method: 'GET', credentials: 'include'});
+    if (!response.ok) {
+        return;
+    }
+
+    const data = await response.json();
+    citySelect.innerHTML = `<option value="0">Select City</option>`;
+    if (data.cities && data.cities.length > 0) {
+        data.cities.forEach((city) => {
+            const option = document.createElement('option');
+            option.value = city.id;
+            option.innerHTML = city.name;
+            citySelect.appendChild(option);
+        });
+    }
+}
+
+const editDistrictSelect = document.getElementById('editDistrictSelect');
+if (editDistrictSelect) {
+    editDistrictSelect.addEventListener('change', loadEditCities);
+}
+

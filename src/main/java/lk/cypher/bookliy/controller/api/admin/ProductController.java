@@ -63,4 +63,22 @@ public class ProductController {
         String responseJson = productService.updateProduct(product);
         return Response.ok().entity(responseJson).build();
     }
+
+    @Path("/{productId}/update")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateProduct(@PathParam("productId") int productId, String productJson, @Context HttpServletRequest request) {
+        ProductDTO productDTO = AppUtil.gson.fromJson(productJson, ProductDTO.class);
+        String responseJson = new ProductServices().updateProductDetails(productId, productDTO, request);
+        return Response.ok().entity(responseJson).build();
+    }
+
+    @Path("/{productId}/delete")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProduct(@PathParam("productId") int productId, @Context HttpServletRequest request) {
+        String responseJson = new ProductServices().deleteProduct(productId, request);
+        return Response.ok().entity(responseJson).build();
+    }
 }

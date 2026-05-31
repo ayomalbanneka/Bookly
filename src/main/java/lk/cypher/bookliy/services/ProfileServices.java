@@ -54,6 +54,7 @@ public class ProfileServices {
             addrObj.addProperty("isPrimary", address.isPrimary());
             addrObj.addProperty("cityId", address.getCity().getId());
             addrObj.addProperty("cityName", address.getCity().getName());
+            addrObj.addProperty("districtId", address.getCity().getDistrict().getId());
             addressesArray.add(addrObj);
         }
 
@@ -255,6 +256,271 @@ public class ProfileServices {
             }
             e.printStackTrace();
             message = "Failed to add new address: " + e.getMessage();
+        } finally {
+            if (hibernateSession != null) {
+                hibernateSession.close();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String setDefaultAddress(String jsonData, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+        Session hibernateSession = null;
+        Transaction transaction = null;
+
+        try {
+            JsonObject addressJson = AppUtil.gson.fromJson(jsonData, JsonObject.class);
+            int addressId = addressJson != null && addressJson.has("addressId") ? addressJson.get("addressId").getAsInt() : 0;
+
+            if (addressId <= 0) {
+                message = "Invalid address selection.";
+            } else {
+                HttpSession httpSession = request.getSession(false);
+                if (httpSession == null) {
+                    message = "Session expired. Please login again.";
+                } else {
+                    User sessionUser = (User) httpSession.getAttribute("user");
+                    if (sessionUser == null) {
+                        message = "User not found in session. Please login again.";
+                    } else {
+                        hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                        User dbUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
+                                .setParameter("email", sessionUser.getEmail())
+                                .uniqueResult();
+
+                        if (dbUser == null) {
+                            message = "User not found in database.";
+                        } else {
+                            Address address = hibernateSession.createQuery(
+                                            "FROM Address a WHERE a.id = :addressId AND a.user = :user",
+                                            Address.class)
+                                    .setParameter("addressId", addressId)
+                                    .setParameter("user", dbUser)
+                                    .getSingleResultOrNull();
+
+                            if (address == null) {
+                                message = "Address not found.";
+                            } else {
+                                transaction = hibernateSession.beginTransaction();
+                                hibernateSession.createQuery(
+                                                "UPDATE Address SET isPrimary = false WHERE user.id = :userId AND id <> :addressId")
+                                        .setParameter("userId", dbUser.getId())
+                                        .setParameter("addressId", addressId)
+                                        .executeUpdate();
+
+                                if (!address.isPrimary()) {
+                                    address.setPrimary(true);
+                                    hibernateSession.merge(address);
+                                }
+
+                                transaction.commit();
+                                status = true;
+                                message = "Default address updated successfully.";
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            message = "Failed to update default address: " + e.getMessage();
+        } finally {
+            if (hibernateSession != null) {
+                hibernateSession.close();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String updateAddress(String jsonData, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+        Session hibernateSession = null;
+        Transaction transaction = null;
+
+        try {
+            JsonObject addressJson = AppUtil.gson.fromJson(jsonData, JsonObject.class);
+
+            int addressId = addressJson.has("id") ? addressJson.get("id").getAsInt() : 0;
+            String line1 = addressJson.has("line1") ? addressJson.get("line1").getAsString() : null;
+            String line2 = addressJson.has("line2") ? addressJson.get("line2").getAsString() : null;
+            int cityId = addressJson.has("cityId") ? addressJson.get("cityId").getAsInt() : 0;
+            String postalCode = addressJson.has("postalCode") ? addressJson.get("postalCode").getAsString() : null;
+            String mobile = addressJson.has("mobile") ? addressJson.get("mobile").getAsString() : null;
+            boolean isDefault = addressJson.has("isDefault") && addressJson.get("isDefault").getAsBoolean();
+
+            if (addressId <= 0) {
+                message = "Invalid address selection.";
+            } else if (line1 == null || line1.trim().isEmpty()) {
+                message = "Address Line 1 is required.";
+            } else if (line2 == null || line2.trim().isEmpty()) {
+                message = "Address Line 2 is required.";
+            } else if (cityId <= 0) {
+                message = "Please select a city.";
+            } else if (postalCode == null || postalCode.trim().isEmpty()) {
+                message = "Postal code is required.";
+            } else if (mobile == null || mobile.trim().isEmpty()) {
+                message = "Mobile number is required.";
+            } else if (!mobile.matches("^[0-9]{10}$")) {
+                message = "Please provide a valid 10-digit mobile number.";
+            } else {
+                HttpSession httpSession = request.getSession(false);
+                if (httpSession == null) {
+                    message = "Session expired. Please login again.";
+                } else {
+                    User sessionUser = (User) httpSession.getAttribute("user");
+                    if (sessionUser == null) {
+                        message = "User not found in session. Please login again.";
+                    } else {
+                        hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                        User dbUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
+                                .setParameter("email", sessionUser.getEmail())
+                                .uniqueResult();
+
+                        if (dbUser == null) {
+                            message = "User not found in database.";
+                        } else {
+                            Address address = hibernateSession.createQuery(
+                                            "FROM Address a WHERE a.id = :addressId AND a.user = :user",
+                                            Address.class)
+                                    .setParameter("addressId", addressId)
+                                    .setParameter("user", dbUser)
+                                    .getSingleResultOrNull();
+
+                            if (address == null) {
+                                message = "Address not found.";
+                            } else {
+                                City city = hibernateSession.find(City.class, cityId);
+                                if (city == null) {
+                                    message = "Invalid city selected.";
+                                } else {
+                                    transaction = hibernateSession.beginTransaction();
+
+                                    if (isDefault) {
+                                        hibernateSession.createQuery(
+                                                        "UPDATE Address SET isPrimary = false WHERE user.id = :userId AND id <> :addressId")
+                                                .setParameter("userId", dbUser.getId())
+                                                .setParameter("addressId", addressId)
+                                                .executeUpdate();
+                                        address.setPrimary(true);
+                                    }
+
+                                    address.setLine1(line1.trim());
+                                    address.setLine2(line2.trim());
+                                    address.setCity(city);
+                                    address.setPostalCode(postalCode.trim());
+                                    address.setMobile(mobile.trim());
+
+                                    hibernateSession.merge(address);
+                                    transaction.commit();
+
+                                    status = true;
+                                    message = "Address updated successfully.";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            message = "Failed to update address: " + e.getMessage();
+        } finally {
+            if (hibernateSession != null) {
+                hibernateSession.close();
+            }
+        }
+
+        responseObj.addProperty("status", status);
+        responseObj.addProperty("message", message);
+        return AppUtil.gson.toJson(responseObj);
+    }
+
+    public String deleteAddress(int addressId, HttpServletRequest request) {
+        JsonObject responseObj = new JsonObject();
+        boolean status = false;
+        String message = "";
+        Session hibernateSession = null;
+        Transaction transaction = null;
+
+        try {
+            if (addressId <= 0) {
+                message = "Invalid address selection.";
+            } else {
+                HttpSession httpSession = request.getSession(false);
+                if (httpSession == null) {
+                    message = "Session expired. Please login again.";
+                } else {
+                    User sessionUser = (User) httpSession.getAttribute("user");
+                    if (sessionUser == null) {
+                        message = "User not found in session. Please login again.";
+                    } else {
+                        hibernateSession = HibernateUtil.getSessionFactory().openSession();
+                        User dbUser = hibernateSession.createNamedQuery("user.getByEmail", User.class)
+                                .setParameter("email", sessionUser.getEmail())
+                                .uniqueResult();
+
+                        if (dbUser == null) {
+                            message = "User not found in database.";
+                        } else {
+                            Address address = hibernateSession.createQuery(
+                                            "FROM Address a WHERE a.id = :addressId AND a.user = :user",
+                                            Address.class)
+                                    .setParameter("addressId", addressId)
+                                    .setParameter("user", dbUser)
+                                    .getSingleResultOrNull();
+
+                            if (address == null) {
+                                message = "Address not found.";
+                            } else {
+                                transaction = hibernateSession.beginTransaction();
+
+                                boolean wasPrimary = address.isPrimary();
+                                hibernateSession.remove(address);
+
+                                if (wasPrimary) {
+                                    Address nextAddress = hibernateSession.createQuery(
+                                                    "FROM Address a WHERE a.user = :user ORDER BY a.id ASC",
+                                                    Address.class)
+                                            .setParameter("user", dbUser)
+                                            .setMaxResults(1)
+                                            .getSingleResultOrNull();
+                                    if (nextAddress != null) {
+                                        nextAddress.setPrimary(true);
+                                        hibernateSession.merge(nextAddress);
+                                    }
+                                }
+
+                                transaction.commit();
+                                status = true;
+                                message = "Address deleted successfully.";
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            message = "Failed to delete address: " + e.getMessage();
         } finally {
             if (hibernateSession != null) {
                 hibernateSession.close();
